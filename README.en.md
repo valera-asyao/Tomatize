@@ -11,7 +11,7 @@
 - When creating this project, we were inspired by services like **Habitica**, **Pou**, and **TikTok** (regarding gamification and visual style).
 - Each habit has its own progress; maintaining the pet is only possible by following your chosen habits.
 
-## Знакомьтесь, наш маскот - Помидорик!
+## Meet our mascot - Little Tomato!
 
 ![image](images/logo.png)
 
