@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Tomatize</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="profile">Профиль</string>
+    <string name="statistics">Статистика</string>
+    <string name="habits">Привычки</string>
+    <string name="mainscreen">Главный экран</string>
+    <string name="shop">Магазин</string>
+    <string name="addhabit">Добавить привычку</string>
 </resources>

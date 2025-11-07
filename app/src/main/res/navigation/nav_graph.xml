@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="ui.HomeFragment"
+        android:label="@string/mainscreen" />
+
+    <fragment
+        android:id="@+id/statisticsFragment"
+        android:name="ui.StatisticsFragment"
+        android:label="@string/statistics" />
+
+    <fragment
+        android:id="@+id/addHabitFragment"
+        android:name="ui.AddHabitFragment"
+        android:label="@string/addhabit" />
+
+    <fragment
+        android:id="@+id/shopFragment"
+        android:name="ui.ShopFragment"
+        android:label="@string/shop" />
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="ui.ProfileFragment"
+        android:label="@string/profile" />
+
+</navigation>
