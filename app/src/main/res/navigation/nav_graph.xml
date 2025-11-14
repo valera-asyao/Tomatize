@@ -15,11 +15,6 @@
         android:label="@string/statistics" />
 
     <fragment
-        android:id="@+id/addHabitFragment"
-        android:name="ui.AddHabitFragment"
-        android:label="@string/addhabit" />
-
-    <fragment
         android:id="@+id/shopFragment"
         android:name="ui.ShopFragment"
         android:label="@string/shop" />

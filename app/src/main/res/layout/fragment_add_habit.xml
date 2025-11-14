@@ -1,14 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Добавление привычки"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+    <!-- Затемненный фон -->
+    <View
+        android:id="@+id/overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000" />
 
-</FrameLayout>
+    <!-- Контент диалога -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_margin="20dp"
+        android:orientation="vertical"
+        android:background="@drawable/bg_dialog"
+        android:padding="20dp">
+
+        <!-- Заголовок -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="ДОБАВИТЬ ПРИВЫЧКУ"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/btnClose"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentEnd="true"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                 />
+
+        </RelativeLayout>
+
+        <!-- Название привычки -->
+        <EditText
+            android:id="@+id/nameEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:hint="Название привычки"
+            android:padding="20dp"
+            android:background="@drawable/bg_edittext" />
+
+        <!-- Описание привычки -->
+        <EditText
+            android:id="@+id/descriptionEditText"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginBottom="16dp"
+            android:gravity="top"
+            android:hint="Описание привычки"
+            android:padding="20dp"
+            android:background="@drawable/bg_edittext" />
+
+        <!-- Выбор типа привычки -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="ТИП ПРИВЫЧКИ"
+            android:textAlignment="center"
+            android:textSize="18sp" />
+
+        <RadioGroup
+            android:id="@+id/typeRadioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/goodRadioButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Хорошая"
+                android:textSize="14sp" />
+
+            <RadioButton
+                android:id="@+id/badRadioButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Плохая"
+                android:textSize="14sp" />
+
+        </RadioGroup>
+
+
+        <Button
+            android:id="@+id/btnAddHabit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_button"
+            android:text="ДОБАВИТЬ"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+
+</RelativeLayout>

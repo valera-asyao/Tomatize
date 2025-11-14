@@ -1,18 +1,135 @@
 package ui
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.tomatize.R
 
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
+
+    private lateinit var databaseHelper: HabitDatabaseHelper
+    private lateinit var habitsAdapter: HabitsAdapter
+    private lateinit var habitsRecyclerView: RecyclerView
+    private lateinit var emptyStateTextView: TextView
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_home, container, false)
+    ): View {
+        val view = inflater.inflate(R.layout.fragment_home, container, false)
+
+        habitsRecyclerView = view.findViewById(R.id.habitsRecyclerView)
+        emptyStateTextView = view.findViewById(R.id.emptyStateTextView)
+
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        databaseHelper = HabitDatabaseHelper(requireContext())
+        setupRecyclerView()
+        loadHabits()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Обновляем список при возврате на фрагмент
+        loadHabits()
+    }
+
+    private fun setupRecyclerView() {
+        habitsAdapter = HabitsAdapter(
+            onHabitClick = { habit ->
+                showHabitDetails(habit)
+            },
+            onCompleteClick = { habit ->
+                completeHabit(habit)
+            }
+        )
+
+        habitsRecyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = habitsAdapter
+        }
+    }
+
+    private fun loadHabits() {
+        val habits = databaseHelper.getAllHabits()
+        habitsAdapter.updateHabits(habits)
+
+        if (habits.isEmpty()) {
+            emptyStateTextView.visibility = View.VISIBLE
+            habitsRecyclerView.visibility = View.GONE
+        } else {
+            emptyStateTextView.visibility = View.GONE
+            habitsRecyclerView.visibility = View.VISIBLE
+        }
+    }
+
+    // Публичный метод для обновления списка извне
+    fun refreshHabits() {
+        loadHabits()
+    }
+
+    fun showAddHabitDialog() {
+        val dialog = AddHabitDialog()
+        dialog.setOnHabitAddedListener(this)
+        dialog.show(parentFragmentManager, "AddHabitDialog")
+    }
+
+    override fun onHabitAdded(habit: Habit) {
+        val id = databaseHelper.addHabit(habit)
+        if (id != -1L) {
+            loadHabits()
+            android.widget.Toast.makeText(
+                requireContext(),
+                "Привычка добавлена!",
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    private fun completeHabit(habit: Habit) {
+        val success = databaseHelper.completeHabit(habit.id)
+        if (success) {
+            loadHabits()
+            showCompletionMessage(habit)
+        }
+    }
+
+    private fun showCompletionMessage(habit: Habit) {
+        val message = when (habit.type) {
+            HabitType.GOOD -> "Привычка '${habit.name}' выполнена! 🔥"
+            HabitType.BAD -> "Вы удержались от '${habit.name}'! 💪"
+        }
+        android.widget.Toast.makeText(requireContext(), message, android.widget.Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showHabitDetails(habit: Habit) {
+        val message = """
+            Название: ${habit.name}
+            Описание: ${habit.description}
+            Тип: ${if (habit.type == HabitType.GOOD) "Хорошая" else "Плохая"}
+            Текущий стрик: ${habit.streakCount} дней
+            ${if (habit.lastCompleted != null) "Последнее выполнение: ${formatDate(habit.lastCompleted)}" else "Еще не выполнялась"}
+        """.trimIndent()
+
+        android.app.AlertDialog.Builder(requireContext())
+            .setTitle("Информация о привычке")
+            .setMessage(message)
+            .setPositiveButton("OK", null)
+            .show()
+    }
+
+    private fun formatDate(timestamp: Long): String {
+        return java.text.SimpleDateFormat("dd.MM.yyyy HH:mm", java.util.Locale.getDefault())
+            .format(java.util.Date(timestamp))
     }
 }
