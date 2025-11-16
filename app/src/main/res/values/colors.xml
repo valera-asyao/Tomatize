@@ -2,4 +2,8 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="good_habit_color">#4CAF50</color>
+    <color name="bad_habit_color">#F44336</color>
+    <color name="streak_color">#FF9800</color>
+    <color name="button_color">#2196F3</color>
 </resources>
