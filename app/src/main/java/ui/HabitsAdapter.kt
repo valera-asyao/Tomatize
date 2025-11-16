@@ -40,7 +40,7 @@ class HabitsAdapter(
         val habit = habits[position]
 
         holder.nameTextView.text = habit.name
-        holder.streakTextView.text = "${habit.streakCount} 🔥"
+        holder.streakTextView.text = "${habit.streakCount} дн."
 
         val color = when (habit.type) {
             HabitType.GOOD -> R.color.good_habit_color
@@ -51,8 +51,8 @@ class HabitsAdapter(
         )
 
         holder.completeButton.text = when (habit.type) {
-            HabitType.GOOD -> "Выполнено"
-            HabitType.BAD -> "Сорвался"
+            HabitType.GOOD -> "✔"
+            HabitType.BAD -> "✔"
         }
 
         holder.completeButton.setOnClickListener {

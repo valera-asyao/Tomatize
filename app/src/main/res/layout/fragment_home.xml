@@ -1,23 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F8F9FA"
     android:orientation="vertical"
     android:padding="16dp">
 
-    <TextView
-        android:id="@+id/emptyStateTextView"
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:text="Нет привычек\nПерейдите в раздел 'Добавить привычку'"
-        android:textSize="16sp"
-        android:visibility="gone" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="400dp"
+        app:cardBackgroundColor="#231F20"
+        app:cardCornerRadius="25dp"
+        app:cardElevation="4dp">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/habitsRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone" />
+        android:clipToPadding="false"
+        android:padding="8dp" />
 
-</LinearLayout>
+</androidx.cardview.widget.CardView>
+
+<TextView
+android:id="@+id/emptyStateTextView"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:gravity="center"
+android:padding="32dp"
+android:text="У вас пока нет привычек\nНажмите + чтобы добавить первую"
+android:textColor="#666666"
+android:textSize="16sp"
+android:visibility="gone" />
+
+    </LinearLayout>

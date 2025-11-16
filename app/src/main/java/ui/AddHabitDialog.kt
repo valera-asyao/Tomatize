@@ -7,8 +7,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
+import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import com.example.tomatize.R
+
 
 class AddHabitDialog : DialogFragment() {
 
@@ -36,7 +38,6 @@ class AddHabitDialog : DialogFragment() {
 
         return AlertDialog.Builder(requireContext())
             .setView(view)
-            .setTitle("Добавить привычку")
             .create()
     }
 
@@ -117,5 +118,6 @@ class AddHabitDialog : DialogFragment() {
         descriptionEditText.text?.clear()
         typeRadioGroup.clearCheck()
         nameEditText.requestFocus()
+
+        }
     }
-}

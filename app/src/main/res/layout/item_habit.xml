@@ -4,21 +4,20 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="4dp">
+    app:cardElevation="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#424242"
+        android:background="@drawable/bg_habit"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:padding="12dp">
 
 
         <View
             android:id="@+id/typeIndicatorView"
             android:layout_width="4dp"
-            android:layout_height="60dp"
+            android:layout_height="match_parent"
             android:layout_marginEnd="16dp"
             android:background="@color/good_habit_color" />
 
@@ -33,9 +32,10 @@
                 android:id="@+id/habitNameTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_regular"
                 android:text="Название привычки"
                 android:textColor="@color/white"
-                android:textSize="18sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -43,7 +43,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="0 🔥"
+                android:text="0 дн."
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -54,13 +54,11 @@
         <Button
             android:id="@+id/completeButton"
             android:layout_width="wrap_content"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:backgroundTint="@color/button_color"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:text="Выполнить"
-            android:textColor="@android:color/white" />
+            android:backgroundTint="@color/white"
+            android:text="✔"
+            android:textColor="@android:color/black" />
 
     </LinearLayout>
 
