@@ -154,4 +154,32 @@ class HabitDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
         return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
                 cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
     }
+
+    // Проверка БД на не пустоту
+    fun isDataBaseEmpty(): Boolean {
+        val db = readableDatabase;
+        val cursor = db.rawQuery("SELECT COUNT(*) FROM $TABLE_HABITS", null);
+        var count = 0;
+        cursor.use {
+            if (it.moveToFirst()){
+                count = it.getInt(0);
+            }
+        }
+        db.close();
+        return count == 0;
+    }
+
+    // Подсчёт количества привычек в БД
+    fun countHabits(): Int{
+        val db = readableDatabase;
+        val cursor = db.rawQuery("SELECT COUNT(*) FROM $TABLE_HABITS", null);
+        var count = 0;
+        cursor.use {
+            if (it.moveToFirst()){
+                count = it.getInt(0);
+            }
+        }
+        db.close();
+        return count;
+    }
 }
