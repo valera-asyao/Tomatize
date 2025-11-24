@@ -8,4 +8,6 @@
     <string name="mainscreen">Главный экран</string>
     <string name="shop">Магазин</string>
     <string name="addhabit">Добавить привычку</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>
