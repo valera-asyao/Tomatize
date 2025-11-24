@@ -6,4 +6,9 @@
     <color name="bad_habit_color">#F44336</color>
     <color name="streak_color">#FF9800</color>
     <color name="button_color">#2196F3</color>
+    <color name="light_blue_600">#FF039BE5</color>
+    <color name="light_blue_900">#FF01579B</color>
+    <color name="light_blue_A200">#FF40C4FF</color>
+    <color name="light_blue_A400">#FF00B0FF</color>
+    <color name="black_overlay">#66000000</color>
 </resources>

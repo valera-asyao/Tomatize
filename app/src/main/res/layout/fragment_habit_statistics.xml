@@ -1,0 +1,904 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="16dp"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/backButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="16dp"
+                android:background="@color/design_default_color_on_primary"
+                android:text="←"
+                android:textSize="18sp"
+                app:srcCompat="@drawable/arrow_back" />
+
+            <TextView
+                android:id="@+id/header"
+                android:layout_width="354dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:fontFamily="@font/gnf"
+                android:gravity="center"
+                android:text="HEADER"
+                android:textColor="#000000"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+            <View
+                android:layout_width="48dp"
+                android:layout_height="48dp">
+            </View>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/rounded_card"
+            android:padding="16dp"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:id="@+id/habitDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Text"
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:layout_marginBottom="8dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/rounded_card"
+            android:padding="16dp"
+            android:layout_marginBottom="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Пн"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Вт"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Ср"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Чт"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Пт"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Сб"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Вс"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:id="@+id/currentDay1"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#000000"
+                    android:layout_margin="2dp" />
+
+                <TextView
+                    android:id="@+id/currentDay2"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#000000"
+                    android:layout_margin="2dp" />
+
+                <TextView
+                    android:id="@+id/currentDay3"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#000000"
+                    android:layout_margin="2dp" />
+
+                <TextView
+                    android:id="@+id/currentDay4"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#000000"
+                    android:layout_margin="2dp" />
+
+                <TextView
+                    android:id="@+id/currentDay5"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#000000"
+                    android:layout_margin="2dp" />
+
+                <TextView
+                    android:id="@+id/currentDay6"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#000000"
+                    android:layout_margin="2dp" />
+
+                <TextView
+                    android:id="@+id/currentDay7"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:background="@color/white"
+                android:layout_marginBottom="10dp">
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp"
+                >
+
+                <TextView
+                    android:id="@+id/series"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="series"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:gravity="start"/>
+
+                <TextView
+                    android:id="@+id/record"
+                    android:layout_width="310dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="record"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:paddingRight="5dp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/rounded_card"
+            android:padding="12dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="КАЛЕНДАРЬ ВЫПОЛНЕНИЯ"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:gravity="center"
+                android:fontFamily="@font/gnf"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Дни недели для календаря -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Пн"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Вт"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Ср"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Чт"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Пт"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Сб"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Вс"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="2dp">
+
+                <TextView
+                    android:id="@+id/calDay1"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+
+                    android:layout_weight="1"
+                    android:background="@drawable/day_circle"
+                    android:text=""
+                    android:gravity="center"
+                    android:layout_margin="2dp" />
+
+                <TextView
+                    android:id="@+id/calDay2"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/day_circle"
+                    android:text=""
+                    android:gravity="center"
+                    android:layout_margin="2dp" />
+
+                <TextView
+                    android:id="@+id/calDay3"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_margin="2dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/day_circle"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/calDay4"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#000000"
+                    android:layout_margin="2dp" />
+
+                <TextView
+                    android:id="@+id/calDay5"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#000000"
+                    android:layout_margin="2dp" />
+
+                <TextView
+                    android:id="@+id/calDay6"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#000000"
+                    android:layout_margin="2dp" />
+
+                <TextView
+                    android:id="@+id/calDay7"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="2dp">
+
+                <TextView
+                    android:id="@+id/calDay8"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+
+                <TextView
+                    android:id="@+id/calDay9"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+
+                <TextView
+                    android:id="@+id/calDay10"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+
+                <TextView
+                    android:id="@+id/calDay11"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+
+                <TextView
+                    android:id="@+id/calDay12"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+
+                <TextView
+                    android:id="@+id/calDay13"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay14"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="2dp">
+
+                <TextView
+                    android:id="@+id/calDay15"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay16"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay17"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay18"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay19"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay20"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay21"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="2dp">
+
+                <TextView
+                    android:id="@+id/calDay22"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay23"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay24"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay25"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay26"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay27"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay28"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="2dp">
+
+                <TextView
+                    android:id="@+id/calDay29"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay30"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay31"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay32"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay33"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay34"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay35"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="4dp">
+
+                <TextView
+                    android:id="@+id/calDay36"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay37"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay38"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay39"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay40"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay41"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+                <TextView
+                    android:id="@+id/calDay42"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@drawable/day_circle"
+                    android:textColor="#FFFFFF"
+                    android:layout_margin="2dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>
