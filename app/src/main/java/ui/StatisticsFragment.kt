@@ -1,7 +1,6 @@
 package ui
 
 import android.content.res.ColorStateList
-import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -10,11 +9,11 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.tomatize.R
 import com.google.android.material.button.MaterialButton
+import android.widget.Toast
 
 class StatisticsFragment : Fragment() {
     private lateinit var databaseHelper: HabitDatabaseHelper
@@ -55,7 +54,7 @@ class StatisticsFragment : Fragment() {
             text = "Нет добавленных привычек"
             textSize = 20f
             gravity = Gravity.CENTER
-            setTextColor(ContextCompat.getColor(requireContext(), android.R.color.darker_gray))
+            setTextColor(getThemeColor(android.R.attr.textColorSecondary))
 
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -74,7 +73,7 @@ class StatisticsFragment : Fragment() {
             text = "Статистика"
             textSize = 18f
             gravity = Gravity.CENTER
-            setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+            setTextColor(getThemeColor(android.R.attr.textColorPrimary))
             setPadding(0, 0, 0, 32)
         }
 
@@ -113,7 +112,7 @@ class StatisticsFragment : Fragment() {
             else
                 text = "${habit.name}\n🔥 ${x} дня"
             setOnClickListener {
-                onHabitClicked(habit)
+                openHabitStatistics(habit)
             }
 
             layoutParams = LinearLayout.LayoutParams(
@@ -146,10 +145,40 @@ class StatisticsFragment : Fragment() {
         container.addView(habitButton)
     }
 
-    private fun onHabitClicked(habit: Habit) {
-        navigateToHabitStatistics(habit)
+    private fun openHabitStatistics(habit: Habit) {
+        try {
+            val habitStatisticsFragment = HabitStatisticsFragment.newInstance(habit.id)
+
+            // Проверяем, что контейнер существует
+            val containerId = R.id.nav_host_fragment
+            if (requireActivity().findViewById<View>(containerId) == null) {
+                throw IllegalStateException("Контейнер фрагментов не найден. ID: $containerId")
+            }
+
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(containerId, habitStatisticsFragment)
+                .addToBackStack("habit_statistics")
+                .commit()
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            showError("Ошибка открытия статистики: ${e.message}")
+        }
+
     }
 
-    private fun navigateToHabitStatistics(habit: Habit){
+    private fun showError(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun getThemeColor(attrRes: Int): Int {
+        return try {
+            val typedArray = requireContext().theme.obtainStyledAttributes(intArrayOf(attrRes))
+            val color = typedArray.getColor(0, ContextCompat.getColor(requireContext(), android.R.color.black))
+            typedArray.recycle()
+            color
+        } catch (e: Exception) {
+            ContextCompat.getColor(requireContext(), android.R.color.black)
+        }
     }
 }
