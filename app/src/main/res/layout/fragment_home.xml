@@ -11,17 +11,17 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginTop="400dp"
+        android:layout_marginTop="450dp"
         app:cardBackgroundColor="#231F20"
         app:cardCornerRadius="25dp"
-        app:cardElevation="4dp">
+    >
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/habitsRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:padding="8dp" />
+        android:padding="4dp" />
 
 </androidx.cardview.widget.CardView>
 

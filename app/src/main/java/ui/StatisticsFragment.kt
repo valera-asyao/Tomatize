@@ -106,11 +106,11 @@ class StatisticsFragment : Fragment() {
         val habitButton = MaterialButton(requireContext()).apply {
             val x = habit.streakCount
             if (x % 10 == 0 || x % 10 == 5 || x % 10 == 6 || x % 10 == 7 || x % 10 == 8 || x % 10 == 9 || (x in 10..20))
-                text = "${habit.name}\n🔥 ${x} дней"
+                text = "${habit.name}\n ${x} дней"
             else if (x % 10 == 1)
-                text = "${habit.name}\n🔥 ${x} день"
+                text = "${habit.name}\n ${x} день"
             else
-                text = "${habit.name}\n🔥 ${x} дня"
+                text = "${habit.name}\n ${x} дня"
             setOnClickListener {
                 openHabitStatistics(habit)
             }

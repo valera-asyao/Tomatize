@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_margin="4dp"
     android:background="@drawable/bg_habit"
     android:orientation="horizontal"
     android:padding="12dp">
@@ -27,8 +27,7 @@
             android:fontFamily="@font/montserrat_regular"
             android:text="Название привычки"
             android:textColor="@color/white"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/streakCountTextView"
@@ -37,11 +36,10 @@
             android:layout_marginTop="8dp"
             android:text="0 дн."
             android:textColor="@color/white"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textSize="16sp" />
 
     </LinearLayout>
-	
+
 	  <Space
         android:layout_width="0dp"
         android:layout_height="0dp"
