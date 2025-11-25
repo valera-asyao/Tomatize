@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -47,16 +48,40 @@ class HabitStatisticsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        setupDeleteButton()
         setupBackButton()
         loadHabitStatistics()
     }
 
     private fun setupBackButton() {
-        view?.findViewById<androidx.appcompat.widget.AppCompatImageButton>(R.id.backButton)?.setOnClickListener {
+        view?.findViewById<ImageButton>(R.id.backButton)?.setOnClickListener {
             requireActivity().supportFragmentManager.popBackStack()
         }
     }
+    private fun showDeleteConfirmation() {
+        activity?.let { context ->
+            android.app.AlertDialog.Builder(context)
+                .setTitle("Удалить привычку?")
+                .setMessage("Вы уверены, что хотите удалить эту привычку? Все данные будут безвозвратно удалены.")
+                .setPositiveButton("Удалить") { _, _ ->
+                    val success = databaseHelper.deleteHabit(habitId)
+                    if (success) {
+                        android.widget.Toast.makeText(context, "Привычка удалена", android.widget.Toast.LENGTH_SHORT).show()
+                        requireActivity().supportFragmentManager.popBackStack()
+                    } else {
+                        android.widget.Toast.makeText(context, "Ошибка при удалении", android.widget.Toast.LENGTH_SHORT).show()
+                    }
+                }
+                .setNegativeButton("Отмена", null)
+                .show()
+        }
+    }
+    private fun setupDeleteButton() {
+        view?.findViewById<ImageButton>(R.id.deleteButton)?.setOnClickListener {
+            showDeleteConfirmation()
+        }
+    }
+
 
     private fun loadHabitStatistics() {
         if (habitId == -1L) return

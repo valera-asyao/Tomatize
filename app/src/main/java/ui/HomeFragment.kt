@@ -112,6 +112,30 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         android.widget.Toast.makeText(requireContext(), message, android.widget.Toast.LENGTH_SHORT).show()
     }
 
+    private fun deleteHabit(habit: Habit) {
+        val builder = android.app.AlertDialog.Builder(requireContext())
+        builder.setTitle("Удалить привычку?")
+            .setMessage("Вы уверены, что хотите удалить '${habit.name}'? Все данные будут потеряны.")
+            .setPositiveButton("Удалить") { _, _ ->
+                val success = databaseHelper.deleteHabit(habit.id)
+                if (success) {
+                    loadHabits()
+                    android.widget.Toast.makeText(
+                        requireContext(),
+                        "Привычка удалена",
+                        android.widget.Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    android.widget.Toast.makeText(
+                        requireContext(),
+                        "Ошибка при удалении",
+                        android.widget.Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+            .setNegativeButton("Отмена", null)
+            .show()
+    }
     private fun showHabitDetails(habit: Habit) {
         val message = """
             Название: ${habit.name}
@@ -121,11 +145,22 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
             ${if (habit.lastCompleted != null) "Последнее выполнение: ${formatDate(habit.lastCompleted)}" else "Еще не выполнялась"}
         """.trimIndent()
 
-        android.app.AlertDialog.Builder(requireContext())
+        val dialog = android.app.AlertDialog.Builder(requireContext())
             .setTitle("Информация о привычке")
             .setMessage(message)
             .setPositiveButton("OK", null)
-            .show()
+            .setNeutralButton("Удалить") { _, _ ->
+                deleteHabit(habit)
+            }
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(android.app.AlertDialog.BUTTON_NEUTRAL)?.setTextColor(
+                android.graphics.Color.RED
+            )
+        }
+
+        dialog.show()
     }
 
     private fun formatDate(timestamp: Long): String {

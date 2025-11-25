@@ -234,7 +234,13 @@ class HabitDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
     fun resetHabitStreak(habitId: Long): Boolean {
         return updateHabitStreak(habitId, 0, null)
     }
-
+    fun deleteHabit(habitId:Long): Boolean{
+        val db = writableDatabase
+        db.delete(TABLE_HABIT_COMPLETIONS, "$COLUMN_HABIT_ID_FK = ?", arrayOf(habitId.toString()))
+        val rowsDeleted = db.delete(TABLE_HABITS, "$COLUMN_ID = ?", arrayOf(habitId.toString()))
+        db.close()
+        return rowsDeleted > 0
+    }
     public fun getHabitById(habitId: Long): Habit? {
         val db = readableDatabase
         val cursor = db.query(

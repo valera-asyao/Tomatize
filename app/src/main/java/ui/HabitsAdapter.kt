@@ -19,7 +19,8 @@ class HabitsAdapter(
     private var habits: List<Habit> = emptyList(),
     private val onHabitClick: (Habit) -> Unit = {},
     private val onHabitLongClick: (Habit) -> Unit = {},
-    private val onCompleteClick: (Habit) -> Unit = {}
+    private val onCompleteClick: (Habit) -> Unit = {},
+    private val onDeleteClick: (Habit) -> Unit = {}
 ) : RecyclerView.Adapter<HabitsAdapter.HabitViewHolder>() {
 
     class HabitViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
