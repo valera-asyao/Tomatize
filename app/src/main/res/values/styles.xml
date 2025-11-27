@@ -1,7 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Widget.Theme.Tomatize.ButtonBar.Fullscreen" parent="">
-        <item name="android:background">@color/black_overlay</item>
-        <item name="android:buttonBarStyle">?android:attr/buttonBarStyle</item>
+    <style name="AppTheme.Dark" parent="Theme.Material3.DayNight.NoActionBar">
+         <item name="android:textColor">@color/white</item>
+         <item name="android:textColorPrimary">@color/white</item>
+         <item name="android:textColorSecondary">@color/white</item>
+         <item name="android:windowBackground">@color/black</item>
     </style>
 </resources>
