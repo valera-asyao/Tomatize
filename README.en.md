@@ -17,7 +17,7 @@
 
 ## ⚙️ Technologies
 
-- Java
+- Kotlin
 - SQL
 
 ## 🎨 Design link
