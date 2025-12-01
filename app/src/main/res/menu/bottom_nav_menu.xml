@@ -7,12 +7,12 @@
 
     <item
         android:id="@+id/statisticsFragment"
-        android:icon="@drawable/tomato_icon"
+        android:icon="@drawable/ic_statistics"
         android:title="@string/statistics" />
 
     <item
         android:id="@+id/addHabitFragment"
-        android:icon="@drawable/ic_add"
+        android:icon="@drawable/tomato_icon"
         android:title="@string/addhabit" />
 
     <item
