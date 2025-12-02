@@ -2,6 +2,7 @@ package com.example.tomatize
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -15,6 +16,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var databaseHelper: HabitDatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Force light mode to be independent of system theme
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
