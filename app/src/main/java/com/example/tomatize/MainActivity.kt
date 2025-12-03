@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import ui.AddHabitDialog
 import ui.Habit
@@ -46,6 +45,16 @@ class MainActivity : AppCompatActivity() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             bottomNav.menu.findItem(destination.id)?.isChecked = true
         }
+    }
+
+    fun disableNavBarSelection() {
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        bottomNav?.menu?.setGroupCheckable(0, false, true)
+    }
+
+    fun enableNavBarSelection() {
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        bottomNav?.menu?.setGroupCheckable(0, true, true)
     }
 
     private fun showAddHabitDialog() {

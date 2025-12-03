@@ -4,11 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.example.tomatize.MainActivity
 import com.example.tomatize.R
 import java.util.Calendar
 
@@ -48,9 +48,15 @@ class HabitStatisticsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        (activity as? MainActivity)?.disableNavBarSelection()
         setupDeleteButton()
         setupBackButton()
         loadHabitStatistics()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        (activity as? MainActivity)?.enableNavBarSelection()
     }
 
     private fun setupBackButton() {
@@ -97,7 +103,6 @@ class HabitStatisticsFragment : Fragment() {
     }
 
     private fun showError(message: String) {
-        // Можно показать Toast или изменить интерфейс для отображения ошибки
         android.widget.Toast.makeText(requireContext(), message, android.widget.Toast.LENGTH_SHORT).show()
     }
 
