@@ -9,7 +9,8 @@
         android:id="@+id/itemIcon"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:contentDescription="item icon"/>
+        android:background="@null"
+        android:scaleType="centerInside"/>
 
     <TextView
         android:id="@+id/itemName"

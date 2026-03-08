@@ -13,9 +13,9 @@ import com.example.tomatize.UserData
 class ShopFragment : Fragment() {
 
     private val shopItems = listOf(
-        ShopItem(1, "Hat", 10, R.drawable.tomato_icon),
-        ShopItem(2, "Glasses", 15, R.drawable.tomato_icon),
-        ShopItem(3, "Mustache", 20, R.drawable.tomato_icon)
+        ShopItem(1, "Hat", 10, R.drawable.hat),
+        ShopItem(2, "Glasses", 15, R.drawable.glasses),
+        ShopItem(3, "Mustache", 20, R.drawable.mustache)
     )
 
     override fun onCreateView(
