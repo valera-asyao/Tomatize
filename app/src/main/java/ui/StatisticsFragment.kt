@@ -103,46 +103,41 @@ class StatisticsFragment : Fragment() {
     }
 
     private fun addHabitButton(container: LinearLayout, habit: Habit) {
-        val habitButton = MaterialButton(requireContext()).apply {
-            val x = habit.streakCount
-            if (x % 10 == 0 || x % 10 == 5 || x % 10 == 6 || x % 10 == 7 || x % 10 == 8 || x % 10 == 9 || (x in 10..20))
-                text = "${habit.name}\n ${x} дней"
-            else if (x % 10 == 1)
-                text = "${habit.name}\n ${x} день"
-            else
-                text = "${habit.name}\n ${x} дня"
-            setOnClickListener {
-                openHabitStatistics(habit)
-            }
+        val habitView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.item_habit_statistics, container, false)
 
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                setMargins(0, 0, 0, 16)
-            }
 
-            cornerRadius = 32;
-            textSize = 16f
-            isAllCaps = false
-            setPadding(32, 32, 32, 32)
-            elevation = 0f
+        val nameTextView = habitView.findViewById<TextView>(R.id.habitNameTextView)
+        val typeTextView = habitView.findViewById<TextView>(R.id.typeOfHabit)
+        val indicatorView = habitView.findViewById<View>(R.id.typeIndicatorView)
+        val mainItemContainer = habitView.findViewById<View>(R.id.habitItemContainer)
 
-            when (habit.type) {
-                HabitType.GOOD -> {
-                    backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.good_habit_color))
-                    setTextColor(ContextCompat.getColor(context, android.R.color.white))
-                }
-                HabitType.BAD -> {
-                    backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.bad_habit_color))
-                    setTextColor(ContextCompat.getColor(context, android.R.color.white))
-                }
-            }
-            insetTop = 0
-            insetBottom = 0
-            strokeWidth = 0
+        val x = habit.streakCount
+        val daysText = when {
+            x % 100 in 11..19 -> "$x дней"
+            x % 10 == 1 -> "$x день"
+            x % 10 in 2..4 -> "$x дня"
+            else -> "$x дней"
         }
-        container.addView(habitButton)
+
+        nameTextView.text = habit.name
+        typeTextView.text = daysText
+
+        val colorRes = if (habit.type == HabitType.GOOD) {
+            R.color.good_habit_color
+        } else {
+            R.color.bad_habit_color
+        }
+        val color = ContextCompat.getColor(requireContext(), colorRes)
+
+        indicatorView.setBackgroundColor(color)
+
+        val clickableArea = mainItemContainer ?: habitView
+        clickableArea.setOnClickListener {
+            openHabitStatistics(habit)
+        }
+
+        container.addView(habitView)
     }
 
     private fun openHabitStatistics(habit: Habit) {
