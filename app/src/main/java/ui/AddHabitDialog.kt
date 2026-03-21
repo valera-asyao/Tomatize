@@ -118,6 +118,6 @@ class AddHabitDialog : DialogFragment() {
         descriptionEditText.text?.clear()
         typeRadioGroup.clearCheck()
         nameEditText.requestFocus()
-
+        dialog?.window?.setBackgroundDrawableResource(android.R.color.transparent)
         }
     }

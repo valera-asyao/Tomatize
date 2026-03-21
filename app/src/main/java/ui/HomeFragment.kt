@@ -106,8 +106,8 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
 
     private fun showCompletionMessage(habit: Habit) {
         val message = when (habit.type) {
-            HabitType.GOOD -> "Привычка '${habit.name}' выполнена! 🔥"
-            HabitType.BAD -> "Вы удержались от '${habit.name}'! 💪"
+            HabitType.GOOD -> "Привычка '${habit.name}' выполнена!"
+            HabitType.BAD -> "Вы удержались от '${habit.name}'!"
         }
         android.widget.Toast.makeText(requireContext(), message, android.widget.Toast.LENGTH_SHORT).show()
     }

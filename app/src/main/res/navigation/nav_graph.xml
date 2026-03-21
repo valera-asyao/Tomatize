@@ -15,6 +15,15 @@
         android:label="@string/statistics" />
 
     <fragment
+        android:id="@+id/habitStatisticsFragment"
+        android:name="ui.HabitStatisticsFragment"
+        android:label="Детальная статистика">
+        <argument
+            android:name="habit_id"
+            app:argType="long" />
+    </fragment>
+
+    <fragment
         android:id="@+id/shopFragment"
         android:name="ui.ShopFragment"
         android:label="@string/shop" />
