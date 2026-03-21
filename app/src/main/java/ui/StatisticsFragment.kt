@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import com.example.tomatize.R
 import com.google.android.material.button.MaterialButton
 import android.widget.Toast
+import androidx.navigation.fragment.findNavController
 
 class StatisticsFragment : Fragment() {
     private lateinit var databaseHelper: HabitDatabaseHelper
@@ -141,25 +142,14 @@ class StatisticsFragment : Fragment() {
     }
 
     private fun openHabitStatistics(habit: Habit) {
-        try {
-            val habitStatisticsFragment = HabitStatisticsFragment.newInstance(habit.id)
-
-            // Проверяем, что контейнер существует
-            val containerId = R.id.nav_host_fragment
-            if (requireActivity().findViewById<View>(containerId) == null) {
-                throw IllegalStateException("Контейнер фрагментов не найден. ID: $containerId")
-            }
-
-            requireActivity().supportFragmentManager.beginTransaction()
-                .replace(containerId, habitStatisticsFragment)
-                .addToBackStack("habit_statistics")
-                .commit()
-
+        try {        val bundle = Bundle().apply {
+            putLong("habit_id", habit.id)
+        }
+            findNavController().navigate(R.id.habitStatisticsFragment, bundle)
         } catch (e: Exception) {
             e.printStackTrace()
             showError("Ошибка открытия статистики: ${e.message}")
         }
-
     }
 
     private fun showError(message: String) {
