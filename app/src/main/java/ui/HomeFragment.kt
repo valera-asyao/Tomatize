@@ -16,6 +16,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     private lateinit var habitsAdapter: HabitsAdapter
     private lateinit var habitsRecyclerView: RecyclerView
     private lateinit var emptyStateTextView: TextView
+    private lateinit var tvCurrencyHome: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -26,7 +27,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
 
         habitsRecyclerView = view.findViewById(R.id.habitsRecyclerView)
         emptyStateTextView = view.findViewById(R.id.emptyStateTextView)
-
+        tvCurrencyHome = view.findViewById(R.id.tvCurrencyHome)
         return view
     }
 
@@ -42,6 +43,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         super.onResume()
         // Обновляем список при возврате на фрагмент
         loadHabits()
+        updateBalanceUI()
     }
 
     private fun setupRecyclerView() {
@@ -72,7 +74,11 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
             habitsRecyclerView.visibility = View.VISIBLE
         }
     }
-
+    private fun updateBalanceUI() {
+        val prefs = requireActivity().getSharedPreferences("AppPrefs", android.content.Context.MODE_PRIVATE)
+        val balance = prefs.getInt("USER_CURRENCY", 0)
+        tvCurrencyHome.text = balance.toString()
+    }
     // Публичный метод для обновления списка извне
     fun refreshHabits() {
         loadHabits()
@@ -141,6 +147,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
                 android.widget.Toast.LENGTH_SHORT
             ).show()
         }
+        updateBalanceUI()
     }
 
     private fun showCompletionMessage(habit: Habit) {
