@@ -24,6 +24,9 @@ class ShopFragment : Fragment() {
     private var currentItems = allShopItems.toList()
     private lateinit var adapter: ShopAdapter
     private lateinit var tvCurrency: TextView
+    private lateinit var filterAll: TextView
+    private lateinit var filterHats: TextView
+    private lateinit var filterGlasses: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,24 +34,54 @@ class ShopFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val root = inflater.inflate(R.layout.fragment_shop, container, false)
+        tvCurrency = root.findViewById(R.id.tvCurrency)
+        filterAll = root.findViewById(R.id.filterAll)
+        filterHats = root.findViewById(R.id.filterHats)
+        filterGlasses = root.findViewById(R.id.filterGlasses)
         val btnCheat = root.findViewById<Button>(R.id.btnCheatCode)
+        val recyclerView = root.findViewById<RecyclerView>(R.id.shop_recycler)
         btnCheat.setOnClickListener {
-            val prefs = requireActivity().getSharedPreferences("AppPrefs", android.content.Context.MODE_PRIVATE)
+            val prefs = requireActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
             val currentBalance = prefs.getInt("USER_CURRENCY", 0)
             prefs.edit().putInt("USER_CURRENCY", currentBalance + 5000).apply()
             updateBalanceUI()
-            android.widget.Toast.makeText(requireContext(), "Вы читер!", android.widget.Toast.LENGTH_SHORT).show()
+            android.widget.Toast.makeText(requireContext(), "Валюта начислена! ✨", android.widget.Toast.LENGTH_SHORT).show()
         }
-        tvCurrency = root.findViewById(R.id.tvCurrency)
-        updateBalanceUI()
-        val recyclerView = root.findViewById<RecyclerView>(R.id.shop_recycler)
-        recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
-        adapter = ShopAdapter(currentItems) { item ->
+        adapter = ShopAdapter(allShopItems) { item ->
             handlePurchase(item)
         }
+        recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
         recyclerView.adapter = adapter
-        setupFilters(root)
+
+        setupFilters()
+        updateBalanceUI()
+        updateFilterVisuals(filterAll)
+
         return root
+    }
+    private fun setupFilters() {
+        filterAll.setOnClickListener {
+            adapter.updateItems(allShopItems)
+            updateFilterVisuals(filterAll)
+        }
+        filterHats.setOnClickListener {
+            adapter.updateItems(allShopItems.filter { it.type == "hat" })
+            updateFilterVisuals(filterHats)
+        }
+        filterGlasses.setOnClickListener {
+            adapter.updateItems(allShopItems.filter { it.type == "glasses" })
+            updateFilterVisuals(filterGlasses)
+        }
+    }
+    private fun updateFilterVisuals(selectedView: TextView) {
+        val filters = listOf(filterAll, filterHats, filterGlasses)
+        filters.forEach { textView ->
+            if (textView == selectedView) {
+                textView.setBackgroundResource(R.drawable.bg_pill_red) // Активный - красный
+            } else {
+                textView.setBackgroundResource(R.drawable.bg_pill_dark) // Неактивный - темный
+            }
+        }
     }
 
     private fun handlePurchase(item: ShopItem) {
