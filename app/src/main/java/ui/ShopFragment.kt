@@ -16,7 +16,7 @@ import com.example.tomatize.ShopItem
 
 class ShopFragment : Fragment() {
     private val allShopItems = listOf(
-        ShopItem(1, "шляпа\nковбоя", 500, R.drawable.hat, "hat"),
+        ShopItem(1, "шляпа\nповара", 500, R.drawable.hat, "hat"),
         ShopItem(2, "очки\nкрутые", 300, R.drawable.glasses, "glasses"),
         ShopItem(3, "усы\nмодные", 200, R.drawable.mustache, "other")
     )

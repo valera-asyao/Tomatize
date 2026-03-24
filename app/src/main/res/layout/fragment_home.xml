@@ -51,17 +51,32 @@
                 android:textSize="14sp" />
         </LinearLayout>
     </RelativeLayout>
-    <ImageView
-        android:id="@+id/imageView"
+
+    <!-- Mascot Area with Overlays -->
+    <FrameLayout
+        android:id="@+id/mascotContainerHome"
         android:layout_width="match_parent"
-        android:layout_height="380sp"
-        app:srcCompat="@drawable/tomagochi" />
+        android:layout_height="380dp">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/tomagochi" />
+
+        <ImageView
+            android:id="@+id/accessory_overlay_home"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+    </FrameLayout>
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-
         app:cardBackgroundColor="#231F20"
         app:cardCornerRadius="25dp">
 
