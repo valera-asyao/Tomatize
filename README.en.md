@@ -15,7 +15,9 @@
 
 ## Meet our mascot - Little Tomato!
 
-![image](images/logo.png)
+<p align="center">
+  <img src="images/logo.png" width="250" title="">
+</p>
 
 ## ⚙️ Technologies
 
