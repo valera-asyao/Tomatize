@@ -2,14 +2,16 @@
 
 * [***Русская версия***](README.md)
 
-**Tomatize** is a habit tracker app with Tamagotchi-style gameplay.
+**Tomatize** is a modern Android habit tracker with Tamagotchi elements that turns self-improvement into an engaging game.
 
-## 📲 Description
+## 📲 Description and Features
 
-- Helps you track good and bad habits in a game-like format: take care of a virtual pet by keeping up with your habits.
-- Earn daily rewards for consistent habit tracking (Daily Reward).
-- When creating this project, we were inspired by services like **Habitica**, **Pou**, and **TikTok** (regarding gamification and visual style).
-- Each habit has its own progress; maintaining the pet is only possible by following your chosen habits.
+- **Habit Gamification**: Helps you track good and bad habits in a game-like format. Take care of your virtual pet — Little Tomato — by completing tasks in real life.
+- **Accessory Shop**: Earn in-game currency and buy cool items for your pet (hats, glasses, and other accessories).
+- **Detailed Statistics**: Track your progress with dedicated screens. Visual charts, completion calendars, and streak history help you stay motivated.
+- **Reward System**: Earn daily rewards for consistent habit tracking and app usage.
+- **Inspiration**: This project was inspired by services like **Habitica**, **Pou**, and **TikTok** (in terms of gamification and visual approach).
+- **Growth**: Each habit has its own progress, and your pet's development depends entirely on following your chosen habits.
 
 ## Meet our mascot - Little Tomato!
 
@@ -17,8 +19,9 @@
 
 ## ⚙️ Technologies
 
-- Kotlin
-- SQL
+- **Language**: Kotlin
+- **DB**: SQLite / SQL (for reliable local data storage)
+- **Architecture**: Android Jetpack (Navigation, Fragments)
 
 ## 🎨 Design link
 
