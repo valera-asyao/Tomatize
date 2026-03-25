@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="#F8F9FA">
 
-    <ImageView
+    <!-- <ImageView
         android:id="@+id/settings_icon"
         android:layout_width="56dp"
         android:layout_height="56dp"
@@ -18,7 +18,7 @@
         android:focusable="true"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:contentDescription="Settings" />
+        android:contentDescription="Settings" /> -->
 
     <TextView
         android:layout_width="wrap_content"

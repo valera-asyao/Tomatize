@@ -18,14 +18,17 @@ class ProfileFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
         
+        /* 
         val settingsIcon = view.findViewById<ImageView>(R.id.settings_icon)
         settingsIcon.setOnClickListener {
             showSettingsMenu(it)
         }
+        */
         
         return view
     }
 
+    /*
     private fun showSettingsMenu(view: View) {
         val popup = PopupMenu(requireContext(), view)
         popup.menu.add(0, 1, 0, "Toggle Theme")
@@ -46,4 +49,5 @@ class ProfileFragment : Fragment() {
         }
         popup.show()
     }
+    */
 }
