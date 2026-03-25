@@ -52,6 +52,44 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         updateBalanceUI()
     }
 
+    // Функция для проверки лимитов и выдачи награды
+    private fun checkAndAwardCurrency(habitId: Long) {
+        val prefs = requireActivity().getSharedPreferences("AppPrefs", android.content.Context.MODE_PRIVATE)
+        val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+        val currentDate = sdf.format(java.util.Date())
+
+        val lastRewardDate = prefs.getString("LAST_REWARD_DATE", "")
+        var rewardedHabits = prefs.getString("REWARDED_HABITS_TODAY", "")?.split(",")?.toMutableList() ?: mutableListOf()
+        if (currentDate != lastRewardDate) {
+            rewardedHabits = mutableListOf()
+            prefs.edit().putString("LAST_REWARD_DATE", currentDate).apply()
+        }
+        if (rewardedHabits.contains(habitId.toString())) {
+            return
+        }
+        if (rewardedHabits.size < 3) {
+            val currentBalance = prefs.getInt("USER_CURRENCY", 0)
+            val rewardAmount = 50
+            rewardedHabits.add(habitId.toString())
+            val newList = rewardedHabits.joinToString(",")
+            prefs.edit()
+                .putInt("USER_CURRENCY", currentBalance + rewardAmount)
+                .putString("REWARDED_HABITS_TODAY", newList)
+                .apply()
+            android.widget.Toast.makeText(
+                requireContext(),
+                "Награда $rewardAmount \uD83C\uDF45! (${rewardedHabits.size}/3)",
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+        } else {
+            android.widget.Toast.makeText(
+                requireContext(),
+                "Лимит наград на сегодня исчерпан",
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
     private fun updateBalanceUI() {
         val prefs = requireActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
         val balance = prefs.getInt("USER_CURRENCY", 0)
@@ -131,6 +169,8 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         if (success) {
             loadHabits()
             showCompletionMessage(habit)
+            checkAndAwardCurrency(habit.id);
+            updateBalanceUI();
         }
     }
 
