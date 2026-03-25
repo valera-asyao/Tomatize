@@ -12,7 +12,7 @@
 
     <item
         android:id="@+id/addHabitFragment"
-        android:icon="@drawable/tomato_icon"
+        android:icon="@drawable/ic_add"
         android:title="@string/addhabit" />
 
     <item
