@@ -1,18 +1,15 @@
 package ui
 
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.tomatize.R
-import com.google.android.material.button.MaterialButton
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 
@@ -53,15 +50,18 @@ class StatisticsFragment : Fragment() {
     private fun showEmptyState() {
         val emptyText = TextView(requireContext()).apply {
             text = "Нет добавленных привычек"
-            textSize = 20f
+            textSize = 18f
             gravity = Gravity.CENTER
             setTextColor(getThemeColor(android.R.attr.textColorSecondary))
+            try {
+                typeface = resources.getFont(R.font.gnf)
+            } catch (e: Exception) {}
 
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
+                LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                gravity = Gravity.CENTER
+                setMargins(0, 100, 0, 0)
             }
         }
         mainContainer.addView(emptyText)
@@ -70,37 +70,11 @@ class StatisticsFragment : Fragment() {
     private fun showHabitsList() {
         val habits = databaseHelper.getAllHabits()
 
-        val headerText = TextView(requireContext()).apply {
-            text = "Статистика"
-            textSize = 18f
-            gravity = Gravity.CENTER
-            setTextColor(getThemeColor(android.R.attr.textColorPrimary))
-            setPadding(0, 0, 0, 32)
-        }
-
-        mainContainer.addView(headerText)
-
-        val habitsContainer = LinearLayout(requireContext()).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            orientation = LinearLayout.VERTICAL
-        }
+        // Header is now in fragment_statistics.xml to match Shop fragment
 
         habits.forEach { habit ->
-            addHabitButton(habitsContainer, habit)
+            addHabitButton(mainContainer, habit)
         }
-
-        val scrollView = ScrollView(requireContext()).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
-            )
-        }
-
-        scrollView.addView(habitsContainer)
-        mainContainer.addView(scrollView)
     }
 
     private fun addHabitButton(container: LinearLayout, habit: Habit) {
@@ -142,9 +116,10 @@ class StatisticsFragment : Fragment() {
     }
 
     private fun openHabitStatistics(habit: Habit) {
-        try {        val bundle = Bundle().apply {
-            putLong("habit_id", habit.id)
-        }
+        try {
+            val bundle = Bundle().apply {
+                putLong("habit_id", habit.id)
+            }
             findNavController().navigate(R.id.habitStatisticsFragment, bundle)
         } catch (e: Exception) {
             e.printStackTrace()
