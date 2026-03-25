@@ -1,14 +1,17 @@
 package ui
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tomatize.R
+import com.example.tomatize.UserData
 
 class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
 
@@ -16,6 +19,8 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     private lateinit var habitsAdapter: HabitsAdapter
     private lateinit var habitsRecyclerView: RecyclerView
     private lateinit var emptyStateTextView: TextView
+    private lateinit var accessoryOverlay: ImageView
+    private lateinit var tvCurrencyHome: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -26,6 +31,8 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
 
         habitsRecyclerView = view.findViewById(R.id.habitsRecyclerView)
         emptyStateTextView = view.findViewById(R.id.emptyStateTextView)
+        accessoryOverlay = view.findViewById(R.id.accessory_overlay_home)
+        tvCurrencyHome = view.findViewById(R.id.tvCurrencyHome)
 
         return view
     }
@@ -40,8 +47,32 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
 
     override fun onResume() {
         super.onResume()
-        // Обновляем список при возврате на фрагмент
         loadHabits()
+        updateMascot()
+        updateBalanceUI()
+    }
+
+    private fun updateBalanceUI() {
+        val prefs = requireActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+        val balance = prefs.getInt("USER_CURRENCY", 0)
+        tvCurrencyHome.text = balance.toString()
+    }
+
+    private fun updateMascot() {
+        val prefs = requireActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+        val equippedId = prefs.getInt("EQUIPPED_ITEM", -1)
+        
+        if (equippedId != -1) {
+            val item = UserData.allShopItems.find { it.id == equippedId }
+            if (item != null) {
+                accessoryOverlay.setImageResource(item.iconRes)
+                accessoryOverlay.visibility = View.VISIBLE
+            } else {
+                accessoryOverlay.visibility = View.GONE
+            }
+        } else {
+            accessoryOverlay.visibility = View.GONE
+        }
     }
 
     private fun setupRecyclerView() {
@@ -73,7 +104,6 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         }
     }
 
-    // Публичный метод для обновления списка извне
     fun refreshHabits() {
         loadHabits()
     }
@@ -136,6 +166,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
             .setNegativeButton("Отмена", null)
             .show()
     }
+
     private fun showHabitDetails(habit: Habit) {
         val message = """
             Название: ${habit.name}
