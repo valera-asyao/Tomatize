@@ -28,10 +28,12 @@ class ProfileFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
         
+        /* кнопка настроек
         val settingsIcon = view.findViewById<ImageView>(R.id.settings_icon)
         settingsIcon.setOnClickListener {
             showSettingsMenu(it)
         }
+        */
 
         accessoryOverlay = view.findViewById(R.id.accessory_overlay)
         ownedItemsRecycler = view.findViewById(R.id.owned_items_recycler)
@@ -42,6 +44,7 @@ class ProfileFragment : Fragment() {
         return view
     }
 
+    
     private fun getOwnedItemsIds(): List<Int> {
         val prefs = requireActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
         val ownedString = prefs.getString("OWNED_ITEMS", "") ?: ""
@@ -94,6 +97,7 @@ class ProfileFragment : Fragment() {
         }
     }
 
+    /*   кнопка настроек
     private fun showSettingsMenu(view: View) {
         val popup = PopupMenu(requireContext(), view)
         popup.menu.add(0, 1, 0, "Toggle Theme")
@@ -114,6 +118,7 @@ class ProfileFragment : Fragment() {
         }
         popup.show()
     }
+    */
 
     private inner class InventoryAdapter(
         private val items: List<ShopItem>,
