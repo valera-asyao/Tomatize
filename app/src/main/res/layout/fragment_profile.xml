@@ -9,48 +9,61 @@
         android:id="@+id/settings_icon"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:padding="8dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:src="@drawable/ic_settings"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:clickable="true"
+        android:contentDescription="Settings"
         android:focusable="true"
-        app:layout_constraintTop_toTopOf="parent"
+        android:padding="8dp"
+        android:src="@drawable/ic_settings"
         app:layout_constraintEnd_toEndOf="parent"
-        android:contentDescription="Settings" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/profile_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:text="Профиль"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:layout_marginTop="24dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Mascot Area -->
     <FrameLayout
         android:id="@+id/mascot_container"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:layout_marginTop="24dp"
-        app:layout_constraintTop_toBottomOf="@id/profile_title"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/profile_title">
 
         <ImageView
             android:id="@+id/mascot_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/tomagochi"
-            android:scaleType="fitCenter" />
+            android:scaleType="fitCenter"
+            android:src="@drawable/tomagochi" />
 
         <ImageView
-            android:id="@+id/accessory_overlay"
+            android:id="@+id/clothes_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/mustache_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/glasses_overlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitCenter"
@@ -61,22 +74,22 @@
         android:id="@+id/inventory_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="16dp"
         android:text="Ваш инвентарь"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:layout_marginTop="24dp"
-        android:layout_marginStart="16dp"
-        app:layout_constraintTop_toBottomOf="@id/mascot_container"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/mascot_container" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/owned_items_recycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        android:padding="8dp"
         android:clipToPadding="false"
-        app:layout_constraintTop_toBottomOf="@id/inventory_label"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:padding="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inventory_label" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
