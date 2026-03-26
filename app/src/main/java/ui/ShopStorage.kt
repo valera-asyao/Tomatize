@@ -54,16 +54,7 @@ object ShopStorage {
         return true
     }
 
-    private fun keyForType(type: String): String {
-        return when (type) {
-            "hat" -> UserData.KEY_EQUIPPED_HAT
-            "glasses" -> UserData.KEY_EQUIPPED_GLASSES
-            "mustache" -> UserData.KEY_EQUIPPED_MUSTACHE
-            "clothes" -> UserData.KEY_EQUIPPED_CLOTHES
-            "other" -> UserData.KEY_EQUIPPED_OTHER
-            else -> error("Unknown type: $type")
-        }
-    }
+    private fun keyForType(type: String): String = UserData.keyForType(type)
 
     fun getEquippedItemId(context: Context, type: String): Int? {
         val value = prefs(context).getInt(keyForType(type), -1)

@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,13 +20,8 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     private lateinit var habitsAdapter: HabitsAdapter
     private lateinit var habitsRecyclerView: RecyclerView
     private lateinit var emptyStateTextView: TextView
-    private lateinit var accessoryOverlay: ImageView
+    private lateinit var mascotOverlayContainer: FrameLayout
     private lateinit var tvCurrencyHome: TextView
-
-    private lateinit var hatOverlay: ImageView
-    private lateinit var glassesOverlay: ImageView
-    private lateinit var mustacheOverlay: ImageView
-    private lateinit var clothesOverlay: ImageView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,10 +29,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         savedInstanceState: Bundle?
     ): View {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
-        hatOverlay = view.findViewById(R.id.hat_overlay_home)
-        glassesOverlay = view.findViewById(R.id.glasses_overlay_home)
-        mustacheOverlay = view.findViewById(R.id.mustache_overlay_home)
-        clothesOverlay = view.findViewById(R.id.clothes_overlay_home)
+        mascotOverlayContainer = view.findViewById(R.id.mascot_overlay_container_home)
         habitsRecyclerView = view.findViewById(R.id.habitsRecyclerView)
         emptyStateTextView = view.findViewById(R.id.emptyStateTextView)
         tvCurrencyHome = view.findViewById(R.id.tvCurrencyHome)
@@ -67,23 +59,13 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     }
 
     private fun updateMascot() {
-        updateOverlay(hatOverlay, "hat")
-        updateOverlay(glassesOverlay, "glasses")
-        updateOverlay(mustacheOverlay, "mustache")
-        updateOverlay(clothesOverlay, "clothes")
+        val equippedItems = UserData.shopTypes
+            .mapNotNull { type -> ShopStorage.getEquippedItemId(requireContext(), type) }
+            .mapNotNull(UserData::findItemById)
+
+        MascotOverlayRenderer.render(requireContext(), mascotOverlayContainer, equippedItems)
     }
 
-    private fun updateOverlay(imageView: ImageView, type: String) {
-        val equippedId = ShopStorage.getEquippedItemId(requireContext(), type)
-        val item = UserData.allShopItems.find { it.id == equippedId }
-
-        if (item != null) {
-            imageView.setImageResource(item.overlayRes)
-            imageView.visibility = View.VISIBLE
-        } else {
-            imageView.visibility = View.GONE
-        }
-    }
     private fun setupRecyclerView() {
         habitsAdapter = HabitsAdapter(
             onHabitClick = { habit ->

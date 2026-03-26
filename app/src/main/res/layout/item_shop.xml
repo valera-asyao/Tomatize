@@ -30,24 +30,31 @@
 
             <TextView
                 android:id="@+id/itemName"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:layout_toStartOf="@+id/itemPrice"
                 android:layout_marginEnd="8dp"
+                android:layout_toStartOf="@+id/itemPrice"
+                android:breakStrategy="simple"
+                android:ellipsize="end"
+                android:hyphenationFrequency="none"
                 android:textColor="#FFFFFF"
                 android:textSize="12sp"
                 android:maxLines="2" />
 
             <TextView
                 android:id="@+id/itemPrice"
-                android:layout_width="wrap_content"
+                android:layout_width="72dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="1"
+                android:singleLine="true"
                 android:textColor="#FFFFFF"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
         </RelativeLayout>
