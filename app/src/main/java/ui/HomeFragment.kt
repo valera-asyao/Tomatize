@@ -27,6 +27,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     private lateinit var glassesOverlay: ImageView
     private lateinit var mustacheOverlay: ImageView
     private lateinit var clothesOverlay: ImageView
+    private lateinit var tvMaxStreak: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,6 +42,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         habitsRecyclerView = view.findViewById(R.id.habitsRecyclerView)
         emptyStateTextView = view.findViewById(R.id.emptyStateTextView)
         tvCurrencyHome = view.findViewById(R.id.tvCurrencyHome)
+        tvMaxStreak = view.findViewById(R.id.tvMaxStreakTitle)
 
         return view
     }
@@ -141,6 +143,9 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     private fun loadHabits() {
         val habits = databaseHelper.getAllHabits()
         habitsAdapter.updateHabits(habits)
+
+        val maxStreak = habits.maxOfOrNull {  it.streakCount }?: 0
+        tvMaxStreak.text = "Дней серии\n$maxStreak"
 
         if (habits.isEmpty()) {
             emptyStateTextView.visibility = View.VISIBLE
