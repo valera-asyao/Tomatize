@@ -11,6 +11,8 @@ import com.example.tomatize.ShopItem
 
 class ShopAdapter(
     private var items: List<ShopItem>,
+    private val isOwned: (ShopItem) -> Boolean,
+    private val isEquipped: (ShopItem) -> Boolean,
     private val onItemClick: (ShopItem) -> Unit
 ) : RecyclerView.Adapter<ShopAdapter.ShopViewHolder>() {
 
@@ -34,6 +36,11 @@ class ShopAdapter(
         holder.price.text = item.price.toString()
         holder.container.setOnClickListener {
             onItemClick(item)
+        }
+        when {
+            isEquipped(item) -> holder.price.text = "Надето"
+            isOwned(item) -> holder.price.text = "Куплено"
+            else -> holder.price.text = item.price.toString()
         }
     }
 

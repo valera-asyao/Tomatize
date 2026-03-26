@@ -52,7 +52,6 @@
         </LinearLayout>
     </RelativeLayout>
 
-    <!-- Mascot Area with Overlays -->
     <FrameLayout
         android:id="@+id/mascotContainerHome"
         android:layout_width="match_parent"
@@ -66,7 +65,28 @@
             app:srcCompat="@drawable/tomagochi" />
 
         <ImageView
-            android:id="@+id/accessory_overlay_home"
+            android:id="@+id/clothes_overlay_home"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/mustache_overlay_home"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/glasses_overlay_home"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/hat_overlay_home"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitCenter"

@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tomatize.R
+import com.example.tomatize.ShopStorage
 import com.example.tomatize.UserData
 
 class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
@@ -22,16 +23,23 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     private lateinit var accessoryOverlay: ImageView
     private lateinit var tvCurrencyHome: TextView
 
+    private lateinit var hatOverlay: ImageView
+    private lateinit var glassesOverlay: ImageView
+    private lateinit var mustacheOverlay: ImageView
+    private lateinit var clothesOverlay: ImageView
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
-
+        hatOverlay = view.findViewById(R.id.hat_overlay_home)
+        glassesOverlay = view.findViewById(R.id.glasses_overlay_home)
+        mustacheOverlay = view.findViewById(R.id.mustache_overlay_home)
+        clothesOverlay = view.findViewById(R.id.clothes_overlay_home)
         habitsRecyclerView = view.findViewById(R.id.habitsRecyclerView)
         emptyStateTextView = view.findViewById(R.id.emptyStateTextView)
-        accessoryOverlay = view.findViewById(R.id.accessory_overlay_home)
         tvCurrencyHome = view.findViewById(R.id.tvCurrencyHome)
 
         return view
@@ -97,22 +105,23 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     }
 
     private fun updateMascot() {
-        val prefs = requireActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
-        val equippedId = prefs.getInt("EQUIPPED_ITEM", -1)
-        
-        if (equippedId != -1) {
-            val item = UserData.allShopItems.find { it.id == equippedId }
-            if (item != null) {
-                accessoryOverlay.setImageResource(item.iconRes)
-                accessoryOverlay.visibility = View.VISIBLE
-            } else {
-                accessoryOverlay.visibility = View.GONE
-            }
-        } else {
-            accessoryOverlay.visibility = View.GONE
-        }
+        updateOverlay(hatOverlay, "hat")
+        updateOverlay(glassesOverlay, "glasses")
+        updateOverlay(mustacheOverlay, "mustache")
+        updateOverlay(clothesOverlay, "clothes")
     }
 
+    private fun updateOverlay(imageView: ImageView, type: String) {
+        val equippedId = ShopStorage.getEquippedItemId(requireContext(), type)
+        val item = UserData.allShopItems.find { it.id == equippedId }
+
+        if (item != null) {
+            imageView.setImageResource(item.overlayRes)
+            imageView.visibility = View.VISIBLE
+        } else {
+            imageView.visibility = View.GONE
+        }
+    }
     private fun setupRecyclerView() {
         habitsAdapter = HabitsAdapter(
             onHabitClick = { habit ->
