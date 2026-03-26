@@ -70,16 +70,6 @@ class StatisticsFragment : Fragment() {
     private fun showHabitsList() {
         val habits = databaseHelper.getAllHabits()
 
-        val headerText = TextView(requireContext()).apply {
-            text = "Статистика"
-            textSize = 18f
-            gravity = Gravity.CENTER
-            setTextColor(getThemeColor(android.R.attr.textColorPrimary))
-            setPadding(0, 0, 0, 32)
-        }
-
-        mainContainer.addView(headerText)
-
         val habitsContainer = LinearLayout(requireContext()).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,

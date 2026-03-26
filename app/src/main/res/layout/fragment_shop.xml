@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F4F4F6"
-    android:paddingTop="24dp">
+    android:paddingTop="48dp">
 
     <TextView
         android:id="@+id/titleShop"
@@ -13,8 +13,8 @@
         android:layout_marginStart="24dp"
         android:text="Магазин"
         android:textColor="#000000"
+        android:fontFamily="@font/gnf"
         android:textSize="22sp"
-        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/currencyContainer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/currencyContainer" />

@@ -11,6 +11,10 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.navigation.fragment.NavHostFragment
@@ -30,7 +34,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         // Force light mode to be independent of system theme
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -42,6 +46,9 @@ class MainActivity : AppCompatActivity() {
 
         // Initialize Custom Bottom Nav
         selectorOval = findViewById(R.id.nav_selector_oval)
+
+
+
         navButtons = listOf(
             findViewById(R.id.nav_home),
             findViewById(R.id.nav_statistics),
@@ -99,7 +106,7 @@ class MainActivity : AppCompatActivity() {
 
         // Move Animation
         val moveAnimator = ObjectAnimator.ofFloat(selectorOval, "translationX", startX, endX)
-        
+
         // Stretch Animation (Rubber effect)
         // We stretch more if the distance is larger, but a fixed scale also looks good
         val stretchAnimator = ValueAnimator.ofFloat(1f, 1.25f, 1f)
@@ -116,7 +123,7 @@ class MainActivity : AppCompatActivity() {
 
         // Update colors
         updateNavColors(newIndex)
-        
+
         animatorSet.start()
         currentIndex = newIndex
     }
@@ -124,10 +131,10 @@ class MainActivity : AppCompatActivity() {
     private fun moveSelector(index: Int, animate: Boolean) {
         val container = findViewById<View>(R.id.nav_buttons_container)
         if (container.width == 0) return // Wait for layout
-        
+
         val tabWidth = container.width / 5f
         val targetX = index * tabWidth + (tabWidth - selectorOval.width) / 2f
-        
+
         if (animate) {
             animateSelector(index)
         } else {
@@ -172,7 +179,8 @@ class MainActivity : AppCompatActivity() {
 
                     val navHostFragment = supportFragmentManager
                         .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-                    val currentFragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
+                    val currentFragment =
+                        navHostFragment.childFragmentManager.fragments.firstOrNull()
 
                     if (currentFragment is HomeFragment) {
                         currentFragment.refreshHabits()

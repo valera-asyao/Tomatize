@@ -31,8 +31,6 @@ class ProfileFragment : Fragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
 
-        val settingsIcon = view.findViewById<ImageView>(R.id.settings_icon)
-        settingsIcon.setOnClickListener { showSettingsMenu(it) }
 
         glassesOverlay = view.findViewById(R.id.glasses_overlay)
         mustacheOverlay = view.findViewById(R.id.mustache_overlay)
