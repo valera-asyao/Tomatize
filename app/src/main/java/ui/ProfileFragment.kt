@@ -130,10 +130,14 @@ class ProfileFragment : Fragment() {
             val item = items[position]
 
             holder.icon.setImageResource(item.iconRes)
-            holder.name.text = item.name
-            holder.price.text = if (ShopStorage.isEquipped(requireContext(), item)) "Надето" else ""
-
-            holder.container.alpha = if (ShopStorage.isEquipped(requireContext(), item)) 0.7f else 1f
+            holder.price.visibility = View.GONE
+            if (ShopStorage.isEquipped(requireContext(), item)) {
+                holder.name.text = "Надето"
+                holder.container.alpha = 0.7f
+            } else {
+                holder.name.text = item.name
+                holder.container.alpha = 1f
+            }
 
             holder.itemView.setOnClickListener {
                 onItemClick(item)
