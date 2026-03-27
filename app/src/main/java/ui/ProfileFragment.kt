@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
@@ -19,11 +18,9 @@ import com.example.tomatize.UserData
 
 class ProfileFragment : Fragment() {
 
-    private companion object {
-        private const val PROFILE_CLOTHES_OFFSET_DP = 2f
-    }
-
-    private lateinit var mascotOverlayContainer: FrameLayout
+    private lateinit var glassesOverlay: ImageView
+    private lateinit var mustacheOverlay: ImageView
+    private lateinit var clothesOverlay: ImageView
     private lateinit var ownedItemsRecycler: RecyclerView
     private lateinit var inventoryAdapter: InventoryAdapter
 
@@ -35,7 +32,9 @@ class ProfileFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
 
 
-        mascotOverlayContainer = view.findViewById(R.id.mascot_overlay_container)
+        glassesOverlay = view.findViewById(R.id.glasses_overlay)
+        mustacheOverlay = view.findViewById(R.id.mustache_overlay)
+        clothesOverlay = view.findViewById(R.id.clothes_overlay)
         ownedItemsRecycler = view.findViewById(R.id.owned_items_recycler)
 
         setupInventory()
@@ -48,13 +47,16 @@ class ProfileFragment : Fragment() {
         super.onResume()
         updateMascot()
         if (::inventoryAdapter.isInitialized) {
-            refreshInventory()
+            inventoryAdapter.notifyDataSetChanged()
         }
     }
 
     private fun setupInventory() {
+        val ownedIds = ShopStorage.getOwnedItemIds(requireContext())
+        val ownedItems = UserData.allShopItems.filter { it.id in ownedIds }
+
         ownedItemsRecycler.layoutManager = GridLayoutManager(requireContext(), 3)
-        inventoryAdapter = InventoryAdapter(emptyList()) { item ->
+        inventoryAdapter = InventoryAdapter(ownedItems) { item ->
             if (ShopStorage.isEquipped(requireContext(), item)) {
                 ShopStorage.unequipType(requireContext(), item.type)
             } else {
@@ -62,30 +64,27 @@ class ProfileFragment : Fragment() {
             }
 
             updateMascot()
-            refreshInventory()
+            inventoryAdapter.notifyDataSetChanged()
         }
         ownedItemsRecycler.adapter = inventoryAdapter
-        refreshInventory()
-    }
-
-    private fun refreshInventory() {
-        val ownedIds = ShopStorage.getOwnedItemIds(requireContext())
-        val ownedItems = UserData.allShopItems.filter { it.id in ownedIds }
-
-        inventoryAdapter.updateItems(ownedItems)
     }
 
     private fun updateMascot() {
-        val equippedItems = UserData.shopTypes
-            .mapNotNull { type -> ShopStorage.getEquippedItemId(requireContext(), type) }
-            .mapNotNull(UserData::findItemById)
+        updateOverlay(glassesOverlay, "glasses")
+        updateOverlay(mustacheOverlay, "mustache")
+        updateOverlay(clothesOverlay, "clothes")
+    }
 
-        MascotOverlayRenderer.render(
-            requireContext(),
-            mascotOverlayContainer,
-            equippedItems,
-            clothesOffsetDp = PROFILE_CLOTHES_OFFSET_DP
-        )
+    private fun updateOverlay(imageView: ImageView, type: String) {
+        val equippedId = ShopStorage.getEquippedItemId(requireContext(), type)
+        val item = UserData.allShopItems.find { it.id == equippedId }
+
+        if (item != null) {
+            imageView.setImageResource(item.overlayRes)
+            imageView.visibility = View.VISIBLE
+        } else {
+            imageView.visibility = View.GONE
+        }
     }
 
     private fun showSettingsMenu(view: View) {
@@ -110,7 +109,7 @@ class ProfileFragment : Fragment() {
     }
 
     private inner class InventoryAdapter(
-        private var items: List<ShopItem>,
+        private val items: List<ShopItem>,
         private val onItemClick: (ShopItem) -> Unit
     ) : RecyclerView.Adapter<InventoryAdapter.ViewHolder>() {
 
@@ -142,10 +141,5 @@ class ProfileFragment : Fragment() {
         }
 
         override fun getItemCount(): Int = items.size
-
-        fun updateItems(newItems: List<ShopItem>) {
-            items = newItems
-            notifyDataSetChanged()
-        }
     }
 }

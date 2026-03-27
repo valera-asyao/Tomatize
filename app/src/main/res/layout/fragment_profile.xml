@@ -34,11 +34,26 @@
             android:scaleType="fitCenter"
             android:src="@drawable/tomagochi" />
 
-        <FrameLayout
-            android:id="@+id/mascot_overlay_container"
+        <ImageView
+            android:id="@+id/clothes_overlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:importantForAccessibility="no" />
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/mustache_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/glasses_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
     </FrameLayout>
 
     <TextView

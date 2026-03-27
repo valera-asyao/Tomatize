@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:fontFamily="@font/gnf"
-            android:text="Дней серии&#10;1000"
+            android:text="Дней серии\n1000"
             android:textColor="@color/black"
             android:textSize="32sp" />
 
@@ -64,11 +64,33 @@
             android:scaleType="fitCenter"
             app:srcCompat="@drawable/tomagochi" />
 
-        <FrameLayout
-            android:id="@+id/mascot_overlay_container_home"
+        <ImageView
+            android:id="@+id/clothes_overlay_home"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:importantForAccessibility="no" />
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/mustache_overlay_home"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/glasses_overlay_home"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/hat_overlay_home"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
     </FrameLayout>
 
     <androidx.cardview.widget.CardView
@@ -93,7 +115,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:padding="32dp"
-        android:text="У вас пока нет привычек&#10;Нажмите + чтобы добавить первую"
+        android:text="У вас пока нет привычек\nНажмите + чтобы добавить первую"
         android:textColor="#666666"
         android:textSize="16sp"
         android:visibility="gone" />
