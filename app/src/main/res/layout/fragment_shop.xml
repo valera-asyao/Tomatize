@@ -18,17 +18,19 @@
         app:layout_constraintBottom_toBottomOf="@+id/currencyContainer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/currencyContainer" />
+
     <Button
         android:id="@+id/btnCheatCode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:backgroundTint="#1B6B19"
         android:text="+5000🍅"
         android:textSize="10sp"
-        android:backgroundTint="#1B6B19"
-        app:layout_constraintEnd_toStartOf="@+id/currencyContainer"
-        app:layout_constraintTop_toTopOf="@+id/currencyContainer"
         app:layout_constraintBottom_toBottomOf="@+id/currencyContainer"
-        android:layout_marginEnd="8dp" />
+        app:layout_constraintEnd_toStartOf="@+id/currencyContainer"
+        app:layout_constraintTop_toTopOf="@+id/currencyContainer" />
+
     <LinearLayout
         android:id="@+id/currencyContainer"
         android:layout_width="wrap_content"
@@ -70,48 +72,10 @@
         app:layout_constraintTop_toBottomOf="@+id/currencyContainer">
 
         <LinearLayout
+            android:id="@+id/filterContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/filterAll"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
-                android:background="@drawable/bg_pill_red"
-                android:paddingHorizontal="24dp"
-                android:paddingVertical="10dp"
-                android:text="Все типы"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/filterHats"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
-                android:background="@drawable/bg_pill_dark"
-                android:paddingHorizontal="24dp"
-                android:paddingVertical="10dp"
-                android:text="Шапки"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/filterGlasses"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_pill_dark"
-                android:paddingHorizontal="24dp"
-                android:paddingVertical="10dp"
-                android:text="Очки"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-        </LinearLayout>
+            android:orientation="horizontal" />
     </HorizontalScrollView>
 
     <androidx.recyclerview.widget.RecyclerView

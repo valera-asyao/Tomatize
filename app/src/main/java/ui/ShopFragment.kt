@@ -1,11 +1,12 @@
 package ui
 
-import android.content.Context
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -15,27 +16,14 @@ import com.example.tomatize.R
 import com.example.tomatize.ShopItem
 import com.example.tomatize.ShopStorage
 import com.example.tomatize.UserData
+import kotlin.math.roundToInt
 
 class ShopFragment : Fragment() {
 
-    companion object {
-        private const val PREFS_NAME = "AppPrefs"
-        private const val KEY_CURRENCY = "USER_CURRENCY"
-        private const val KEY_OWNED_ITEMS = "OWNED_ITEMS"
-
-        private const val KEY_EQUIPPED_HAT = "EQUIPPED_HAT"
-        private const val KEY_EQUIPPED_GLASSES = "EQUIPPED_GLASSES"
-        private const val KEY_EQUIPPED_OTHER = "EQUIPPED_OTHER"
-    }
-
     private lateinit var adapter: ShopAdapter
     private lateinit var tvCurrency: TextView
-    private lateinit var filterAll: TextView
-    private lateinit var filterHats: TextView
-    private lateinit var filterGlasses: TextView
-
-    private val allShopItems: List<ShopItem>
-        get() = UserData.allShopItems
+    private lateinit var filterContainer: LinearLayout
+    private var selectedType: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,31 +33,16 @@ class ShopFragment : Fragment() {
         val root = inflater.inflate(R.layout.fragment_shop, container, false)
 
         tvCurrency = root.findViewById(R.id.tvCurrency)
-        filterAll = root.findViewById(R.id.filterAll)
-        filterHats = root.findViewById(R.id.filterHats)
-        filterGlasses = root.findViewById(R.id.filterGlasses)
+        filterContainer = root.findViewById(R.id.filterContainer)
 
         val btnCheat = root.findViewById<Button>(R.id.btnCheatCode)
         val recyclerView = root.findViewById<RecyclerView>(R.id.shop_recycler)
 
         adapter = ShopAdapter(
-            items = allShopItems,
+            items = UserData.allShopItems,
             isOwned = { ShopStorage.isOwned(requireContext(), it.id) },
             isEquipped = { ShopStorage.isEquipped(requireContext(), it) },
-            onItemClick = { item ->
-                if (ShopStorage.isOwned(requireContext(), item.id)) {
-                    if (ShopStorage.isEquipped(requireContext(), item)) {
-                        ShopStorage.unequipType(requireContext(), item.type)
-                        Toast.makeText(requireContext(), "Снято: ${item.name}", Toast.LENGTH_SHORT).show()
-                    } else {
-                        ShopStorage.equipItem(requireContext(), item)
-                        Toast.makeText(requireContext(), "Надето: ${item.name}", Toast.LENGTH_SHORT).show()
-                    }
-                    adapter.notifyDataSetChanged()
-                } else {
-                    handlePurchase(item)
-                }
-            }
+            onItemClick = ::onShopItemClick
         )
 
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
@@ -81,134 +54,108 @@ class ShopFragment : Fragment() {
         }
 
         setupFilters()
+        updateVisibleItems()
         updateBalanceUI()
 
         return root
     }
 
-    private fun onShopItemClick(item: ShopItem) {
-        if (isOwned(item.id)) {
-            toggleEquip(item)
-        } else {
-            buyItem(item)
-        }
+    override fun onResume() {
+        super.onResume()
+        updateBalanceUI()
+        updateVisibleItems()
     }
 
-    private fun buyItem(item: ShopItem) {
-        val balance = getBalance()
-
-        if (balance < item.price) {
-            Toast.makeText(requireContext(), "Недостаточно средств!", Toast.LENGTH_SHORT).show()
-            return
+    private fun onShopItemClick(item: ShopItem) {
+        if (ShopStorage.isOwned(requireContext(), item.id)) {
+            toggleEquip(item)
+        } else {
+            handlePurchase(item)
         }
-
-        val newOwnedIds = getOwnedItemIds().toMutableSet()
-        newOwnedIds.add(item.id)
-
-        getPrefs().edit()
-            .putInt(KEY_CURRENCY, balance - item.price)
-            .putString(KEY_OWNED_ITEMS, newOwnedIds.joinToString(","))
-            .apply()
-
-        updateBalanceUI()
-        adapter.notifyDataSetChanged()
-        Toast.makeText(requireContext(), "Куплено: ${item.name}", Toast.LENGTH_SHORT).show()
     }
 
     private fun toggleEquip(item: ShopItem) {
-        val currentEquippedId = getEquippedItemId(item.type)
+        val currentEquippedId = ShopStorage.getEquippedItemId(requireContext(), item.type)
 
         if (currentEquippedId == item.id) {
-            setEquippedItemId(item.type, null)
-            Toast.makeText(requireContext(), "Снято: ${item.name}", Toast.LENGTH_SHORT).show()
+            ShopStorage.unequipType(requireContext(), item.type)
+            Toast.makeText(
+                requireContext(),
+                "\u0421\u043d\u044f\u0442\u043e: ${item.name}",
+                Toast.LENGTH_SHORT
+            ).show()
         } else {
-            setEquippedItemId(item.type, item.id)
-            Toast.makeText(requireContext(), "Надето: ${item.name}", Toast.LENGTH_SHORT).show()
+            ShopStorage.equipItem(requireContext(), item)
+            Toast.makeText(
+                requireContext(),
+                "\u041d\u0430\u0434\u0435\u0442\u043e: ${item.name}",
+                Toast.LENGTH_SHORT
+            ).show()
         }
 
         adapter.notifyDataSetChanged()
     }
 
     private fun setupFilters() {
-        filterAll.setOnClickListener {
-            adapter.updateItems(allShopItems)
-            updateFilterVisuals(filterAll)
+        filterContainer.removeAllViews()
+
+        (listOf<String?>(null) + UserData.shopTypes).forEach { type ->
+            filterContainer.addView(createFilterView(type))
         }
 
-        filterHats.setOnClickListener {
-            adapter.updateItems(allShopItems.filter { it.type == "hat" })
-            updateFilterVisuals(filterHats)
-        }
-
-        filterGlasses.setOnClickListener {
-            adapter.updateItems(allShopItems.filter { it.type == "glasses" })
-            updateFilterVisuals(filterGlasses)
-        }
+        updateFilterVisuals()
     }
 
-    private fun updateFilterVisuals(selectedView: TextView) {
-        val filters = listOf(filterAll, filterHats, filterGlasses)
+    private fun createFilterView(type: String?): TextView {
+        val filterTag = type ?: "all"
 
-        filters.forEach { filter ->
-            if (filter == selectedView) {
-                filter.setBackgroundResource(R.drawable.bg_pill_red)
-            } else {
-                filter.setBackgroundResource(R.drawable.bg_pill_dark)
+        return TextView(requireContext()).apply {
+            tag = filterTag
+            text = UserData.typeLabel(type)
+            setTextColor(android.graphics.Color.WHITE)
+            textSize = 14f
+            setTypeface(typeface, Typeface.BOLD)
+            setPadding(dp(24), dp(10), dp(24), dp(10))
+            layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply {
+                marginEnd = dp(12)
+            }
+            setOnClickListener {
+                selectedType = type
+                updateVisibleItems()
+                updateFilterVisuals()
             }
         }
     }
 
-    private fun updateBalanceUI() {
-        tvCurrency.text = getBalance().toString()
-    }
+    private fun updateFilterVisuals() {
+        for (index in 0 until filterContainer.childCount) {
+            val filterView = filterContainer.getChildAt(index)
+            val isSelected = filterView.tag == (selectedType ?: "all")
 
-    private fun getPrefs() =
-        requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-
-    private fun getBalance(): Int {
-        return getPrefs().getInt(KEY_CURRENCY, 0)
-    }
-
-    private fun addCurrency(amount: Int) {
-        val newBalance = getBalance() + amount
-        getPrefs().edit().putInt(KEY_CURRENCY, newBalance).apply()
-    }
-
-    private fun getOwnedItemIds(): Set<Int> {
-        val raw = getPrefs().getString(KEY_OWNED_ITEMS, "") ?: ""
-
-        if (raw.isBlank()) return emptySet()
-
-        return raw.split(",")
-            .mapNotNull { it.trim().toIntOrNull() }
-            .toSet()
-    }
-
-    private fun isOwned(itemId: Int): Boolean {
-        return getOwnedItemIds().contains(itemId)
-    }
-
-    private fun getEquippedKey(type: String): String {
-        return when (type) {
-            "hat" -> KEY_EQUIPPED_HAT
-            "glasses" -> KEY_EQUIPPED_GLASSES
-            else -> KEY_EQUIPPED_OTHER
+            filterView.setBackgroundResource(
+                if (isSelected) R.drawable.bg_pill_red else R.drawable.bg_pill_dark
+            )
         }
     }
 
-    private fun getEquippedItemId(type: String): Int? {
-        val value = getPrefs().getInt(getEquippedKey(type), -1)
-        return if (value == -1) null else value
+    private fun updateVisibleItems() {
+        adapter.updateItems(UserData.filterItems(selectedType))
     }
 
-    private fun setEquippedItemId(type: String, itemId: Int?) {
-        getPrefs().edit()
-            .putInt(getEquippedKey(type), itemId ?: -1)
-            .apply()
+    private fun updateBalanceUI() {
+        tvCurrency.text = ShopStorage.getBalance(requireContext()).toString()
     }
+
     private fun handlePurchase(item: ShopItem) {
         if (ShopStorage.isOwned(requireContext(), item.id)) {
-            Toast.makeText(requireContext(), "Предмет уже куплен", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                "\u041f\u0440\u0435\u0434\u043c\u0435\u0442 \u0443\u0436\u0435 \u043a\u0443\u043f\u043b\u0435\u043d",
+                Toast.LENGTH_SHORT
+            ).show()
             return
         }
 
@@ -217,9 +164,20 @@ class ShopFragment : Fragment() {
         if (success) {
             updateBalanceUI()
             adapter.notifyDataSetChanged()
-            Toast.makeText(requireContext(), "Куплено: ${item.name}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                "\u041a\u0443\u043f\u043b\u0435\u043d\u043e: ${item.name}",
+                Toast.LENGTH_SHORT
+            ).show()
         } else {
-            Toast.makeText(requireContext(), "Недостаточно средств", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                "\u041d\u0435\u0434\u043e\u0441\u0442\u0430\u0442\u043e\u0447\u043d\u043e \u0441\u0440\u0435\u0434\u0441\u0442\u0432",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
+
+    private fun dp(value: Int): Int =
+        (value * resources.displayMetrics.density).roundToInt()
 }

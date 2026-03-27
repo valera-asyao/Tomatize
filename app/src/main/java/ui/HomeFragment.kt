@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,14 +20,8 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     private lateinit var habitsAdapter: HabitsAdapter
     private lateinit var habitsRecyclerView: RecyclerView
     private lateinit var emptyStateTextView: TextView
-    private lateinit var accessoryOverlay: ImageView
+    private lateinit var mascotOverlayContainer: FrameLayout
     private lateinit var tvCurrencyHome: TextView
-
-    private lateinit var hatOverlay: ImageView
-    private lateinit var glassesOverlay: ImageView
-    private lateinit var mustacheOverlay: ImageView
-    private lateinit var clothesOverlay: ImageView
-    private lateinit var tvMaxStreak: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,14 +29,10 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         savedInstanceState: Bundle?
     ): View {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
-        hatOverlay = view.findViewById(R.id.hat_overlay_home)
-        glassesOverlay = view.findViewById(R.id.glasses_overlay_home)
-        mustacheOverlay = view.findViewById(R.id.mustache_overlay_home)
-        clothesOverlay = view.findViewById(R.id.clothes_overlay_home)
+        mascotOverlayContainer = view.findViewById(R.id.mascot_overlay_container_home)
         habitsRecyclerView = view.findViewById(R.id.habitsRecyclerView)
         emptyStateTextView = view.findViewById(R.id.emptyStateTextView)
         tvCurrencyHome = view.findViewById(R.id.tvCurrencyHome)
-        tvMaxStreak = view.findViewById(R.id.tvMaxStreakTitle)
 
         return view
     }
@@ -62,44 +52,6 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         updateBalanceUI()
     }
 
-    // Функция для проверки лимитов и выдачи награды
-    private fun checkAndAwardCurrency(habitId: Long) {
-        val prefs = requireActivity().getSharedPreferences("AppPrefs", android.content.Context.MODE_PRIVATE)
-        val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
-        val currentDate = sdf.format(java.util.Date())
-
-        val lastRewardDate = prefs.getString("LAST_REWARD_DATE", "")
-        var rewardedHabits = prefs.getString("REWARDED_HABITS_TODAY", "")?.split(",")?.toMutableList() ?: mutableListOf()
-        if (currentDate != lastRewardDate) {
-            rewardedHabits = mutableListOf()
-            prefs.edit().putString("LAST_REWARD_DATE", currentDate).apply()
-        }
-        if (rewardedHabits.contains(habitId.toString())) {
-            return
-        }
-        if (rewardedHabits.size < 3) {
-            val currentBalance = prefs.getInt("USER_CURRENCY", 0)
-            val rewardAmount = 50
-            rewardedHabits.add(habitId.toString())
-            val newList = rewardedHabits.joinToString(",")
-            prefs.edit()
-                .putInt("USER_CURRENCY", currentBalance + rewardAmount)
-                .putString("REWARDED_HABITS_TODAY", newList)
-                .apply()
-            android.widget.Toast.makeText(
-                requireContext(),
-                "Награда $rewardAmount \uD83C\uDF45! (${rewardedHabits.size}/3)",
-                android.widget.Toast.LENGTH_SHORT
-            ).show()
-        } else {
-            android.widget.Toast.makeText(
-                requireContext(),
-                "Лимит наград на сегодня исчерпан",
-                android.widget.Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
-
     private fun updateBalanceUI() {
         val prefs = requireActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
         val balance = prefs.getInt("USER_CURRENCY", 0)
@@ -107,23 +59,13 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     }
 
     private fun updateMascot() {
-        updateOverlay(hatOverlay, "hat")
-        updateOverlay(glassesOverlay, "glasses")
-        updateOverlay(mustacheOverlay, "mustache")
-        updateOverlay(clothesOverlay, "clothes")
+        val equippedItems = UserData.shopTypes
+            .mapNotNull { type -> ShopStorage.getEquippedItemId(requireContext(), type) }
+            .mapNotNull(UserData::findItemById)
+
+        MascotOverlayRenderer.render(requireContext(), mascotOverlayContainer, equippedItems)
     }
 
-    private fun updateOverlay(imageView: ImageView, type: String) {
-        val equippedId = ShopStorage.getEquippedItemId(requireContext(), type)
-        val item = UserData.allShopItems.find { it.id == equippedId }
-
-        if (item != null) {
-            imageView.setImageResource(item.overlayRes)
-            imageView.visibility = View.VISIBLE
-        } else {
-            imageView.visibility = View.GONE
-        }
-    }
     private fun setupRecyclerView() {
         habitsAdapter = HabitsAdapter(
             onHabitClick = { habit ->
@@ -143,9 +85,6 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     private fun loadHabits() {
         val habits = databaseHelper.getAllHabits()
         habitsAdapter.updateHabits(habits)
-
-        val maxStreak = habits.maxOfOrNull {  it.streakCount }?: 0
-        tvMaxStreak.text = "Дней серии\n$maxStreak"
 
         if (habits.isEmpty()) {
             emptyStateTextView.visibility = View.VISIBLE
@@ -183,8 +122,6 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         if (success) {
             loadHabits()
             showCompletionMessage(habit)
-            checkAndAwardCurrency(habit.id);
-            updateBalanceUI();
         }
     }
 
