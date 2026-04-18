@@ -1,19 +1,13 @@
 package ui
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tomatize.R
-import ui.Habit
-import java.text.SimpleDateFormat
-import java.util.*
 
 class HabitsAdapter(
     private var habits: List<Habit> = emptyList(),

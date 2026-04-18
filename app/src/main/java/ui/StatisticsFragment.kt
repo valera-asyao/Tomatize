@@ -1,6 +1,5 @@
 package ui
 
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -12,7 +11,6 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.tomatize.R
-import com.google.android.material.button.MaterialButton
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 

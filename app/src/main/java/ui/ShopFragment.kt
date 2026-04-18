@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tomatize.R
 import com.example.tomatize.ShopItem
-import com.example.tomatize.ShopStorage
 import com.example.tomatize.UserData
 import kotlin.math.roundToInt
 

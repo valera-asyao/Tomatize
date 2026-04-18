@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tomatize.R
-import com.example.tomatize.ShopStorage
 import com.example.tomatize.UserData
 
 class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {

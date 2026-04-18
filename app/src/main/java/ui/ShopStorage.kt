@@ -1,6 +1,8 @@
-package com.example.tomatize
+package ui
 
 import android.content.Context
+import com.example.tomatize.ShopItem
+import com.example.tomatize.UserData
 
 object ShopStorage {
 
