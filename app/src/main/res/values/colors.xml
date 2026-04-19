@@ -2,7 +2,7 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="background_light">#F8F9FA</color>
+    <color name="background_light">#EFEFEF</color>
     <color name="good_habit_color">#4CAF50</color>
     <color name="bad_habit_color">#F44336</color>
     <color name="streak_color">#FF9800</color>
@@ -18,4 +18,13 @@
     <color name="nav_inactive">#8E8E93</color>
     <color name="nav_oval">#33FF4B4B</color>
     <color name="nav_background">#231F20</color>
+
+    <!-- New Habit Colors -->
+    <color name="habit_good_bg">#79B381</color>
+    <color name="habit_good_btn">#264031</color>
+    <color name="habit_good_text">#000000</color>
+    
+    <color name="habit_bad_bg">#D84E4E</color>
+    <color name="habit_bad_btn">#672726</color>
+    <color name="habit_bad_text">#EEEEEE</color>
 </resources>

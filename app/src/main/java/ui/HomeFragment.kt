@@ -127,7 +127,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         habitsAdapter.updateHabits(habits)
 
         val maxStreak = habits.maxOfOrNull {  it.streakCount }?: 0
-        tvMaxStreak.text = "Дней серии\n$maxStreak"
+        tvMaxStreak.text = "$maxStreak"
 
         if (habits.isEmpty()) {
             emptyStateTextView.visibility = View.VISIBLE

@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/habitItemLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
     android:background="@drawable/bg_habit"
+    android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="12dp">
+    android:padding="16dp">
 
     <View
         android:id="@+id/typeIndicatorView"
-        android:layout_width="3dp"
-        android:layout_height="match_parent"
-        android:layout_marginEnd="12dp"
-        android:background="@color/good_habit_color" />
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -24,9 +26,9 @@
             android:id="@+id/habitNameTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/montserrat_regular"
+            android:fontFamily="@font/montserrat_semibold"
             android:text="Название привычки"
-            android:textColor="@color/white"
+            android:textColor="#000000"
             android:textSize="20sp" />
 
         <TextView
@@ -34,23 +36,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="0 дн."
-            android:textColor="@color/white"
+            android:textColor="#000000"
             android:textSize="16sp" />
 
     </LinearLayout>
 
-	  <Space
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_weight="0.05" />
-
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/completeButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:backgroundTint="@color/white"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:background="@drawable/bg_circle_button"
         android:text="✔"
-        android:textColor="@android:color/black" />
+        android:textColor="#FFFFFF"
+        android:textSize="18sp" />
 
 </LinearLayout>

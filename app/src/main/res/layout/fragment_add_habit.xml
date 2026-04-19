@@ -88,21 +88,21 @@
                 android:text="ХОРОШАЯ"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
 
             <Button
                 android:id="@+id/btnTypeBad"
                 style="?android:attr/borderlessButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="40dp"
+                android:layout_marginStart="30dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_edittext"
                 android:fontFamily="@font/montserrat_medium"
                 android:text="ПЛОХАЯ"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
 
         </LinearLayout>
 

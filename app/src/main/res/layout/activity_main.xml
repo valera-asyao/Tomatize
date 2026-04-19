@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="70dp"
-        android:background="@color/nav_background"
+        android:background="#F6FBFA"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <!-- Animated Selection Oval -->
