@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/itemCardContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     app:cardCornerRadius="16dp"
-    app:cardElevation="0dp"
-    android:id="@+id/itemCardContainer">
+    app:cardElevation="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -38,10 +38,11 @@
                 android:layout_toStartOf="@+id/itemPrice"
                 android:breakStrategy="simple"
                 android:ellipsize="end"
+                android:fontFamily="@font/montserrat_medium"
                 android:hyphenationFrequency="none"
+                android:maxLines="2"
                 android:textColor="#FFFFFF"
-                android:textSize="12sp"
-                android:maxLines="2" />
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/itemPrice"
@@ -50,12 +51,12 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:ellipsize="end"
-                android:gravity="center"
+                android:fontFamily="@font/montserrat_medium"
+                android:gravity="end"
                 android:maxLines="1"
                 android:singleLine="true"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textSize="16sp" />
 
         </RelativeLayout>
     </LinearLayout>

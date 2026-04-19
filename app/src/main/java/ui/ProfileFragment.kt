@@ -1,14 +1,14 @@
 package ui
 
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -33,9 +33,6 @@ class ProfileFragment : Fragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
 
-        val settingsIcon = view.findViewById<ImageView>(R.id.settings_icon)
-        settingsIcon.setOnClickListener { showSettingsMenu(it) }
-
         mascotOverlayContainer = view.findViewById(R.id.mascot_overlay_container)
         ownedItemsRecycler = view.findViewById(R.id.owned_items_recycler)
 
@@ -54,7 +51,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun setupInventory() {
-        ownedItemsRecycler.layoutManager = GridLayoutManager(requireContext(), 3)
+        ownedItemsRecycler.layoutManager = GridLayoutManager(requireContext(), 2)
         inventoryAdapter = InventoryAdapter(emptyList()) { item ->
             if (ShopStorage.isEquipped(requireContext(), item)) {
                 ShopStorage.unequipType(requireContext(), item.type)
@@ -89,27 +86,6 @@ class ProfileFragment : Fragment() {
         )
     }
 
-    private fun showSettingsMenu(view: View) {
-        val popup = PopupMenu(requireContext(), view)
-        popup.menu.add(0, 1, 0, "Toggle Theme")
-
-        popup.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                1 -> {
-                    val currentMode = AppCompatDelegate.getDefaultNightMode()
-                    if (currentMode == AppCompatDelegate.MODE_NIGHT_YES) {
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                    } else {
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                    }
-                    true
-                }
-                else -> false
-            }
-        }
-        popup.show()
-    }
-
     private inner class InventoryAdapter(
         private var items: List<ShopItem>,
         private val onItemClick: (ShopItem) -> Unit
@@ -130,12 +106,35 @@ class ProfileFragment : Fragment() {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = items[position]
+            val isEquipped = ShopStorage.isEquipped(requireContext(), item)
 
             holder.icon.setImageResource(item.iconRes)
-            holder.name.text = item.name
-            holder.price.text = if (ShopStorage.isEquipped(requireContext(), item)) "Надето" else ""
+            holder.price.visibility = View.GONE // Hide price/status text since we use 'name' field
 
-            holder.container.alpha = if (ShopStorage.isEquipped(requireContext(), item)) 0.7f else 1f
+            val params = holder.name.layoutParams as RelativeLayout.LayoutParams
+            
+            if (isEquipped) {
+                // Show "НАДЕТО" in the middle
+                holder.name.text = "НАДЕТО"
+                holder.name.gravity = Gravity.CENTER
+                holder.name.setTextColor(android.graphics.Color.parseColor("#4CAF50")) // Green
+                
+                // Remove constraints to price to allow centering in the whole bar
+                params.removeRule(RelativeLayout.START_OF)
+                params.removeRule(RelativeLayout.LEFT_OF)
+                params.width = RelativeLayout.LayoutParams.MATCH_PARENT
+            } else {
+                // Show original name
+                holder.name.text = item.name
+                holder.name.gravity = Gravity.START or Gravity.CENTER_VERTICAL
+                holder.name.setTextColor(android.graphics.Color.WHITE)
+                
+                // Restore original constraints if needed (though price is GONE)
+                params.width = RelativeLayout.LayoutParams.MATCH_PARENT
+            }
+            holder.name.layoutParams = params
+
+            holder.container.alpha = if (isEquipped) 0.8f else 1f
 
             holder.itemView.setOnClickListener {
                 onItemClick(item)

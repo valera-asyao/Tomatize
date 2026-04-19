@@ -45,10 +45,7 @@ class HabitsAdapter(
             ContextCompat.getColor(holder.itemView.context, color)
         )
 
-        holder.completeButton.text = when (habit.type) {
-            HabitType.GOOD -> "✔"
-            HabitType.BAD -> "✔"
-        }
+        holder.completeButton.text = "✔"
 
         holder.completeButton.setOnClickListener {
             onCompleteClick(habit)

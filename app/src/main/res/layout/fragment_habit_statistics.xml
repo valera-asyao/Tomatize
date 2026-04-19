@@ -3,9 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="#F8F9FA"
     android:paddingStart="12dp"
-    android:paddingTop="35dp"
     android:paddingEnd="12dp">
 
     <LinearLayout
@@ -25,7 +24,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_marginEnd="16dp"
-                android:background="@color/design_default_color_on_primary"
+                android:background="#F8F9FA"
                 android:text="←"
                 android:textSize="18sp"
                 app:srcCompat="@drawable/arrow_back" />

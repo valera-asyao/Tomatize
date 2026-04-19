@@ -9,9 +9,9 @@
 
     <View
         android:id="@+id/typeIndicatorView"
-        android:layout_width="4dp"
+        android:layout_width="3dp"
         android:layout_height="match_parent"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="12dp"
         android:background="@color/good_habit_color" />
 
     <LinearLayout
@@ -33,7 +33,6 @@
             android:id="@+id/streakCountTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:text="0 дн."
             android:textColor="@color/white"
             android:textSize="16sp" />

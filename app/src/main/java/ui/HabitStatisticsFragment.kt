@@ -48,6 +48,7 @@ class HabitStatisticsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        (activity as? MainActivity)?.setNavBarVisibility(false)
         (activity as? MainActivity)?.disableNavBarSelection()
         setupDeleteButton()
         setupBackButton()
@@ -56,6 +57,7 @@ class HabitStatisticsFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        (activity as? MainActivity)?.setNavBarVisibility(true)
         (activity as? MainActivity)?.enableNavBarSelection()
     }
 
@@ -115,7 +117,7 @@ class HabitStatisticsFragment : Fragment() {
             "Выполнено: ${statistics.completedDays} из ${statistics.totalDays} дней"
 
         view?.findViewById<TextView>(R.id.habitDescription)?.text =
-            habit.description ?: "Описание отсутствует"
+            if (habit.description.isNullOrBlank()) "Описания привычки нет" else habit.description
 
         // Серии
         val seriesText = when {

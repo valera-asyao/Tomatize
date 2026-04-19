@@ -171,10 +171,8 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     }
 
     private fun showCompletionMessage(habit: Habit) {
-        val message = when (habit.type) {
-            HabitType.GOOD -> "Привычка '${habit.name}' выполнена!"
-            HabitType.BAD -> "Вы удержались от '${habit.name}'!"
-        }
+        val message = "Привычка ${habit.name} соблюдена!"
+
         android.widget.Toast.makeText(requireContext(), message, android.widget.Toast.LENGTH_SHORT).show()
     }
 
@@ -204,9 +202,10 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     }
 
     private fun showHabitDetails(habit: Habit) {
+        val description = if (habit.description.isNullOrBlank()) "Описания привычки нет" else habit.description
         val message = """
             Название: ${habit.name}
-            Описание: ${habit.description}
+            Описание: $description
             Тип: ${if (habit.type == HabitType.GOOD) "Хорошая" else "Плохая"}
             Текущий стрик: ${habit.streakCount} дней
             ${if (habit.lastCompleted != null) "Последнее выполнение: ${formatDate(habit.lastCompleted)}" else "Еще не выполнялась"}
