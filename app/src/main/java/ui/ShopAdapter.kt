@@ -1,5 +1,7 @@
 package ui
 
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,19 +35,32 @@ class ShopAdapter(
         val item = items[position]
         holder.icon.setImageResource(item.iconRes)
         holder.name.text = item.name
-        holder.price.text = item.price.toString()
-        holder.container.setOnClickListener {
-            onItemClick(item)
-        }
-        when {
-            isEquipped(item) -> holder.price.text = "Надето"
-            isOwned(item) -> holder.price.text = "Куплено"
-            else -> holder.price.text = item.price.toString()
+        
+        val owned = isOwned(item)
+        val equipped = isEquipped(item)
+
+        if (owned || equipped) {
+            // Apply grayscale and disable click
+            val matrix = ColorMatrix()
+            matrix.setSaturation(0f)
+            holder.icon.colorFilter = ColorMatrixColorFilter(matrix)
+            holder.container.alpha = 0.5f
+            holder.container.isEnabled = false
+            holder.price.text = if (equipped) "Надето" else "Куплен"
+        } else {
+            // Reset to normal state
+            holder.icon.colorFilter = null
+            holder.container.alpha = 1.0f
+            holder.container.isEnabled = true
+            holder.price.text = item.price.toString()
+            holder.container.setOnClickListener {
+                onItemClick(item)
+            }
         }
     }
 
     override fun getItemCount() = items.size
-    // Метод для обновления списка при использовании фильтров
+
     fun updateItems(newItems: List<ShopItem>) {
         this.items = newItems
         notifyDataSetChanged()

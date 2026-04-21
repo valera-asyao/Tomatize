@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background_light">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
@@ -23,10 +24,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="70dp"
-        android:background="#F6FBFA"
+        android:background="@color/white_color"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <!-- Animated Selection Oval -->
         <View
             android:id="@+id/nav_selector_oval"
             android:layout_width="60dp"
@@ -36,7 +36,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <!-- Navigation Buttons -->
         <LinearLayout
             android:id="@+id/nav_buttons_container"
             android:layout_width="match_parent"
@@ -86,13 +85,11 @@
                 android:layout_weight="1"
                 android:clickable="true"
                 android:focusable="true">
-
                 <ImageView
                     android:id="@+id/iv_add"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:layout_gravity="center"
-                    android:contentDescription="@null"
                     android:src="@drawable/tomato_icon" />
             </FrameLayout>
 
@@ -134,13 +131,31 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Keeping original BottomNav hidden for compatibility -->
+    <!-- Splash Screen Overlay -->
+    <FrameLayout
+        android:id="@+id/splash_screen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background_light"
+        android:elevation="100dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="@font/gnf"
+            android:text="TOMATIZE"
+            android:textColor="@color/black"
+            android:textSize="48sp" />
+    </FrameLayout>
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:menu="@menu/bottom_nav_menu" />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

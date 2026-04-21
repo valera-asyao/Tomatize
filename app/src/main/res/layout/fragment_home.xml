@@ -70,30 +70,46 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Block 2: Mascot -->
-    <FrameLayout
+    <!-- Block 2: Mascot with Room Background -->
+    <androidx.cardview.widget.CardView
         android:id="@+id/mascotContainerHome"
         android:layout_width="match_parent"
         android:layout_height="250dp"
         android:layout_marginBottom="12dp"
-        android:background="@drawable/bg_home_block"
-        android:padding="8dp">
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="fitCenter"
-            app:srcCompat="@drawable/tomagochi" />
+        app:cardCornerRadius="20dp"
+        app:cardElevation="0dp"
+        app:cardPreventCornerOverlap="false">
 
         <FrameLayout
-            android:id="@+id/mascot_overlay_container_home"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:importantForAccessibility="no" />
-    </FrameLayout>
+            android:background="@color/white_color">
 
-    <!-- Block 3: Habits List (Returned CardView for clipping) -->
+
+            <!--<ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/room" />-->
+
+            <!-- Mascot Character -->
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/tomagochi" />
+
+            <!-- Accessories Overlay -->
+            <FrameLayout
+                android:id="@+id/mascot_overlay_container_home"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:importantForAccessibility="no" />
+        </FrameLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Block 3: Habits List -->
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -113,6 +129,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
+                android:background="@color/white_color"
                 android:padding="8dp" />
 
             <TextView

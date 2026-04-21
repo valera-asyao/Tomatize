@@ -114,10 +114,9 @@ class ProfileFragment : Fragment() {
             val params = holder.name.layoutParams as RelativeLayout.LayoutParams
             
             if (isEquipped) {
-                // Show "НАДЕТО" in the middle
                 holder.name.text = "НАДЕТО"
                 holder.name.gravity = Gravity.CENTER
-                holder.name.setTextColor(android.graphics.Color.parseColor("#4CAF50")) // Green
+                holder.name.setTextColor(android.graphics.Color.parseColor("#FFFFFF"))
                 
                 // Remove constraints to price to allow centering in the whole bar
                 params.removeRule(RelativeLayout.START_OF)
@@ -126,7 +125,7 @@ class ProfileFragment : Fragment() {
             } else {
                 // Show original name
                 holder.name.text = item.name
-                holder.name.gravity = Gravity.START or Gravity.CENTER_VERTICAL
+                holder.name.gravity = Gravity.CENTER
                 holder.name.setTextColor(android.graphics.Color.WHITE)
                 
                 // Restore original constraints if needed (though price is GONE)

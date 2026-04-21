@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
+    <color name="black">#2B1010</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="background_light">#EFEFEF</color>
+    <color name="background_light">#FBEDED</color>
+    <color name="white_color">#FDF6F6</color>
     <color name="good_habit_color">#4CAF50</color>
     <color name="bad_habit_color">#F44336</color>
     <color name="streak_color">#FF9800</color>
