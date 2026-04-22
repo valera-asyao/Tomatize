@@ -15,7 +15,8 @@ class HabitsAdapter(
     private val onHabitClick: (Habit) -> Unit = {},
     private val onHabitLongClick: (Habit) -> Unit = {},
     private val onCompleteClick: (Habit) -> Unit = {},
-    private val onDeleteClick: (Habit) -> Unit = {}
+    private val onDeleteClick: (Habit) -> Unit = {},
+    private val onUndoClick: (Habit) -> Unit = {}
 ) : RecyclerView.Adapter<HabitsAdapter.HabitViewHolder>() {
 
     class HabitViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -23,6 +24,7 @@ class HabitsAdapter(
         val nameTextView: TextView = itemView.findViewById(R.id.habitNameTextView)
         val streakTextView: TextView = itemView.findViewById(R.id.streakCountTextView)
         val completeButton: Button = itemView.findViewById(R.id.completeButton)
+        val cancelButton: Button = itemView.findViewById(R.id.cancel_button)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HabitViewHolder {
@@ -65,19 +67,32 @@ class HabitsAdapter(
         if (habit.type == HabitType.GOOD) {
             holder.rootLayout.backgroundTintList = ColorStateList.valueOf(goodBg)
             holder.completeButton.backgroundTintList = ColorStateList.valueOf(goodBtn)
+            holder.cancelButton.backgroundTintList = ColorStateList.valueOf(goodBtn)
             holder.nameTextView.setTextColor(goodTxt)
             holder.streakTextView.setTextColor(goodTxt)
         } else {
             holder.rootLayout.backgroundTintList = ColorStateList.valueOf(badBg)
             holder.completeButton.backgroundTintList = ColorStateList.valueOf(badBtn)
+            holder.cancelButton.backgroundTintList = ColorStateList.valueOf(badBtn)
             holder.nameTextView.setTextColor(badTxt)
             holder.streakTextView.setTextColor(badTxt)
         }
 
         holder.completeButton.text = "✔"
+        holder.cancelButton.text = "✘"
 
         holder.completeButton.setOnClickListener {
-            onCompleteClick(habit)
+            it.animate().alpha(0.5f).setDuration(200).withEndAction {
+                it.animate().alpha(1.0f).start()
+                onCompleteClick(habit)
+            }.start()
+        }
+
+        holder.cancelButton.setOnClickListener {
+            it.animate().alpha(0.5f).setDuration(200).withEndAction {
+                it.animate().alpha(1.0f).start()
+                onUndoClick(habit)
+            }.start()
         }
 
         holder.itemView.setOnClickListener {
