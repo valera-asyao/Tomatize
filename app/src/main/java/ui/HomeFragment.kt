@@ -67,7 +67,10 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         val currentDate = sdf.format(java.util.Date())
 
         val lastRewardDate = prefs.getString("LAST_REWARD_DATE", "")
-        var rewardedHabits = prefs.getString("REWARDED_HABITS_TODAY", "")?.split(",")?.toMutableList() ?: mutableListOf()
+        var rewardedHabits = prefs.getString("REWARDED_HABITS_TODAY", "")
+            ?.split(",")
+            ?.filter { it.isNotBlank() }
+            ?.toMutableList() ?: mutableListOf()
         if (currentDate != lastRewardDate) {
             rewardedHabits = mutableListOf()
             prefs.edit().putString("LAST_REWARD_DATE", currentDate).apply()
@@ -98,6 +101,29 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         }
     }
 
+    private fun checkAndDeductCurrency(habitId: Long) {
+        val prefs = requireActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+        val rewardedHabitsToday = prefs.getString("REWARDED_HABITS_TODAY", "") ?: ""
+
+        val rewardedList = rewardedHabitsToday.split(",").filter { it.isNotBlank() }.toMutableList()
+
+        if (rewardedList.contains(habitId.toString())) {
+            val currentBalance = prefs.getInt("USER_CURRENCY", 0)
+            val rewardAmount = 50
+
+            rewardedList.remove(habitId.toString())
+
+            val newList = rewardedList.joinToString(",")
+
+            prefs.edit()
+                .putInt("USER_CURRENCY", maxOf(0, currentBalance - rewardAmount))
+                .putString("REWARDED_HABITS_TODAY", newList)
+                .apply()
+
+            android.widget.Toast.makeText(requireContext(), "Награда $rewardAmount 🍅 отменена", android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun updateMascot() {
         val equippedItems = UserData.shopTypes
             .mapNotNull { type -> ShopStorage.getEquippedItemId(requireContext(), type) }
@@ -113,6 +139,9 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
             },
             onCompleteClick = { habit ->
                 completeHabit(habit)
+            },
+            onUndoClick = { habit ->
+                undoHabitCompletion(habit)
             }
         )
 
@@ -127,7 +156,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         habitsAdapter.updateHabits(habits)
 
         val maxStreak = habits.maxOfOrNull {  it.streakCount }?: 0
-        tvMaxStreak.text = "Дней серии\n$maxStreak"
+        tvMaxStreak.text = "$maxStreak"
 
         if (habits.isEmpty()) {
             emptyStateTextView.visibility = View.VISIBLE
@@ -170,11 +199,22 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         }
     }
 
-    private fun showCompletionMessage(habit: Habit) {
-        val message = when (habit.type) {
-            HabitType.GOOD -> "Привычка '${habit.name}' выполнена!"
-            HabitType.BAD -> "Вы удержались от '${habit.name}'!"
+    private fun undoHabitCompletion(habit: Habit) {
+        val success = databaseHelper.undoCompleteHabit(habit.id)
+        if (success) {
+            checkAndDeductCurrency(habit.id)
+            loadHabits()
+            updateBalanceUI()
+            android.widget.Toast.makeText(requireContext(), "Выполнение отменено", android.widget.Toast.LENGTH_SHORT).show()
         }
+        else {
+            android.widget.Toast.makeText(requireContext(), "Привычка сегодня не соблюдалась", android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun showCompletionMessage(habit: Habit) {
+        val message = "Привычка ${habit.name} соблюдена!"
+
         android.widget.Toast.makeText(requireContext(), message, android.widget.Toast.LENGTH_SHORT).show()
     }
 
@@ -204,9 +244,10 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     }
 
     private fun showHabitDetails(habit: Habit) {
+        val description = if (habit.description.isNullOrBlank()) "Описания привычки нет" else habit.description
         val message = """
             Название: ${habit.name}
-            Описание: ${habit.description}
+            Описание: $description
             Тип: ${if (habit.type == HabitType.GOOD) "Хорошая" else "Плохая"}
             Текущий стрик: ${habit.streakCount} дней
             ${if (habit.lastCompleted != null) "Последнее выполнение: ${formatDate(habit.lastCompleted)}" else "Еще не выполнялась"}

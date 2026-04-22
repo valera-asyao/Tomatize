@@ -256,6 +256,53 @@ class HabitDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
         return false
     }
 
+    fun undoCompleteHabit(habitId: Long): Boolean {
+        val habit = getHabitById(habitId) ?: return false
+        val lastCompleted = habit.lastCompleted ?: return false
+
+        val now = Calendar.getInstance()
+        val lastCal = Calendar.getInstance().apply { timeInMillis = lastCompleted }
+        if (!isSameDay(now, lastCal)) {
+            return false
+        }
+
+        val db = writableDatabase
+
+        db.delete(
+            TABLE_HABIT_COMPLETIONS,
+            "$COLUMN_HABIT_ID_FK = ? AND $COLUMN_COMPLETION_DATE = ?",
+            arrayOf(habitId.toString(), lastCompleted.toString())
+        )
+
+        val cursor = db.query(
+            TABLE_HABIT_COMPLETIONS,
+            arrayOf(COLUMN_COMPLETION_DATE),
+            "$COLUMN_HABIT_ID_FK = ?",
+            arrayOf(habitId.toString()),
+            null, null,
+            "$COLUMN_COMPLETION_DATE DESC",
+            "1"
+        )
+
+        var previousCompletionDate: Long? = null
+        if (cursor.moveToFirst()) {
+            previousCompletionDate = cursor.getLong(0)
+        }
+        cursor.close()
+
+        val newStreak = maxOf(0, habit.streakCount - 1)
+
+        val values = ContentValues().apply {
+            put(COLUMN_STREAK_COUNT, newStreak)
+            put(COLUMN_LAST_COMPLETED, previousCompletionDate)
+        }
+
+        val result = db.update(TABLE_HABITS, values, "$COLUMN_ID = ?", arrayOf(habitId.toString()))
+        db.close()
+
+        return result > 0
+    }
+
     private fun isYesterday(last: Calendar, now: Calendar): Boolean {
         val yesterday = now.clone() as Calendar
         yesterday.add(Calendar.DAY_OF_YEAR, -1)

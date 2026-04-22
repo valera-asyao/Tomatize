@@ -1,5 +1,6 @@
 package com.example.tomatize
 
+import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
@@ -7,15 +8,16 @@ import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.AccelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.navigation.fragment.NavHostFragment
 import ui.AddHabitDialog
@@ -32,11 +34,28 @@ class MainActivity : AppCompatActivity() {
     private var currentIndex = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Force light mode to be independent of system theme
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Handle Splash Screen
+        val splashScreen = findViewById<View>(R.id.splash_screen)
+        splashScreen.postDelayed({
+            splashScreen.animate()
+                .alpha(0f)
+                .setDuration(500)
+                .setInterpolator(AccelerateInterpolator())
+                .setListener(object : Animator.AnimatorListener {
+                    override fun onAnimationStart(animation: Animator) {}
+                    override fun onAnimationEnd(animation: Animator) {
+                        splashScreen.visibility = View.GONE
+                    }
+                    override fun onAnimationCancel(animation: Animator) {}
+                    override fun onAnimationRepeat(animation: Animator) {}
+                })
+        }, 1000)
 
         databaseHelper = HabitDatabaseHelper(this)
 
@@ -44,11 +63,17 @@ class MainActivity : AppCompatActivity() {
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
 
-        // Initialize Custom Bottom Nav
+        val rootLayout = findViewById<View>(R.id.main_root)
+        val customBottomNav = findViewById<View>(R.id.custom_bottom_nav)
+        
+        ViewCompat.setOnApplyWindowInsetsListener(rootLayout) { view, windowInsets ->
+            val systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(top = systemBars.top)
+            customBottomNav.updatePadding(bottom = systemBars.bottom)
+            windowInsets
+        }
+
         selectorOval = findViewById(R.id.nav_selector_oval)
-
-
-
         navButtons = listOf(
             findViewById(R.id.nav_home),
             findViewById(R.id.nav_statistics),
@@ -92,7 +117,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Initial position after layout
         selectorOval.post {
             moveSelector(0, animate = false)
         }
@@ -104,11 +128,8 @@ class MainActivity : AppCompatActivity() {
         val startX = currentIndex * tabWidth + (tabWidth - selectorOval.width) / 2f
         val endX = newIndex * tabWidth + (tabWidth - selectorOval.width) / 2f
 
-        // Move Animation
         val moveAnimator = ObjectAnimator.ofFloat(selectorOval, "translationX", startX, endX)
-
-        // Stretch Animation (Rubber effect)
-        // We stretch more if the distance is larger, but a fixed scale also looks good
+        
         val stretchAnimator = ValueAnimator.ofFloat(1f, 1.25f, 1f)
         stretchAnimator.addUpdateListener { animator ->
             val scale = animator.animatedValue as Float
@@ -121,20 +142,18 @@ class MainActivity : AppCompatActivity() {
             interpolator = AccelerateDecelerateInterpolator()
         }
 
-        // Update colors
         updateNavColors(newIndex)
-
         animatorSet.start()
         currentIndex = newIndex
     }
 
     private fun moveSelector(index: Int, animate: Boolean) {
         val container = findViewById<View>(R.id.nav_buttons_container)
-        if (container.width == 0) return // Wait for layout
-
+        if (container.width == 0) return
+        
         val tabWidth = container.width / 5f
         val targetX = index * tabWidth + (tabWidth - selectorOval.width) / 2f
-
+        
         if (animate) {
             animateSelector(index)
         } else {
@@ -149,9 +168,16 @@ class MainActivity : AppCompatActivity() {
         val inactiveColor = ContextCompat.getColor(this, R.color.nav_inactive)
 
         navIcons.forEachIndexed { index, imageView ->
-            val color = if (index == activeIndex) activeColor else inactiveColor
-            ImageViewCompat.setImageTintList(imageView, ColorStateList.valueOf(color))
+            if (index != 2) {
+                val color = if (index == activeIndex) activeColor else inactiveColor
+                ImageViewCompat.setImageTintList(imageView, ColorStateList.valueOf(color))
+            }
         }
+    }
+
+    // Missing methods added here
+    fun setNavBarVisibility(visible: Boolean) {
+        findViewById<View>(R.id.custom_bottom_nav).visibility = if (visible) View.VISIBLE else View.GONE
     }
 
     fun disableNavBarSelection() {
@@ -166,32 +192,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun showAddHabitDialog() {
         val dialog = AddHabitDialog()
-
         dialog.setOnHabitAddedListener(object : AddHabitDialog.OnHabitAddedListener {
             override fun onHabitAdded(habit: Habit) {
                 val id = databaseHelper.addHabit(habit)
                 if (id != -1L) {
-                    android.widget.Toast.makeText(
-                        this@MainActivity,
-                        "Привычка добавлена!",
-                        android.widget.Toast.LENGTH_SHORT
-                    ).show()
-
-                    val navHostFragment = supportFragmentManager
-                        .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-                    val currentFragment =
-                        navHostFragment.childFragmentManager.fragments.firstOrNull()
-
-                    if (currentFragment is HomeFragment) {
-                        currentFragment.refreshHabits()
-                    } else {
-                        val navController = navHostFragment.navController
-                        navController.navigate(R.id.homeFragment)
-                    }
+                    android.widget.Toast.makeText(this@MainActivity, "Привычка добавлена!", android.widget.Toast.LENGTH_SHORT).show()
+                    val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+                    val currentFragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
+                    if (currentFragment is HomeFragment) currentFragment.refreshHabits()
                 }
             }
         })
-
         dialog.show(supportFragmentManager, "AddHabitDialog")
     }
 }

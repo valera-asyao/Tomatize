@@ -3,31 +3,49 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA"
+    android:background="@color/background_light"
     android:orientation="vertical"
     android:padding="16dp">
 
-    <RelativeLayout
+    <!-- Block 1: Statistics and Currency -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp">
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/bg_home_block"
+        android:orientation="horizontal"
+        android:padding="16dp">
 
-        <TextView
-            android:id="@+id/tvMaxStreakTitle"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:fontFamily="@font/gnf"
-            android:text="Дней серии&#10;1000"
-            android:textColor="@color/black"
-            android:textSize="32sp" />
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/gnf"
+                android:text="Дней серии"
+                android:textColor="@color/black"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/tvMaxStreakTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/gnf"
+                android:text="1000"
+                android:textColor="@color/black"
+                android:textSize="32sp"
+                android:layout_marginTop="-4dp" />
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/currencyContainerHome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
+            android:layout_gravity="center_vertical"
             android:background="@drawable/bg_pill_dark"
             android:gravity="center_vertical"
             android:orientation="horizontal"
@@ -50,52 +68,82 @@
                 android:text="🍅"
                 android:textSize="14sp" />
         </LinearLayout>
-    </RelativeLayout>
+    </LinearLayout>
 
-    <FrameLayout
+    <!-- Block 2: Mascot with Room Background -->
+    <androidx.cardview.widget.CardView
         android:id="@+id/mascotContainerHome"
         android:layout_width="match_parent"
-        android:layout_height="380dp">
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="fitCenter"
-            app:srcCompat="@drawable/tomagochi" />
+        android:layout_height="250dp"
+        android:layout_marginBottom="12dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="0dp"
+        app:cardPreventCornerOverlap="false">
 
         <FrameLayout
-            android:id="@+id/mascot_overlay_container_home"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:importantForAccessibility="no" />
-    </FrameLayout>
+            android:background="@color/white_color">
 
+
+            <!--<ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/room" />-->
+
+            <!-- Mascot Character -->
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/tomagochi" />
+
+            <!-- Accessories Overlay -->
+            <FrameLayout
+                android:id="@+id/mascot_overlay_container_home"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:importantForAccessibility="no" />
+        </FrameLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Block 3: Habits List -->
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        app:cardBackgroundColor="#231F20"
-        app:cardCornerRadius="25dp">
+        app:cardBackgroundColor="#F6FBFA"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="0dp"
+        app:cardUseCompatPadding="false"
+        app:cardPreventCornerOverlap="false">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/habitsRecyclerView"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:padding="4dp" />
+            android:layout_height="match_parent">
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/habitsRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:background="@color/white_color"
+                android:padding="8dp" />
+
+            <TextView
+                android:id="@+id/emptyStateTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:padding="32dp"
+                android:text="У вас пока нет привычек\nНажмите + чтобы добавить первую"
+                android:textColor="#666666"
+                android:textSize="16sp"
+                android:visibility="gone" />
+        </FrameLayout>
     </androidx.cardview.widget.CardView>
-
-    <TextView
-        android:id="@+id/emptyStateTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="32dp"
-        android:text="У вас пока нет привычек&#10;Нажмите + чтобы добавить первую"
-        android:textColor="#666666"
-        android:textSize="16sp"
-        android:visibility="gone" />
 
 </LinearLayout>

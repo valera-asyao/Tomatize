@@ -14,7 +14,9 @@ object UserData {
         "app_icon",
         "rounded_card",
         "tomagochi",
-        "tomato_icon"
+        "tomato_icon",
+        "room",
+        "hat"
     )
 
     private val excludedDrawablePrefixes = listOf(

@@ -3,16 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="@color/background_light"
     android:paddingStart="12dp"
-    android:paddingTop="35dp"
     android:paddingEnd="12dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingBottom="24dp">
 
+        <!-- Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -25,10 +26,9 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_marginEnd="16dp"
-                android:background="@color/design_default_color_on_primary"
-                android:text="←"
-                android:textSize="18sp"
-                app:srcCompat="@drawable/arrow_back" />
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:srcCompat="@drawable/arrow_back"
+                app:tint="@color/black" />
 
             <TextView
                 android:id="@+id/header"
@@ -49,15 +49,17 @@
                 android:layout_marginStart="16dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Удалить привычку"
-                app:srcCompat="@android:drawable/ic_menu_delete" />
+                app:srcCompat="@android:drawable/ic_menu_delete"
+                app:tint="@color/bad_habit_color" />
 
         </LinearLayout>
 
+        <!-- Description Block -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:background="@drawable/rounded_card"
+            android:background="@drawable/bg_home_block"
             android:orientation="vertical"
             android:padding="16dp">
 
@@ -67,16 +69,17 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat_regular"
                 android:text="Text"
-                android:textColor="@color/white"
+                android:textColor="#000000"
                 android:textSize="16sp" />
 
         </LinearLayout>
 
+        <!-- Main Stats Block -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:background="@drawable/rounded_card"
+            android:background="@drawable/bg_home_block"
             android:orientation="vertical"
             android:padding="16dp">
 
@@ -87,76 +90,13 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:gravity="center"
-                    android:text="Пн"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:gravity="center"
-                    android:text="Вт"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:gravity="center"
-                    android:text="Ср"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:gravity="center"
-                    android:text="Чт"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:gravity="center"
-                    android:text="Пт"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:gravity="center"
-                    android:text="Сб"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:gravity="center"
-                    android:text="Вс"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
-
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:fontFamily="@font/montserrat_regular" android:gravity="center" android:text="Пн" android:textColor="#666666" android:textSize="12sp" />
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:fontFamily="@font/montserrat_regular" android:gravity="center" android:text="Вт" android:textColor="#666666" android:textSize="12sp" />
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:fontFamily="@font/montserrat_regular" android:gravity="center" android:text="Ср" android:textColor="#666666" android:textSize="12sp" />
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:fontFamily="@font/montserrat_regular" android:gravity="center" android:text="Чт" android:textColor="#666666" android:textSize="12sp" />
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:fontFamily="@font/montserrat_regular" android:gravity="center" android:text="Пт" android:textColor="#666666" android:textSize="12sp" />
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:fontFamily="@font/montserrat_regular" android:gravity="center" android:text="Сб" android:textColor="#666666" android:textSize="12sp" />
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:fontFamily="@font/montserrat_regular" android:gravity="center" android:text="Вс" android:textColor="#666666" android:textSize="12sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -166,143 +106,56 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/currentDay1"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:fontFamily="@font/montserrat_bold"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#000000"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/currentDay2"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:fontFamily="@font/montserrat_bold"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#000000"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/currentDay3"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:fontFamily="@font/montserrat_bold"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#000000"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/currentDay4"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:fontFamily="@font/montserrat_bold"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#000000"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/currentDay5"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:fontFamily="@font/montserrat_bold"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#000000"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/currentDay6"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:fontFamily="@font/montserrat_bold"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#000000"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/currentDay7"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:fontFamily="@font/montserrat_bold"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
+                <TextView android:id="@+id/currentDay1" android:layout_width="0dp" android:layout_height="42dp" android:layout_margin="3dp" android:layout_weight="1" android:background="@drawable/day_circle" android:fontFamily="@font/montserrat_bold" android:gravity="center" android:textColor="#000000" android:textSize="14sp" />
+                <TextView android:id="@+id/currentDay2" android:layout_width="0dp" android:layout_height="42dp" android:layout_margin="3dp" android:layout_weight="1" android:background="@drawable/day_circle" android:fontFamily="@font/montserrat_bold" android:gravity="center" android:textColor="#000000" android:textSize="14sp" />
+                <TextView android:id="@+id/currentDay3" android:layout_width="0dp" android:layout_height="42dp" android:layout_margin="3dp" android:layout_weight="1" android:background="@drawable/day_circle" android:fontFamily="@font/montserrat_bold" android:gravity="center" android:textColor="#000000" android:textSize="14sp" />
+                <TextView android:id="@+id/currentDay4" android:layout_width="0dp" android:layout_height="42dp" android:layout_margin="3dp" android:layout_weight="1" android:background="@drawable/day_circle" android:fontFamily="@font/montserrat_bold" android:gravity="center" android:textColor="#000000" android:textSize="14sp" />
+                <TextView android:id="@+id/currentDay5" android:layout_width="0dp" android:layout_height="42dp" android:layout_margin="3dp" android:layout_weight="1" android:background="@drawable/day_circle" android:fontFamily="@font/montserrat_bold" android:gravity="center" android:textColor="#000000" android:textSize="14sp" />
+                <TextView android:id="@+id/currentDay6" android:layout_width="0dp" android:layout_height="42dp" android:layout_margin="3dp" android:layout_weight="1" android:background="@drawable/day_circle" android:fontFamily="@font/montserrat_bold" android:gravity="center" android:textColor="#000000" android:textSize="14sp" />
+                <TextView android:id="@+id/currentDay7" android:layout_width="0dp" android:layout_height="42dp" android:layout_margin="3dp" android:layout_weight="1" android:background="@drawable/day_circle" android:fontFamily="@font/montserrat_bold" android:gravity="center" android:textColor="#000000" android:textSize="14sp" />
             </LinearLayout>
 
-            <LinearLayout
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_marginBottom="10dp"
-                android:background="@color/white"
-                android:gravity="center"
-                android:orientation="vertical">
-
-            </LinearLayout>
+                android:layout_height="1dp"
+                android:layout_marginBottom="16dp"
+                android:background="#DDDDDD" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:gravity="bottom"
                 android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/series"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:fontFamily="@font/montserrat_regular"
                     android:gravity="start"
                     android:text="series"
-                    android:textColor="@color/white"
+                    android:textColor="#000000"
                     android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/record"
-                    android:layout_width="310dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:fontFamily="@font/montserrat_regular"
-                    android:gravity="center"
+                    android:gravity="end"
                     android:text="record"
-                    android:textColor="@color/white"
+                    android:textColor="#000000"
                     android:textSize="14sp" />
             </LinearLayout>
 
         </LinearLayout>
 
+        <!-- Monthly Calendar Block -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/rounded_card"
+            android:background="@drawable/bg_home_block"
             android:orientation="vertical"
             android:padding="12dp">
 
@@ -313,10 +166,9 @@
                 android:fontFamily="@font/gnf"
                 android:gravity="center"
                 android:text="КАЛЕНДАРЬ ВЫПОЛНЕНИЯ"
-                android:textColor="@color/white"
+                android:textColor="#000000"
                 android:textSize="16sp" />
 
-            <!-- Дни недели для календаря -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -324,630 +176,69 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:gravity="center"
-                    android:text="Пн"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:gravity="center"
-                    android:text="Вт"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:gravity="center"
-                    android:text="Ср"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:gravity="center"
-                    android:text="Чт"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:gravity="center"
-                    android:text="Пт"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:gravity="center"
-                    android:text="Сб"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:gravity="center"
-                    android:text="Вс"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
-
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:fontFamily="@font/montserrat_regular" android:gravity="center" android:text="Пн" android:textColor="#666666" android:textSize="12sp" />
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:fontFamily="@font/montserrat_regular" android:gravity="center" android:text="Вт" android:textColor="#666666" android:textSize="12sp" />
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:fontFamily="@font/montserrat_regular" android:gravity="center" android:text="Ср" android:textColor="#666666" android:textSize="12sp" />
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:fontFamily="@font/montserrat_regular" android:gravity="center" android:text="Чт" android:textColor="#666666" android:textSize="12sp" />
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:fontFamily="@font/montserrat_regular" android:gravity="center" android:text="Пт" android:textColor="#666666" android:textSize="12sp" />
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:fontFamily="@font/montserrat_regular" android:gravity="center" android:text="Сб" android:textColor="#666666" android:textSize="12sp" />
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:fontFamily="@font/montserrat_regular" android:gravity="center" android:text="Вс" android:textColor="#666666" android:textSize="12sp" />
             </LinearLayout>
 
-            <LinearLayout
+            <GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:gravity="center"
-                android:orientation="horizontal">
+                android:columnCount="7"
+                android:rowCount="6">
+                
+                <TextView android:id="@+id/calDay1" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay2" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay3" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay4" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay5" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay6" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay7" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                
+                <TextView android:id="@+id/calDay8" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay9" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay10" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay11" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay12" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay13" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay14" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
 
-                <TextView
-                    android:id="@+id/calDay1"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
+                <TextView android:id="@+id/calDay15" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay16" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay17" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay18" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay19" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay20" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay21" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
 
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text="" />
+                <TextView android:id="@+id/calDay22" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay23" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay24" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay25" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay26" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay27" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay28" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
 
-                <TextView
-                    android:id="@+id/calDay2"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text="" />
+                <TextView android:id="@+id/calDay29" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay30" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay31" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay32" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay33" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay34" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay35" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
 
-                <TextView
-                    android:id="@+id/calDay3"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#000000"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay4"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#000000"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay5"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#000000"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay6"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#000000"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay7"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/calDay8"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay9"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay10"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay11"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay12"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay13"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay14"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/calDay15"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay16"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay17"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay18"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay19"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay20"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay21"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/calDay22"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay23"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay24"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay25"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay26"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay27"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay28"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/calDay29"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay30"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay31"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay32"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay33"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay34"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay35"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/calDay36"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay37"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay38"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay39"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay40"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay41"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/calDay42"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_margin="2dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/day_circle"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
+                <TextView android:id="@+id/calDay36" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay37" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay38" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay39" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay40" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay41" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+                <TextView android:id="@+id/calDay42" android:layout_width="0dp" android:layout_height="40dp" android:layout_margin="3dp" android:layout_columnWeight="1" android:gravity="center" android:textSize="14sp" />
+            </GridLayout>
 
         </LinearLayout>
 
