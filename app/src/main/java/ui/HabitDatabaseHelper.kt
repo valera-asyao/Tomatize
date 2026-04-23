@@ -321,7 +321,7 @@ class HabitDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
         return rowsDeleted > 0
     }
 
-    public fun getHabitById(habitId: Long): Habit? {
+    fun getHabitById(habitId: Long): Habit? {
         val db = readableDatabase
         val cursor = db.query(
             TABLE_HABITS,
@@ -399,7 +399,7 @@ class HabitDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
         return diff <= (24 * 60 * 60 * 1000L)
     }
 
-    public fun isSameDay(cal1: Calendar, cal2: Calendar): Boolean {
+    fun isSameDay(cal1: Calendar, cal2: Calendar): Boolean {
         return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
                 cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
     }
@@ -429,4 +429,25 @@ class HabitDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
         db.close()
         return count
     }
+
+    fun hasUncompletedHabitsToday(): Boolean {
+        val habits = getAllHabitsRaw()
+        if (habits.isEmpty()) return false
+
+        val now = Calendar.getInstance()
+
+        for (habit in habits) {
+            val lastCompleted = habit.lastCompleted
+            if (lastCompleted == null) {
+                return true
+            }
+
+            val lastCal = Calendar.getInstance().apply { timeInMillis = lastCompleted }
+            if (!isSameDay(now, lastCal)) {
+                return true
+            }
+        }
+        return false
+    }
+
 }
