@@ -1,10 +1,12 @@
 package ui
 
+import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -60,9 +62,8 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         tvCurrencyHome.text = balance.toString()
     }
 
-    // Функция для проверки лимитов и выдачи награды
     private fun checkAndAwardCurrency(habitId: Long) {
-        val prefs = requireActivity().getSharedPreferences("AppPrefs", android.content.Context.MODE_PRIVATE)
+        val prefs = requireActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
         val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
         val currentDate = sdf.format(java.util.Date())
 
@@ -92,35 +93,6 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
                 "Награда $rewardAmount \uD83C\uDF45! (${rewardedHabits.size}/3)",
                 android.widget.Toast.LENGTH_SHORT
             ).show()
-        } else {
-            android.widget.Toast.makeText(
-                requireContext(),
-                "Лимит наград на сегодня исчерпан",
-                android.widget.Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
-
-    private fun checkAndDeductCurrency(habitId: Long) {
-        val prefs = requireActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
-        val rewardedHabitsToday = prefs.getString("REWARDED_HABITS_TODAY", "") ?: ""
-
-        val rewardedList = rewardedHabitsToday.split(",").filter { it.isNotBlank() }.toMutableList()
-
-        if (rewardedList.contains(habitId.toString())) {
-            val currentBalance = prefs.getInt("USER_CURRENCY", 0)
-            val rewardAmount = 50
-
-            rewardedList.remove(habitId.toString())
-
-            val newList = rewardedList.joinToString(",")
-
-            prefs.edit()
-                .putInt("USER_CURRENCY", maxOf(0, currentBalance - rewardAmount))
-                .putString("REWARDED_HABITS_TODAY", newList)
-                .apply()
-
-            android.widget.Toast.makeText(requireContext(), "Награда $rewardAmount 🍅 отменена", android.widget.Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -138,7 +110,11 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
                 showHabitDetails(habit)
             },
             onCompleteClick = { habit ->
-                completeHabit(habit)
+                if (habit.type == HabitType.BAD) {
+                    showBadHabitFailureDialog(habit)
+                } else {
+                    completeGoodHabit(habit)
+                }
             },
             onUndoClick = { habit ->
                 undoHabitCompletion(habit)
@@ -149,6 +125,28 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = habitsAdapter
         }
+    }
+
+    private fun showBadHabitFailureDialog(habit: Habit) {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_bad_habit_failure, null)
+        val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog)
+            .setView(dialogView)
+            .create()
+
+        dialogView.findViewById<Button>(R.id.btnCancel).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialogView.findViewById<Button>(R.id.btnConfirm).setOnClickListener {
+            if (databaseHelper.recordFailure(habit.id)) {
+                loadHabits()
+                android.widget.Toast.makeText(requireContext(), "Стрик сброшен", android.widget.Toast.LENGTH_SHORT).show()
+            }
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
     }
 
     private fun loadHabits() {
@@ -171,25 +169,12 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         loadHabits()
     }
 
-    fun showAddHabitDialog() {
-        val dialog = AddHabitDialog()
-        dialog.setOnHabitAddedListener(this)
-        dialog.show(parentFragmentManager, "AddHabitDialog")
-    }
-
     override fun onHabitAdded(habit: Habit) {
-        val id = databaseHelper.addHabit(habit)
-        if (id != -1L) {
-            loadHabits()
-            android.widget.Toast.makeText(
-                requireContext(),
-                "Привычка добавлена!",
-                android.widget.Toast.LENGTH_SHORT
-            ).show()
-        }
+        databaseHelper.addHabit(habit)
+        loadHabits()
     }
 
-    private fun completeHabit(habit: Habit) {
+    private fun completeGoodHabit(habit: Habit) {
         val success = databaseHelper.completeHabit(habit.id)
         if (success) {
             loadHabits()
@@ -202,77 +187,21 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     private fun undoHabitCompletion(habit: Habit) {
         val success = databaseHelper.undoCompleteHabit(habit.id)
         if (success) {
-            checkAndDeductCurrency(habit.id)
             loadHabits()
             updateBalanceUI()
             android.widget.Toast.makeText(requireContext(), "Выполнение отменено", android.widget.Toast.LENGTH_SHORT).show()
         }
-        else {
-            android.widget.Toast.makeText(requireContext(), "Привычка сегодня не соблюдалась", android.widget.Toast.LENGTH_SHORT).show()
-        }
     }
 
     private fun showCompletionMessage(habit: Habit) {
-        val message = "Привычка ${habit.name} соблюдена!"
-
-        android.widget.Toast.makeText(requireContext(), message, android.widget.Toast.LENGTH_SHORT).show()
-    }
-
-    private fun deleteHabit(habit: Habit) {
-        val builder = android.app.AlertDialog.Builder(requireContext())
-        builder.setTitle("Удалить привычку?")
-            .setMessage("Вы уверены, что хотите удалить '${habit.name}'? Все данные будут потеряны.")
-            .setPositiveButton("Удалить") { _, _ ->
-                val success = databaseHelper.deleteHabit(habit.id)
-                if (success) {
-                    loadHabits()
-                    android.widget.Toast.makeText(
-                        requireContext(),
-                        "Привычка удалена",
-                        android.widget.Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    android.widget.Toast.makeText(
-                        requireContext(),
-                        "Ошибка при удалении",
-                        android.widget.Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-            .setNegativeButton("Отмена", null)
-            .show()
+        android.widget.Toast.makeText(requireContext(), "Привычка ${habit.name} соблюдена!", android.widget.Toast.LENGTH_SHORT).show()
     }
 
     private fun showHabitDetails(habit: Habit) {
-        val description = if (habit.description.isNullOrBlank()) "Описания привычки нет" else habit.description
-        val message = """
-            Название: ${habit.name}
-            Описание: $description
-            Тип: ${if (habit.type == HabitType.GOOD) "Хорошая" else "Плохая"}
-            Текущий стрик: ${habit.streakCount} дней
-            ${if (habit.lastCompleted != null) "Последнее выполнение: ${formatDate(habit.lastCompleted)}" else "Еще не выполнялась"}
-        """.trimIndent()
-
-        val dialog = android.app.AlertDialog.Builder(requireContext())
-            .setTitle("Информация о привычке")
-            .setMessage(message)
-            .setPositiveButton("OK", null)
-            .setNeutralButton("Удалить") { _, _ ->
-                deleteHabit(habit)
-            }
-            .create()
-
-        dialog.setOnShowListener {
-            dialog.getButton(android.app.AlertDialog.BUTTON_NEUTRAL)?.setTextColor(
-                android.graphics.Color.RED
-            )
-        }
-
-        dialog.show()
-    }
-
-    private fun formatDate(timestamp: Long): String {
-        return java.text.SimpleDateFormat("dd.MM.yyyy HH:mm", java.util.Locale.getDefault())
-            .format(java.util.Date(timestamp))
+        val fragment = HabitStatisticsFragment.newInstance(habit.id)
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.nav_host_fragment, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 }

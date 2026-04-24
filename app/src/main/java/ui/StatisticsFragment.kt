@@ -1,12 +1,12 @@
 package ui
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -54,13 +54,14 @@ class StatisticsFragment : Fragment() {
             text = "Нет добавленных привычек"
             textSize = 20f
             gravity = Gravity.CENTER
-            setTextColor(getThemeColor(android.R.attr.textColorSecondary))
+            setTextColor(ContextCompat.getColor(requireContext(), android.R.color.darker_gray))
 
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT
             ).apply {
                 gravity = Gravity.CENTER
+                topMargin = 100
             }
         }
         mainContainer.addView(emptyText)
@@ -68,7 +69,6 @@ class StatisticsFragment : Fragment() {
 
     private fun showHabitsList() {
         val habits = databaseHelper.getAllHabits()
-
         val habitsContainer = LinearLayout(requireContext()).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -80,50 +80,37 @@ class StatisticsFragment : Fragment() {
         habits.forEach { habit ->
             addHabitButton(habitsContainer, habit)
         }
-
-        val scrollView = ScrollView(requireContext()).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
-            )
-        }
-
-        scrollView.addView(habitsContainer)
-        mainContainer.addView(scrollView)
+        mainContainer.addView(habitsContainer)
     }
 
     private fun addHabitButton(container: LinearLayout, habit: Habit) {
         val habitView = LayoutInflater.from(requireContext())
             .inflate(R.layout.item_habit_statistics, container, false)
 
-
         val nameTextView = habitView.findViewById<TextView>(R.id.habitNameTextView)
-        val typeTextView = habitView.findViewById<TextView>(R.id.typeOfHabit)
-        val indicatorView = habitView.findViewById<View>(R.id.typeIndicatorView)
         val mainItemContainer = habitView.findViewById<View>(R.id.habitItemContainer)
 
-        val x = habit.streakCount
-        val daysText = when {
-            x % 100 in 11..19 -> "$x дней"
-            x % 10 == 1 -> "$x день"
-            x % 10 in 2..4 -> "$x дня"
-            else -> "$x дней"
-        }
-
         nameTextView.text = habit.name
-        typeTextView.text = daysText
 
-        val colorRes = if (habit.type == HabitType.GOOD) {
-            R.color.good_habit_color
+        val context = requireContext()
+        
+        // Правильное определение цветов через R.color
+        val (bgColor, txtColor) = if (habit.type == HabitType.GOOD) {
+            Pair(
+                ContextCompat.getColor(context, R.color.habit_good_bg),
+                ContextCompat.getColor(context, R.color.habit_good_text)
+            )
         } else {
-            R.color.bad_habit_color
+            Pair(
+                ContextCompat.getColor(context, R.color.habit_bad_bg),
+                ContextCompat.getColor(context, R.color.habit_bad_text)
+            )
         }
-        val color = ContextCompat.getColor(requireContext(), colorRes)
 
-        indicatorView.setBackgroundColor(color)
+        mainItemContainer.backgroundTintList = ColorStateList.valueOf(bgColor)
+        nameTextView.setTextColor(txtColor)
 
-        val clickableArea = mainItemContainer ?: habitView
-        clickableArea.setOnClickListener {
+        mainItemContainer.setOnClickListener {
             openHabitStatistics(habit)
         }
 
@@ -148,22 +135,11 @@ class StatisticsFragment : Fragment() {
             findNavController().navigate(R.id.habitStatisticsFragment, bundle, options)
         } catch (e: Exception) {
             e.printStackTrace()
-            showError("Ошибка открытия статистики: ${e.message}")
+            showError("Ошибка открытия статистики")
         }
     }
 
     private fun showError(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun getThemeColor(attrRes: Int): Int {
-        return try {
-            val typedArray = requireContext().theme.obtainStyledAttributes(intArrayOf(attrRes))
-            val color = typedArray.getColor(0, ContextCompat.getColor(requireContext(), android.R.color.black))
-            typedArray.recycle()
-            color
-        } catch (e: Exception) {
-            ContextCompat.getColor(requireContext(), android.R.color.black)
-        }
     }
 }

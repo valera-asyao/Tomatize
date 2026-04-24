@@ -40,22 +40,6 @@ class HabitsAdapter(
         holder.nameTextView.text = habit.name
         holder.streakTextView.text = "${habit.streakCount} дн."
 
-        // Apply dynamic colors based on habit type
-        val (bgColor, btnColor, textColor) = if (habit.type == HabitType.GOOD) {
-            Triple(
-                ContextCompat.getColor(context, R.color.habit_good_bg),
-                ContextCompat.getColor(context, R.color.habit_good_btn),
-                ContextCompat.getColor(context, R.color.habit_good_text)
-            )
-        } else {
-            Triple(
-                ContextCompat.getColor(context, R.color.habit_bad_bg),
-                ContextCompat.getColor(context, R.color.habit_bad_btn),
-                ContextCompat.getColor(context, R.color.habit_bad_text)
-            )
-        }
-
-        // We can't use triple with IDs directly, using safe colors from resources
         val goodBg = ContextCompat.getColor(context, R.color.habit_good_bg)
         val goodBtn = ContextCompat.getColor(context, R.color.habit_good_btn)
         val goodTxt = ContextCompat.getColor(context, R.color.habit_good_text)
@@ -70,29 +54,24 @@ class HabitsAdapter(
             holder.cancelButton.backgroundTintList = ColorStateList.valueOf(goodBtn)
             holder.nameTextView.setTextColor(goodTxt)
             holder.streakTextView.setTextColor(goodTxt)
+            holder.completeButton.text = "✔"
+            holder.cancelButton.visibility = View.VISIBLE
         } else {
             holder.rootLayout.backgroundTintList = ColorStateList.valueOf(badBg)
             holder.completeButton.backgroundTintList = ColorStateList.valueOf(badBtn)
             holder.cancelButton.backgroundTintList = ColorStateList.valueOf(badBtn)
             holder.nameTextView.setTextColor(badTxt)
             holder.streakTextView.setTextColor(badTxt)
+            holder.completeButton.text = "✘"
+            holder.cancelButton.visibility = View.GONE
         }
 
-        holder.completeButton.text = "✔"
-        holder.cancelButton.text = "✘"
-
         holder.completeButton.setOnClickListener {
-            it.animate().alpha(0.5f).setDuration(200).withEndAction {
-                it.animate().alpha(1.0f).start()
-                onCompleteClick(habit)
-            }.start()
+            onCompleteClick(habit)
         }
 
         holder.cancelButton.setOnClickListener {
-            it.animate().alpha(0.5f).setDuration(200).withEndAction {
-                it.animate().alpha(1.0f).start()
-                onUndoClick(habit)
-            }.start()
+            onUndoClick(habit)
         }
 
         holder.itemView.setOnClickListener {
