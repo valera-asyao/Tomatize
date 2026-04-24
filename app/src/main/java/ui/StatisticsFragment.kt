@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import com.example.tomatize.R
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navOptions
 
 class StatisticsFragment : Fragment() {
     private lateinit var databaseHelper: HabitDatabaseHelper
@@ -130,10 +131,21 @@ class StatisticsFragment : Fragment() {
     }
 
     private fun openHabitStatistics(habit: Habit) {
-        try {        val bundle = Bundle().apply {
-            putLong("habit_id", habit.id)
-        }
-            findNavController().navigate(R.id.habitStatisticsFragment, bundle)
+        try {
+            val bundle = Bundle().apply {
+                putLong("habit_id", habit.id)
+            }
+            
+            val options = navOptions {
+                anim {
+                    enter = R.anim.slide_in_right
+                    exit = R.anim.slide_out_left
+                    popEnter = R.anim.slide_in_left
+                    popExit = R.anim.slide_out_right
+                }
+            }
+            
+            findNavController().navigate(R.id.habitStatisticsFragment, bundle, options)
         } catch (e: Exception) {
             e.printStackTrace()
             showError("Ошибка открытия статистики: ${e.message}")
