@@ -139,14 +139,25 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
 
         dialogView.findViewById<Button>(R.id.btnConfirm).setOnClickListener {
             if (databaseHelper.recordFailure(habit.id)) {
+                applyFailurePenalty()
                 loadHabits()
-                android.widget.Toast.makeText(requireContext(), "Стрик сброшен", android.widget.Toast.LENGTH_SHORT).show()
+                updateBalanceUI()
+                android.widget.Toast.makeText(requireContext(), "Стрик сброшен, -100 🍅", android.widget.Toast.LENGTH_SHORT).show()
             }
             dialog.dismiss()
         }
 
         dialog.show()
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+    }
+
+    private fun applyFailurePenalty() {
+        val prefs = requireActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+        val currentBalance = prefs.getInt("USER_CURRENCY", 0)
+        val penalty = 100
+        prefs.edit()
+            .putInt("USER_CURRENCY", maxOf(0, currentBalance - penalty))
+            .apply()
     }
 
     private fun loadHabits() {
@@ -185,6 +196,32 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     }
 
     private fun undoHabitCompletion(habit: Habit) {
+        if (habit.type == HabitType.GOOD) {
+            val prefs = requireActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+            val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+            val currentDate = sdf.format(java.util.Date())
+            
+            val lastRewardDate = prefs.getString("LAST_REWARD_DATE", "")
+            val rewardedHabits = prefs.getString("REWARDED_HABITS_TODAY", "")
+                ?.split(",")
+                ?.filter { it.isNotBlank() }
+                ?.toMutableList() ?: mutableListOf()
+
+            if (currentDate == lastRewardDate && rewardedHabits.contains(habit.id.toString())) {
+                val currentBalance = prefs.getInt("USER_CURRENCY", 0)
+                val penaltyAmount = 50
+                rewardedHabits.remove(habit.id.toString())
+                val newList = rewardedHabits.joinToString(",")
+                
+                prefs.edit()
+                    .putInt("USER_CURRENCY", maxOf(0, currentBalance - penaltyAmount))
+                    .putString("REWARDED_HABITS_TODAY", newList)
+                    .apply()
+                
+                android.widget.Toast.makeText(requireContext(), "Награда -$penaltyAmount \uD83C\uDF45 отменена", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+
         val success = databaseHelper.undoCompleteHabit(habit.id)
         if (success) {
             loadHabits()

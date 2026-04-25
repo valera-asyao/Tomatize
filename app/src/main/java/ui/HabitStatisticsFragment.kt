@@ -138,6 +138,7 @@ class HabitStatisticsFragment : Fragment() {
             )
 
             val today = Calendar.getInstance()
+            val createdAtCal = Calendar.getInstance().apply { timeInMillis = habit.createdAt }
 
             for (i in 0 until 7) {
                 val dayView = view?.findViewById<TextView>(dayIds[i])
@@ -148,8 +149,9 @@ class HabitStatisticsFragment : Fragment() {
                 val isMarkedInDb = isDateInCompletions(calendar.timeInMillis, completions)
                 val isToday = isSameDay(calendar, today)
                 val isBeforeToday = calendar.before(today) && !isToday
+                val existedAtThatDay = isSameDay(calendar, createdAtCal) || calendar.after(createdAtCal)
 
-                updateDayStyle(dayView, isMarkedInDb, isToday, isBeforeToday, habit.type)
+                updateDayStyle(dayView, isMarkedInDb, isToday, isBeforeToday, habit.type, existedAtThatDay)
 
                 calendar.add(Calendar.DAY_OF_MONTH, 1)
             }
@@ -180,6 +182,7 @@ class HabitStatisticsFragment : Fragment() {
 
         var dayCounter = 1
         val today = Calendar.getInstance()
+        val createdAtCal = Calendar.getInstance().apply { timeInMillis = habit.createdAt }
 
         val startPosition = when (firstDayOfWeek) {
             Calendar.MONDAY -> 0
@@ -203,16 +206,25 @@ class HabitStatisticsFragment : Fragment() {
                     val isMarkedInDb = isDateInCompletions(calendar.timeInMillis, completions)
                     val isToday = isSameDay(calendar, today)
                     val isBeforeToday = calendar.before(today) && !isToday
+                    val existedAtThatDay = isSameDay(calendar, createdAtCal) || calendar.after(createdAtCal)
 
-                    updateDayStyle(this, isMarkedInDb, isToday, isBeforeToday, habit.type)
+                    updateDayStyle(this, isMarkedInDb, isToday, isBeforeToday, habit.type, existedAtThatDay)
                 }
                 dayCounter++
             }
         }
     }
 
-    private fun updateDayStyle(dayView: TextView?, isMarkedInDb: Boolean, isToday: Boolean, isBeforeToday: Boolean, habitType: HabitType) {
+    private fun updateDayStyle(dayView: TextView?, isMarkedInDb: Boolean, isToday: Boolean, isBeforeToday: Boolean, habitType: HabitType, existedAtThatDay: Boolean) {
         dayView?.apply {
+            if (!existedAtThatDay) {
+                setBackgroundResource(0)
+                setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black))
+                alpha = 0.3f // Делаем дни до создания полупрозрачными
+                return
+            }
+            alpha = 1.0f
+
             if (habitType == HabitType.GOOD) {
                 when {
                     isMarkedInDb -> {
