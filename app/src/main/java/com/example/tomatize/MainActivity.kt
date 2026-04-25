@@ -36,6 +36,7 @@ import ui.HomeFragment
 import ui.StatisticsFragment
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
+import kotlin.math.abs
 
 class MainActivity : AppCompatActivity() {
 
@@ -129,9 +130,13 @@ class MainActivity : AppCompatActivity() {
                             if (index > actualCurrentIdx) {
                                 enter = R.anim.slide_in_right
                                 exit = R.anim.slide_out_left
+                                popEnter = R.anim.slide_in_left
+                                popExit = R.anim.slide_out_right
                             } else {
                                 enter = R.anim.slide_in_left
                                 exit = R.anim.slide_out_right
+                                popEnter = R.anim.slide_in_right
+                                popExit = R.anim.slide_out_left
                             }
                         }
                         launchSingleTop = true
@@ -169,7 +174,7 @@ class MainActivity : AppCompatActivity() {
 
         val targetX = newIndex * tabWidth + (tabWidth - selectorOval.width) / 2f
 
-        if (Math.abs(selectorOval.translationX - targetX) < 1f) {
+        if (abs(selectorOval.translationX - targetX) < 1f) {
             updateNavColors(newIndex)
             return
         }
