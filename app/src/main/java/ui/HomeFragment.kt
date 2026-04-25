@@ -250,7 +250,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
 
         dialogView.findViewById<TextView>(R.id.detailsHabitName).text = habit.name
         dialogView.findViewById<TextView>(R.id.detailsHabitDescription).text =
-            if (habit.description.isBlank()) "Описание отсутствует" else habit.description
+            habit.description.ifBlank { "Описание отсутствует" }
 
         val typeView = dialogView.findViewById<TextView>(R.id.detailsHabitType)
         val statusView = dialogView.findViewById<TextView>(R.id.detailsHabitStatus)
@@ -304,6 +304,12 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     private fun openFullStatistics(habitId: Long) {
         val fragment = HabitStatisticsFragment.newInstance(habitId)
         requireActivity().supportFragmentManager.beginTransaction()
+            .setCustomAnimations(
+                R.anim.slide_in_right,
+                R.anim.slide_out_left,
+                R.anim.slide_in_left,
+                R.anim.slide_out_right
+            )
             .replace(R.id.nav_host_fragment, fragment)
             .addToBackStack(null)
             .commit()
