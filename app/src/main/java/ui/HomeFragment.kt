@@ -1,13 +1,10 @@
 package ui
 
-import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
-import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -15,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tomatize.R
 import com.example.tomatize.UserData
-import java.util.Calendar
 
 class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
 
@@ -113,7 +109,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
             },
             onCompleteClick = { habit ->
                 if (habit.type == HabitType.BAD) {
-                    showBadHabitFailureDialog(habit)
+                    showBadHabitFailureBottomSheet(habit)
                 } else {
                     completeGoodHabit(habit)
                 }
@@ -129,34 +125,17 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         }
     }
 
-    private fun showBadHabitFailureDialog(habit: Habit) {
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_bad_habit_failure, null)
-        val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog)
-            .setView(dialogView)
-            .create()
-
-        dialogView.findViewById<Button>(R.id.btnCancel).setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialogView.findViewById<Button>(R.id.btnConfirm).setOnClickListener {
+    private fun showBadHabitFailureBottomSheet(habit: Habit) {
+        val bottomSheet = BadHabitFailureBottomSheet.newInstance(habit.id)
+        bottomSheet.setOnConfirmListener {
             if (databaseHelper.recordFailure(habit.id)) {
                 applyFailurePenalty()
                 loadHabits()
                 updateBalanceUI()
                 android.widget.Toast.makeText(requireContext(), "Стрик сброшен, -100 🍅", android.widget.Toast.LENGTH_SHORT).show()
             }
-            dialog.dismiss()
         }
-
-        dialog.show()
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-
-        // Установка ширины для диалога сбоя
-        val layoutParams = WindowManager.LayoutParams()
-        layoutParams.copyFrom(dialog.window?.attributes)
-        layoutParams.width = (resources.displayMetrics.widthPixels * 0.9).toInt()
-        dialog.window?.attributes = layoutParams
+        bottomSheet.show(parentFragmentManager, "BadHabitFailureBottomSheet")
     }
 
     private fun applyFailurePenalty() {
@@ -243,62 +222,11 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     }
 
     private fun showHabitDetails(habit: Habit) {
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_habit_details, null)
-        val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog)
-            .setView(dialogView)
-            .create()
-
-        dialogView.findViewById<TextView>(R.id.detailsHabitName).text = habit.name
-        dialogView.findViewById<TextView>(R.id.detailsHabitDescription).text =
-            habit.description.ifBlank { "Описание отсутствует" }
-
-        val typeView = dialogView.findViewById<TextView>(R.id.detailsHabitType)
-        val statusView = dialogView.findViewById<TextView>(R.id.detailsHabitStatus)
-
-        val isActionToday = habit.lastCompleted?.let {
-            val lastCal = Calendar.getInstance().apply { timeInMillis = it }
-            val nowCal = Calendar.getInstance()
-            lastCal.get(Calendar.YEAR) == nowCal.get(Calendar.YEAR) &&
-            lastCal.get(Calendar.DAY_OF_YEAR) == nowCal.get(Calendar.DAY_OF_YEAR)
-        } ?: false
-
-        if (habit.type == HabitType.GOOD) {
-            typeView.text = "Тип: Хорошая"
-            if (isActionToday) {
-                statusView.text = "Выполнено"
-                statusView.setTextColor(requireContext().getColor(android.R.color.holo_green_dark))
-            } else {
-                statusView.text = "Не выполнено"
-                statusView.setTextColor(requireContext().getColor(android.R.color.holo_red_dark))
-            }
-        } else {
-            typeView.text = "Тип: Плохая"
-            if (isActionToday) {
-                statusView.text = "Срыв зафиксирован"
-                statusView.setTextColor(requireContext().getColor(android.R.color.holo_red_dark))
-            } else {
-                statusView.text = "Срывов не было"
-                statusView.setTextColor(requireContext().getColor(android.R.color.holo_green_dark))
-            }
+        val bottomSheet = HabitDetailsBottomSheet.newInstance(habit.id)
+        bottomSheet.setOnGoToStatsListener { habitId ->
+            openFullStatistics(habitId)
         }
-
-        dialogView.findViewById<Button>(R.id.btnDetailsClose).setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialogView.findViewById<TextView>(R.id.btnGoToStats).setOnClickListener {
-            dialog.dismiss()
-            openFullStatistics(habit.id)
-        }
-
-        dialog.show()
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-
-        // Принудительная установка ширины диалога
-        val layoutParams = WindowManager.LayoutParams()
-        layoutParams.copyFrom(dialog.window?.attributes)
-        layoutParams.width = (resources.displayMetrics.widthPixels * 0.9).toInt() // 90% ширины экрана
-        dialog.window?.attributes = layoutParams
+        bottomSheet.show(parentFragmentManager, "HabitDetailsBottomSheet")
     }
 
     private fun openFullStatistics(habitId: Long) {
