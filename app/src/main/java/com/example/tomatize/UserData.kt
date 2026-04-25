@@ -48,7 +48,8 @@ object UserData {
         "strangehat" to "Странная шляпа",
         "sweatshirt" to "Свитшот",
         "tshirt" to "Футболка",
-        "witchshat" to "Ведьмина шляпа"
+        "witchshat" to "Ведьмина шляпа",
+        "maidcostume" to "Костюм горничной"
     )
 
     val allShopItems: List<ShopItem> by lazy {
