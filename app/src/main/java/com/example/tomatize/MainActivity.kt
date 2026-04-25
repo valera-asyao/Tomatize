@@ -33,6 +33,7 @@ import ui.Habit
 import ui.HabitDatabaseHelper
 import ui.HabitReminderWorker
 import ui.HomeFragment
+import ui.StatisticsFragment
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
@@ -76,7 +77,6 @@ class MainActivity : AppCompatActivity() {
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            val oldIndex = currentNavIndex
             currentNavIndex = getNavIndex(destination.id)
         }
 
@@ -237,7 +237,10 @@ class MainActivity : AppCompatActivity() {
                     android.widget.Toast.makeText(this@MainActivity, "Привычка добавлена!", android.widget.Toast.LENGTH_SHORT).show()
                     val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
                     val currentFragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
-                    if (currentFragment is HomeFragment) currentFragment.refreshHabits()
+                    when (currentFragment) {
+                        is HomeFragment -> currentFragment.refreshHabits()
+                        is StatisticsFragment -> currentFragment.refreshHabits()
+                    }
                 }
             }
         })

@@ -39,6 +39,12 @@ class StatisticsFragment : Fragment() {
         checkAndDisplayHabits()
     }
 
+    fun refreshHabits() {
+        if (isAdded) {
+            checkAndDisplayHabits()
+        }
+    }
+
     private fun checkAndDisplayHabits() {
         mainContainer.removeAllViews()
 
