@@ -75,7 +75,7 @@ class HabitStatisticsFragment : Fragment() {
                 .setPositiveButton("Удалить") { _, _ ->
                     val success = databaseHelper.deleteHabit(habitId)
                     if (success) {
-                        android.widget.Toast.makeText(context, "Привычка удалена", android.widget.Toast.LENGTH_SHORT).show()
+                        (activity as? MainActivity)?.showTopNotification("Привычка удалена")
                         requireActivity().supportFragmentManager.popBackStack()
                     } else {
                         android.widget.Toast.makeText(context, "Ошибка при удалении", android.widget.Toast.LENGTH_SHORT).show()

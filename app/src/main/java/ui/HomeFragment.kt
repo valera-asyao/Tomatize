@@ -7,11 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.tomatize.MainActivity
 import com.example.tomatize.R
 import com.example.tomatize.UserData
+import com.google.android.material.snackbar.Snackbar
 
 class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
 
@@ -86,11 +89,8 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
                 .putInt("USER_CURRENCY", currentBalance + rewardAmount)
                 .putString("REWARDED_HABITS_TODAY", newList)
                 .apply()
-            android.widget.Toast.makeText(
-                requireContext(),
-                "Награда $rewardAmount \uD83C\uDF45! (${rewardedHabits.size}/3)",
-                android.widget.Toast.LENGTH_SHORT
-            ).show()
+            
+            (activity as? MainActivity)?.showTopNotification("Награда $rewardAmount \uD83C\uDF45! (${rewardedHabits.size}/3)")
         }
     }
 
@@ -132,7 +132,8 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
                 applyFailurePenalty()
                 loadHabits()
                 updateBalanceUI()
-                android.widget.Toast.makeText(requireContext(), "Стрик сброшен, -100 🍅", android.widget.Toast.LENGTH_SHORT).show()
+                showActionSnackbar("Срыв зафиксирован", false)
+                (activity as? MainActivity)?.showTopNotification("Вы потеряли 100 \uD83C\uDF45")
             }
         }
         bottomSheet.show(parentFragmentManager, "BadHabitFailureBottomSheet")
@@ -176,7 +177,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         val success = databaseHelper.completeHabit(habit.id)
         if (success) {
             loadHabits()
-            showCompletionMessage(habit)
+            showActionSnackbar("Привычка ${habit.name} соблюдена!", true)
             checkAndAwardCurrency(habit.id)
             updateBalanceUI()
         }
@@ -205,7 +206,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
                     .putString("REWARDED_HABITS_TODAY", newList)
                     .apply()
 
-                android.widget.Toast.makeText(requireContext(), "Награда -$penaltyAmount \uD83C\uDF45 возвращена", android.widget.Toast.LENGTH_SHORT).show()
+                (activity as? MainActivity)?.showTopNotification("Списано $penaltyAmount \uD83C\uDF45")
             }
         }
 
@@ -213,12 +214,55 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         if (success) {
             loadHabits()
             updateBalanceUI()
-            android.widget.Toast.makeText(requireContext(), "Выполнение отменено", android.widget.Toast.LENGTH_SHORT).show()
+            showActionSnackbar("Выполнение отменено", true)
         }
     }
 
-    private fun showCompletionMessage(habit: Habit) {
-        android.widget.Toast.makeText(requireContext(), "Привычка ${habit.name} соблюдена!", android.widget.Toast.LENGTH_SHORT).show()
+    private fun showActionSnackbar(message: String, isSuccess: Boolean) {
+        val view = view ?: return
+        val snackbar = Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
+
+        // Цвета: используйте чуть более темные или насыщенные оттенки, чем у карточек
+        val backgroundColor = ContextCompat.getColor(requireContext(),
+            if (isSuccess) R.color.habit_good_notification else R.color.habit_bad_notification) // Создайте новые цвета в colors.xml
+
+        snackbar.setBackgroundTint(backgroundColor)
+
+        // Получаем View снекбара для кастомизации
+        val snackbarView = snackbar.view
+
+        // 1. Скругление углов через Drawable
+        val background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_snackbar)
+        background?.setTint(backgroundColor)
+        snackbarView.background = background
+
+        // 2. Добавляем отступы, чтобы он "летал" над навигацией
+        val params = snackbarView.layoutParams as ViewGroup.MarginLayoutParams
+        params.setMargins(
+            params.leftMargin + 40,
+            params.topMargin,
+            params.rightMargin + 40,
+            params.bottomMargin + 40
+        )
+        snackbarView.layoutParams = params
+
+        // 3. Настройка текста и иконки
+        val textView = snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+        textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        textView.compoundDrawablePadding = 24
+
+        // Добавляем иконку слева от текста
+        val iconRes = if (isSuccess) R.drawable.ic_check_circle else R.drawable.ic_warning
+        val icon = ContextCompat.getDrawable(requireContext(), iconRes)
+        icon?.setTint(ContextCompat.getColor(requireContext(), R.color.white))
+        textView.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null)
+
+        val bottomNav = activity?.findViewById<View>(R.id.custom_bottom_nav)
+        if (bottomNav != null && bottomNav.visibility == View.VISIBLE) {
+            snackbar.anchorView = bottomNav
+        }
+
+        snackbar.show()
     }
 
     private fun showHabitDetails(habit: Habit) {

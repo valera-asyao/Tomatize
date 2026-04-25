@@ -12,10 +12,13 @@ import android.os.Bundle
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -47,6 +50,10 @@ class MainActivity : AppCompatActivity() {
     private var currentIndex = 0
     private var currentNavIndex = 0
 
+    private lateinit var topNotificationCard: CardView
+    private lateinit var topNotificationText: TextView
+    private lateinit var topNotificationIcon: ImageView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -54,6 +61,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         checkNotificationPermission()
+
+        topNotificationCard = findViewById(R.id.topNotificationCard)
+        topNotificationText = findViewById(R.id.topNotificationText)
+        topNotificationIcon = findViewById(R.id.topNotificationIcon)
 
         val splashScreen = findViewById<View>(R.id.splash_screen)
         splashScreen.postDelayed({
@@ -157,6 +168,26 @@ class MainActivity : AppCompatActivity() {
         selectorOval.post { initSelector() }
     }
 
+    fun showTopNotification(text: String, iconRes: Int = R.drawable.tomato) {
+        topNotificationText.text = text
+        topNotificationIcon.setImageResource(iconRes)
+
+        topNotificationCard.animate()
+            .translationY(0f)
+            .setDuration(500)
+            .setInterpolator(DecelerateInterpolator())
+            .withEndAction {
+                topNotificationCard.postDelayed({
+                    topNotificationCard.animate()
+                        .translationY(-400f)
+                        .setDuration(500)
+                        .setInterpolator(AccelerateInterpolator())
+                        .start()
+                }, 2000)
+            }
+            .start()
+    }
+
     private fun getNavIndex(destinationId: Int?): Int {
         return when (destinationId) {
             R.id.homeFragment -> 0
@@ -239,7 +270,7 @@ class MainActivity : AppCompatActivity() {
             override fun onHabitAdded(habit: Habit) {
                 val id = databaseHelper.addHabit(habit)
                 if (id != -1L) {
-                    android.widget.Toast.makeText(this@MainActivity, "Привычка добавлена!", android.widget.Toast.LENGTH_SHORT).show()
+                    showTopNotification("Привычка добавлена!")
                     val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
                     val currentFragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
                     when (currentFragment) {

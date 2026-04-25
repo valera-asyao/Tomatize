@@ -10,6 +10,8 @@
         <item name="android:textColor">@color/black</item>
         <item name="android:textColorPrimary">@color/black</item>
         <item name="android:textColorSecondary">@color/black</item>
+        
+        <item name="snackbarStyle">@style/CustomSnackbarStyle</item>
     </style>
 
     <style name="Theme.Tomatize" parent="Base.Theme.Tomatize" />
@@ -34,6 +36,14 @@
         <item name="cornerSizeTopRight">16dp</item>
         <item name="cornerSizeBottomLeft">0dp</item>
         <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+
+    <style name="CustomSnackbarStyle" parent="Widget.Material3.Snackbar">
+        <item name="shapeAppearance">@style/SnackbarShapeAppearance</item>
+    </style>
+
+    <style name="SnackbarShapeAppearance" parent="ShapeAppearance.Material3.SmallComponent">
+        <item name="cornerSize">12dp</item>
     </style>
 
     <style name="ThemeOverlay.Tomatize.FullscreenContainer" parent="">
