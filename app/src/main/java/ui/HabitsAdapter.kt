@@ -44,7 +44,7 @@ class HabitsAdapter(
         val goodBtn = ContextCompat.getColor(context, R.color.habit_good_btn)
         val goodTxt = ContextCompat.getColor(context, R.color.habit_good_text)
 
-        val badBg = ContextCompat.getColor(context, R.color.habit_bad_bg)
+        val badBg = ContextCompat.getColor(context, R.color.red_color)
         val badBtn = ContextCompat.getColor(context, R.color.habit_bad_btn)
         val badTxt = ContextCompat.getColor(context, R.color.habit_bad_text)
 

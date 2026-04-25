@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tomatize.R
 import com.example.tomatize.UserData
+import java.util.Calendar
 
 class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
 
@@ -149,6 +151,12 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
 
         dialog.show()
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        // Установка ширины для диалога сбоя
+        val layoutParams = WindowManager.LayoutParams()
+        layoutParams.copyFrom(dialog.window?.attributes)
+        layoutParams.width = (resources.displayMetrics.widthPixels * 0.9).toInt()
+        dialog.window?.attributes = layoutParams
     }
 
     private fun applyFailurePenalty() {
@@ -200,7 +208,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
             val prefs = requireActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
             val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
             val currentDate = sdf.format(java.util.Date())
-            
+
             val lastRewardDate = prefs.getString("LAST_REWARD_DATE", "")
             val rewardedHabits = prefs.getString("REWARDED_HABITS_TODAY", "")
                 ?.split(",")
@@ -212,13 +220,13 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
                 val penaltyAmount = 50
                 rewardedHabits.remove(habit.id.toString())
                 val newList = rewardedHabits.joinToString(",")
-                
+
                 prefs.edit()
                     .putInt("USER_CURRENCY", maxOf(0, currentBalance - penaltyAmount))
                     .putString("REWARDED_HABITS_TODAY", newList)
                     .apply()
-                
-                android.widget.Toast.makeText(requireContext(), "Награда -$penaltyAmount \uD83C\uDF45 отменена", android.widget.Toast.LENGTH_SHORT).show()
+
+                android.widget.Toast.makeText(requireContext(), "Награда -$penaltyAmount \uD83C\uDF45 возвращена", android.widget.Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -235,7 +243,66 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     }
 
     private fun showHabitDetails(habit: Habit) {
-        val fragment = HabitStatisticsFragment.newInstance(habit.id)
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_habit_details, null)
+        val dialog = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog)
+            .setView(dialogView)
+            .create()
+
+        dialogView.findViewById<TextView>(R.id.detailsHabitName).text = habit.name
+        dialogView.findViewById<TextView>(R.id.detailsHabitDescription).text =
+            if (habit.description.isBlank()) "Описание отсутствует" else habit.description
+
+        val typeView = dialogView.findViewById<TextView>(R.id.detailsHabitType)
+        val statusView = dialogView.findViewById<TextView>(R.id.detailsHabitStatus)
+
+        val isActionToday = habit.lastCompleted?.let {
+            val lastCal = Calendar.getInstance().apply { timeInMillis = it }
+            val nowCal = Calendar.getInstance()
+            lastCal.get(Calendar.YEAR) == nowCal.get(Calendar.YEAR) &&
+            lastCal.get(Calendar.DAY_OF_YEAR) == nowCal.get(Calendar.DAY_OF_YEAR)
+        } ?: false
+
+        if (habit.type == HabitType.GOOD) {
+            typeView.text = "Тип: Хорошая"
+            if (isActionToday) {
+                statusView.text = "Выполнено"
+                statusView.setTextColor(requireContext().getColor(android.R.color.holo_green_dark))
+            } else {
+                statusView.text = "Не выполнено"
+                statusView.setTextColor(requireContext().getColor(android.R.color.holo_red_dark))
+            }
+        } else {
+            typeView.text = "Тип: Плохая"
+            if (isActionToday) {
+                statusView.text = "Срыв зафиксирован"
+                statusView.setTextColor(requireContext().getColor(android.R.color.holo_red_dark))
+            } else {
+                statusView.text = "Срывов не было"
+                statusView.setTextColor(requireContext().getColor(android.R.color.holo_green_dark))
+            }
+        }
+
+        dialogView.findViewById<Button>(R.id.btnDetailsClose).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialogView.findViewById<TextView>(R.id.btnGoToStats).setOnClickListener {
+            dialog.dismiss()
+            openFullStatistics(habit.id)
+        }
+
+        dialog.show()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        // Принудительная установка ширины диалога
+        val layoutParams = WindowManager.LayoutParams()
+        layoutParams.copyFrom(dialog.window?.attributes)
+        layoutParams.width = (resources.displayMetrics.widthPixels * 0.9).toInt() // 90% ширины экрана
+        dialog.window?.attributes = layoutParams
+    }
+
+    private fun openFullStatistics(habitId: Long) {
+        val fragment = HabitStatisticsFragment.newInstance(habitId)
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(R.id.nav_host_fragment, fragment)
             .addToBackStack(null)

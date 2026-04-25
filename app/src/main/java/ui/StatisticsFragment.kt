@@ -108,7 +108,7 @@ class StatisticsFragment : Fragment() {
             )
         } else {
             Pair(
-                ContextCompat.getColor(context, R.color.habit_bad_bg),
+                ContextCompat.getColor(context, R.color.red_color),
                 ContextCompat.getColor(context, R.color.habit_bad_text)
             )
         }
