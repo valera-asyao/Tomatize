@@ -284,7 +284,7 @@ class HabitStatisticsFragment : Fragment() {
     }
 
     private fun isHabitCompletedOnDate(habit: Habit, dateInMillis: Long): Boolean {
-        // Упрощенная проверка - сравниваем только с lastCompleted
+        // Упрощенная проверка - сравниваем только с последним выполнением
         if (habit.lastCompleted == null) return false
 
         val habitDate = Calendar.getInstance().apply { timeInMillis = habit.lastCompleted!! }

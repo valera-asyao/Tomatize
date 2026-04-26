@@ -40,7 +40,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Handle Splash Screen
         val splashScreen = findViewById<View>(R.id.splash_screen)
         splashScreen.postDelayed({
             splashScreen.animate()
@@ -175,7 +174,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Missing methods added here
     fun setNavBarVisibility(visible: Boolean) {
         findViewById<View>(R.id.custom_bottom_nav).visibility = if (visible) View.VISIBLE else View.GONE
     }

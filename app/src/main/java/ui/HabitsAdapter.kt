@@ -40,7 +40,6 @@ class HabitsAdapter(
         holder.nameTextView.text = habit.name
         holder.streakTextView.text = "${habit.streakCount} дн."
 
-        // Apply dynamic colors based on habit type
         val (bgColor, btnColor, textColor) = if (habit.type == HabitType.GOOD) {
             Triple(
                 ContextCompat.getColor(context, R.color.habit_good_bg),
@@ -55,7 +54,6 @@ class HabitsAdapter(
             )
         }
 
-        // We can't use triple with IDs directly, using safe colors from resources
         val goodBg = ContextCompat.getColor(context, R.color.habit_good_bg)
         val goodBtn = ContextCompat.getColor(context, R.color.habit_good_btn)
         val goodTxt = ContextCompat.getColor(context, R.color.habit_good_text)

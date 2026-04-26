@@ -13,7 +13,6 @@
         android:orientation="vertical"
         android:paddingBottom="24dp">
 
-        <!-- Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -54,7 +53,6 @@
 
         </LinearLayout>
 
-        <!-- Description Block -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -74,7 +72,6 @@
 
         </LinearLayout>
 
-        <!-- Main Stats Block -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -151,7 +148,6 @@
 
         </LinearLayout>
 
-        <!-- Monthly Calendar Block -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
