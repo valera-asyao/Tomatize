@@ -10,9 +10,41 @@
         <item name="android:textColor">@color/black</item>
         <item name="android:textColorPrimary">@color/black</item>
         <item name="android:textColorSecondary">@color/black</item>
+        
+        <item name="snackbarStyle">@style/CustomSnackbarStyle</item>
     </style>
 
     <style name="Theme.Tomatize" parent="Base.Theme.Tomatize" />
+
+    <style name="CustomAlertDialog" parent="Theme.Material3.Light.Dialog.Alert">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+    </style>
+
+    <style name="BottomSheetDialogTheme" parent="Theme.Material3.Light.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="bottomSheetStyle">@style/CustomBottomSheetStyle</item>
+    </style>
+
+    <style name="CustomBottomSheetStyle" parent="Widget.Material3.BottomSheet">
+        <item name="shapeAppearance">@style/CustomShapeAppearanceBottomSheet</item>
+        <item name="backgroundTint">@color/background_light</item>
+    </style>
+
+    <style name="CustomShapeAppearanceBottomSheet" parent="ShapeAppearance.Material3.LargeComponent">
+        <item name="cornerSizeTopLeft">16dp</item>
+        <item name="cornerSizeTopRight">16dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+
+    <style name="CustomSnackbarStyle" parent="Widget.Material3.Snackbar">
+        <item name="shapeAppearance">@style/SnackbarShapeAppearance</item>
+    </style>
+
+    <style name="SnackbarShapeAppearance" parent="ShapeAppearance.Material3.SmallComponent">
+        <item name="cornerSize">12dp</item>
+    </style>
 
     <style name="ThemeOverlay.Tomatize.FullscreenContainer" parent="">
         <item name="fullscreenBackgroundColor">@color/light_blue_600</item>

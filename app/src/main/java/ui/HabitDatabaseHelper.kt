@@ -6,7 +6,6 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import java.util.Calendar
 
-// Модель для статистики
 data class HabitStatistics(
     val totalDays: Int,
     val completedDays: Int,
@@ -20,17 +19,17 @@ class HabitDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
 
     companion object {
         private const val DATABASE_NAME = "habits.db"
-        private const val DATABASE_VERSION = 2
+        private const val DATABASE_VERSION = 3
         private const val TABLE_HABITS = "habits"
         private const val COLUMN_ID = "id"
         private const val COLUMN_NAME = "name"
         private const val COLUMN_DESCRIPTION = "description"
         private const val COLUMN_TYPE = "type"
+        private const val COLUMN_STREAK_COUNT = "streak_count"
+        private const val COLUMN_RECORD_STREAK = "record_streak"
+        private const val COLUMN_LAST_COMPLETED = "last_completed"
         private const val COLUMN_CREATED_AT = "created_at"
 
-        private const val COLUMN_STREAK_COUNT = "streak_count"
-
-        private const val COLUMN_LAST_COMPLETED = "last_completed"
         private const val TABLE_HABIT_COMPLETIONS = "habit_completions"
         private const val COLUMN_COMPLETION_ID = "completion_id"
         private const val COLUMN_HABIT_ID_FK = "habit_id_fk"
@@ -38,60 +37,47 @@ class HabitDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
     }
 
     override fun onCreate(db: SQLiteDatabase) {
-        val createTable = """
+        db.execSQL("""
             CREATE TABLE $TABLE_HABITS (
                 $COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 $COLUMN_NAME TEXT NOT NULL,
                 $COLUMN_DESCRIPTION TEXT,
                 $COLUMN_TYPE TEXT NOT NULL,
                 $COLUMN_STREAK_COUNT INTEGER DEFAULT 0,
+                $COLUMN_RECORD_STREAK INTEGER DEFAULT 0,
                 $COLUMN_LAST_COMPLETED INTEGER,
                 $COLUMN_CREATED_AT INTEGER NOT NULL
             )
-        """.trimIndent()
-        db.execSQL(createTable)
-
-        val createCompletionsTable = """
+        """)
+        db.execSQL("""
             CREATE TABLE $TABLE_HABIT_COMPLETIONS (
                 $COLUMN_COMPLETION_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 $COLUMN_HABIT_ID_FK INTEGER NOT NULL,
                 $COLUMN_COMPLETION_DATE INTEGER NOT NULL,
                 FOREIGN KEY ($COLUMN_HABIT_ID_FK) REFERENCES $TABLE_HABITS($COLUMN_ID)
             )
-        """.trimIndent()
-        db.execSQL(createCompletionsTable)
+        """)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         if (oldVersion < 2) {
-            val createCompletionsTable = """
-            CREATE TABLE $TABLE_HABIT_COMPLETIONS (
-                $COLUMN_COMPLETION_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                $COLUMN_HABIT_ID_FK INTEGER NOT NULL,
-                $COLUMN_COMPLETION_DATE INTEGER NOT NULL,
-                FOREIGN KEY ($COLUMN_HABIT_ID_FK) REFERENCES $TABLE_HABITS($COLUMN_ID)
-            )
-        """.trimIndent()
-            db.execSQL(createCompletionsTable)
-            migrateExistingCompletions(db)
+            db.execSQL("CREATE TABLE $TABLE_HABIT_COMPLETIONS ($COLUMN_COMPLETION_ID INTEGER PRIMARY KEY AUTOINCREMENT, $COLUMN_HABIT_ID_FK INTEGER NOT NULL, $COLUMN_COMPLETION_DATE INTEGER NOT NULL, FOREIGN KEY ($COLUMN_HABIT_ID_FK) REFERENCES $TABLE_HABITS($COLUMN_ID))")
+        }
+        if (oldVersion < 3) {
+            db.execSQL("ALTER TABLE $TABLE_HABITS ADD COLUMN $COLUMN_RECORD_STREAK INTEGER DEFAULT 0")
         }
     }
 
-    private fun migrateExistingCompletions(db: SQLiteDatabase) {
-        val cursor = db.rawQuery("SELECT $COLUMN_ID, $COLUMN_LAST_COMPLETED FROM $TABLE_HABITS WHERE $COLUMN_LAST_COMPLETED IS NOT NULL", null)
-
+    fun isDataBaseEmpty(): Boolean {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT COUNT(*) FROM $TABLE_HABITS", null)
+        var isEmpty = true
         cursor.use {
-            while (it.moveToNext()) {
-                val habitId = it.getLong(it.getColumnIndexOrThrow(COLUMN_ID))
-                val lastCompleted = it.getLong(it.getColumnIndexOrThrow(COLUMN_LAST_COMPLETED))
-
-                val values = ContentValues().apply {
-                    put(COLUMN_HABIT_ID_FK, habitId)
-                    put(COLUMN_COMPLETION_DATE, lastCompleted)
-                }
-                db.insert(TABLE_HABIT_COMPLETIONS, null, values)
+            if (it.moveToFirst()) {
+                isEmpty = it.getInt(0) == 0
             }
         }
+        return isEmpty
     }
 
     fun addHabit(habit: Habit): Long {
@@ -100,333 +86,206 @@ class HabitDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
             put(COLUMN_NAME, habit.name)
             put(COLUMN_DESCRIPTION, habit.description)
             put(COLUMN_TYPE, habit.type.name)
-            put(COLUMN_STREAK_COUNT, habit.streakCount)
-            put(COLUMN_LAST_COMPLETED, habit.lastCompleted)
-            put(COLUMN_CREATED_AT, habit.createdAt)
+            put(COLUMN_STREAK_COUNT, 0)
+            put(COLUMN_RECORD_STREAK, 0)
+            put(COLUMN_LAST_COMPLETED, null as Long?)
+            put(COLUMN_CREATED_AT, System.currentTimeMillis())
         }
-        val id = db.insert(TABLE_HABITS, null, values)
-        db.close()
-        return id
+        return db.insert(TABLE_HABITS, null, values)
     }
 
-    fun addHabitCompletion(habitId: Long, date: Long = System.currentTimeMillis()): Long {
-        val db = writableDatabase
-        val values = ContentValues().apply {
-            put(COLUMN_HABIT_ID_FK, habitId)
-            put(COLUMN_COMPLETION_DATE, date)
-        }
-        val id = db.insert(TABLE_HABIT_COMPLETIONS, null, values)
-        db.close()
-        return id
-    }
-
-    // Проверяет и сбрасывает стрики, если они просрочены
-    private fun checkAndResetExpiredStreaks() {
-        val habits = getAllHabitsRaw() // Получаем без рекурсии
-        val now = Calendar.getInstance()
-        
-        for (habit in habits) {
-            val lastCompleted = habit.lastCompleted
-            if (lastCompleted != null && habit.streakCount > 0) {
-                val lastDate = Calendar.getInstance().apply { timeInMillis = lastCompleted }
-                
-                // Стрик протух, если сегодня не было выполнения И вчера не было выполнения
-                val completedToday = isSameDay(lastDate, now)
-                val completedYesterday = isYesterday(lastDate, now)
-                
-                if (!completedToday && !completedYesterday) {
-                    updateHabitStreak(habit.id, 0, habit.lastCompleted)
-                }
-            }
-        }
-    }
-
-    // Внутренний метод для получения списка без вызова проверки стриков (чтобы избежать рекурсии)
-    private fun getAllHabitsRaw(): List<Habit> {
+    fun getAllHabits(): List<Habit> {
+        updateStreaks()
         val habits = mutableListOf<Habit>()
         val db = readableDatabase
-        val cursor = db.query(
-            TABLE_HABITS,
-            null, null, null, null, null,
-            "$COLUMN_CREATED_AT DESC"
-        )
-
+        val cursor = db.query(TABLE_HABITS, null, null, null, null, null, "$COLUMN_CREATED_AT DESC")
         cursor.use {
             while (it.moveToNext()) {
-                val habit = Habit(
+                habits.add(Habit(
                     id = it.getLong(it.getColumnIndexOrThrow(COLUMN_ID)),
                     name = it.getString(it.getColumnIndexOrThrow(COLUMN_NAME)),
                     description = it.getString(it.getColumnIndexOrThrow(COLUMN_DESCRIPTION)),
                     type = HabitType.valueOf(it.getString(it.getColumnIndexOrThrow(COLUMN_TYPE))),
                     streakCount = it.getInt(it.getColumnIndexOrThrow(COLUMN_STREAK_COUNT)),
-                    lastCompleted = if (it.isNull(it.getColumnIndexOrThrow(COLUMN_LAST_COMPLETED)))
-                        null else it.getLong(it.getColumnIndexOrThrow(COLUMN_LAST_COMPLETED)),
+                    lastCompleted = if (it.isNull(it.getColumnIndexOrThrow(COLUMN_LAST_COMPLETED))) null else it.getLong(it.getColumnIndexOrThrow(COLUMN_LAST_COMPLETED)),
                     createdAt = it.getLong(it.getColumnIndexOrThrow(COLUMN_CREATED_AT))
-                )
-                habits.add(habit)
+                ))
             }
         }
         return habits
     }
 
-    fun getAllHabits(): List<Habit> {
-        checkAndResetExpiredStreaks() // Проверяем стрики перед выдачей списка
-        return getAllHabitsRaw()
-    }
-
-    fun getHabitCompletions(habitId: Long): List<Long> {
-        val completions = mutableListOf<Long>()
-        val db = readableDatabase
-        val cursor = db.query(
-            TABLE_HABIT_COMPLETIONS,
-            arrayOf(COLUMN_COMPLETION_DATE),
-            "$COLUMN_HABIT_ID_FK = ?",
-            arrayOf(habitId.toString()),
-            null, null,
-            "$COLUMN_COMPLETION_DATE ASC"
-        )
-
-        cursor.use {
-            while (it.moveToNext()) {
-                completions.add(it.getLong(it.getColumnIndexOrThrow(COLUMN_COMPLETION_DATE)))
-            }
-        }
-        db.close()
-        return completions
-    }
-
-    fun updateHabitStreak(habitId: Long, streakCount: Int, lastCompleted: Long?): Boolean {
+    private fun updateStreaks() {
         val db = writableDatabase
-        val values = ContentValues().apply {
-            put(COLUMN_STREAK_COUNT, streakCount)
-            put(COLUMN_LAST_COMPLETED, lastCompleted)
-        }
-        val result = db.update(TABLE_HABITS, values, "$COLUMN_ID = ?", arrayOf(habitId.toString()))
-        db.close()
-        return result > 0
-    }
-
-    fun getHabitCompletionsInRange(habitId: Long, startDate: Long, endDate: Long): List<Long> {
-        val completions = mutableListOf<Long>()
-        val db = readableDatabase
-        val cursor = db.query(
-            TABLE_HABIT_COMPLETIONS,
-            arrayOf(COLUMN_COMPLETION_DATE),
-            "$COLUMN_HABIT_ID_FK = ? AND $COLUMN_COMPLETION_DATE BETWEEN ? AND ?",
-            arrayOf(habitId.toString(), startDate.toString(), endDate.toString()),
-            null, null,
-            "$COLUMN_COMPLETION_DATE ASC"
-        )
-
+        val cursor = db.query(TABLE_HABITS, null, null, null, null, null, null)
+        val now = Calendar.getInstance()
+        
         cursor.use {
             while (it.moveToNext()) {
-                completions.add(it.getLong(it.getColumnIndexOrThrow(COLUMN_COMPLETION_DATE)))
+                val id = it.getLong(it.getColumnIndexOrThrow(COLUMN_ID))
+                val type = HabitType.valueOf(it.getString(it.getColumnIndexOrThrow(COLUMN_TYPE)))
+                val lastDateLong = if (it.isNull(it.getColumnIndexOrThrow(COLUMN_LAST_COMPLETED))) null else it.getLong(it.getColumnIndexOrThrow(COLUMN_LAST_COMPLETED))
+                val createdAt = it.getLong(it.getColumnIndexOrThrow(COLUMN_CREATED_AT))
+                var currentStreak = it.getInt(it.getColumnIndexOrThrow(COLUMN_STREAK_COUNT))
+                var recordStreak = it.getInt(it.getColumnIndexOrThrow(COLUMN_RECORD_STREAK))
+                
+                if (type == HabitType.GOOD) {
+                    if (lastDateLong != null) {
+                        val lastCal = Calendar.getInstance().apply { timeInMillis = lastDateLong }
+                        if (!isSameDay(lastCal, now) && !isYesterday(lastCal, now)) {
+                            currentStreak = 0
+                        }
+                    }
+                } else {
+                    val baseDate = lastDateLong ?: createdAt
+                    val diff = now.timeInMillis - baseDate
+                    val fullDays = (diff / (1000 * 60 * 60 * 24)).toInt()
+                    
+                    val isFailedToday = lastDateLong != null && isSameDay(Calendar.getInstance().apply { timeInMillis = lastDateLong }, now)
+                    currentStreak = if (isFailedToday) 0 else fullDays + 1
+                }
+                
+                if (currentStreak > recordStreak) {
+                    recordStreak = currentStreak
+                }
+                
+                val values = ContentValues().apply {
+                    put(COLUMN_STREAK_COUNT, currentStreak)
+                    put(COLUMN_RECORD_STREAK, recordStreak)
+                }
+                db.update(TABLE_HABITS, values, "$COLUMN_ID = ?", arrayOf(id.toString()))
             }
         }
-        db.close()
-        return completions
     }
 
     fun completeHabit(habitId: Long): Boolean {
-        val habit = getHabitById(habitId)
-        habit?.let {
-            val now = System.currentTimeMillis()
-            val calendarNow = Calendar.getInstance().apply { timeInMillis = now }
-            
-            val lastCompleted = it.lastCompleted
-            if (lastCompleted != null) {
-                val calendarLast = Calendar.getInstance().apply { timeInMillis = lastCompleted }
-                if (isSameDay(calendarNow, calendarLast)) {
-                    return false
-                }
-            }
+        val habit = getHabitById(habitId) ?: return false
+        if (habit.type == HabitType.BAD) return false
 
-            addHabitCompletion(habitId, now)
+        val now = System.currentTimeMillis()
+        val last = habit.lastCompleted
+        if (last != null && isSameDay(Calendar.getInstance().apply { timeInMillis = last }, Calendar.getInstance())) return false
 
-            val shouldIncrementStreak = if (lastCompleted != null) {
-                val calendarLast = Calendar.getInstance().apply { timeInMillis = lastCompleted }
-                isYesterday(calendarLast, calendarNow)
-            } else {
-                true
-            }
+        val db = writableDatabase
+        val newStreak = habit.streakCount + 1
+        
+        // Получаем текущий рекорд из БД напрямую для точности
+        val cursor = db.rawQuery("SELECT $COLUMN_RECORD_STREAK FROM $TABLE_HABITS WHERE $COLUMN_ID = $habitId", null)
+        var currentRecord = 0
+        if (cursor.moveToFirst()) currentRecord = cursor.getInt(0)
+        cursor.close()
+        
+        val newRecord = maxOf(newStreak, currentRecord)
 
-            val newStreak = if (shouldIncrementStreak) it.streakCount + 1 else 1
-            return updateHabitStreak(habitId, newStreak, now)
+        val values = ContentValues().apply {
+            put(COLUMN_STREAK_COUNT, newStreak)
+            put(COLUMN_RECORD_STREAK, newRecord)
+            put(COLUMN_LAST_COMPLETED, now)
         }
-        return false
+        db.insert(TABLE_HABIT_COMPLETIONS, null, ContentValues().apply {
+            put(COLUMN_HABIT_ID_FK, habitId)
+            put(COLUMN_COMPLETION_DATE, now)
+        })
+        return db.update(TABLE_HABITS, values, "$COLUMN_ID = ?", arrayOf(habitId.toString())) > 0
+    }
+
+    fun recordFailure(habitId: Long): Boolean {
+        val db = writableDatabase
+        val now = System.currentTimeMillis()
+        val values = ContentValues().apply {
+            put(COLUMN_STREAK_COUNT, 0)
+            put(COLUMN_LAST_COMPLETED, now)
+        }
+        db.insert(TABLE_HABIT_COMPLETIONS, null, ContentValues().apply {
+            put(COLUMN_HABIT_ID_FK, habitId)
+            put(COLUMN_COMPLETION_DATE, now)
+        })
+        return db.update(TABLE_HABITS, values, "$COLUMN_ID = ?", arrayOf(habitId.toString())) > 0
     }
 
     fun undoCompleteHabit(habitId: Long): Boolean {
         val habit = getHabitById(habitId) ?: return false
-        val lastCompleted = habit.lastCompleted ?: return false
-
-        val now = Calendar.getInstance()
-        val lastCal = Calendar.getInstance().apply { timeInMillis = lastCompleted }
-        if (!isSameDay(now, lastCal)) {
-            return false
-        }
+        val last = habit.lastCompleted ?: return false
+        if (!isSameDay(Calendar.getInstance().apply { timeInMillis = last }, Calendar.getInstance())) return false
 
         val db = writableDatabase
-
-        db.delete(
-            TABLE_HABIT_COMPLETIONS,
-            "$COLUMN_HABIT_ID_FK = ? AND $COLUMN_COMPLETION_DATE = ?",
-            arrayOf(habitId.toString(), lastCompleted.toString())
-        )
-
-        val cursor = db.query(
-            TABLE_HABIT_COMPLETIONS,
-            arrayOf(COLUMN_COMPLETION_DATE),
-            "$COLUMN_HABIT_ID_FK = ?",
-            arrayOf(habitId.toString()),
-            null, null,
-            "$COLUMN_COMPLETION_DATE DESC",
-            "1"
-        )
-
-        var previousCompletionDate: Long? = null
-        if (cursor.moveToFirst()) {
-            previousCompletionDate = cursor.getLong(0)
-        }
+        db.delete(TABLE_HABIT_COMPLETIONS, "$COLUMN_HABIT_ID_FK = ? AND $COLUMN_COMPLETION_DATE = ?", arrayOf(habitId.toString(), last.toString()))
+        
+        val cursor = db.rawQuery("SELECT $COLUMN_COMPLETION_DATE FROM $TABLE_HABIT_COMPLETIONS WHERE $COLUMN_HABIT_ID_FK = $habitId ORDER BY $COLUMN_COMPLETION_DATE DESC LIMIT 1", null)
+        var prevDate: Long? = null
+        if (cursor.moveToFirst()) prevDate = cursor.getLong(0)
         cursor.close()
 
-        val newStreak = maxOf(0, habit.streakCount - 1)
-
         val values = ContentValues().apply {
-            put(COLUMN_STREAK_COUNT, newStreak)
-            put(COLUMN_LAST_COMPLETED, previousCompletionDate)
+            put(COLUMN_STREAK_COUNT, maxOf(0, habit.streakCount - 1))
+            put(COLUMN_LAST_COMPLETED, prevDate as Long?)
         }
-
-        val result = db.update(TABLE_HABITS, values, "$COLUMN_ID = ?", arrayOf(habitId.toString()))
-        db.close()
-
-        return result > 0
+        return db.update(TABLE_HABITS, values, "$COLUMN_ID = ?", arrayOf(habitId.toString())) > 0
     }
 
-    private fun isYesterday(last: Calendar, now: Calendar): Boolean {
-        val yesterday = now.clone() as Calendar
-        yesterday.add(Calendar.DAY_OF_YEAR, -1)
-        return isSameDay(last, yesterday)
-    }
-
-    fun resetHabitStreak(habitId: Long): Boolean {
-        return updateHabitStreak(habitId, 0, null)
-    }
-
-    fun deleteHabit(habitId:Long): Boolean{
-        val db = writableDatabase
-        db.delete(TABLE_HABIT_COMPLETIONS, "$COLUMN_HABIT_ID_FK = ?", arrayOf(habitId.toString()))
-        val rowsDeleted = db.delete(TABLE_HABITS, "$COLUMN_ID = ?", arrayOf(habitId.toString()))
-        db.close()
-        return rowsDeleted > 0
-    }
-
-    public fun getHabitById(habitId: Long): Habit? {
+    fun getHabitById(id: Long): Habit? {
         val db = readableDatabase
-        val cursor = db.query(
-            TABLE_HABITS,
-            null,
-            "$COLUMN_ID = ?",
-            arrayOf(habitId.toString()),
-            null, null, null
-        )
-
+        val cursor = db.query(TABLE_HABITS, null, "$COLUMN_ID = ?", arrayOf(id.toString()), null, null, null)
         return cursor.use {
-            if (it.moveToFirst()) {
-                Habit(
-                    id = it.getLong(it.getColumnIndexOrThrow(COLUMN_ID)),
-                    name = it.getString(it.getColumnIndexOrThrow(COLUMN_NAME)),
-                    description = it.getString(it.getColumnIndexOrThrow(COLUMN_DESCRIPTION)),
-                    type = HabitType.valueOf(it.getString(it.getColumnIndexOrThrow(COLUMN_TYPE))),
-                    streakCount = it.getInt(it.getColumnIndexOrThrow(COLUMN_STREAK_COUNT)),
-                    lastCompleted = if (it.isNull(it.getColumnIndexOrThrow(COLUMN_LAST_COMPLETED)))
-                        null else it.getLong(it.getColumnIndexOrThrow(COLUMN_LAST_COMPLETED)),
-                    createdAt = it.getLong(it.getColumnIndexOrThrow(COLUMN_CREATED_AT))
-                )
-            } else {
-                null
-            }
+            if (it.moveToFirst()) Habit(
+                id = it.getLong(it.getColumnIndexOrThrow(COLUMN_ID)),
+                name = it.getString(it.getColumnIndexOrThrow(COLUMN_NAME)),
+                description = it.getString(it.getColumnIndexOrThrow(COLUMN_DESCRIPTION)),
+                type = HabitType.valueOf(it.getString(it.getColumnIndexOrThrow(COLUMN_TYPE))),
+                streakCount = it.getInt(it.getColumnIndexOrThrow(COLUMN_STREAK_COUNT)),
+                lastCompleted = if (it.isNull(it.getColumnIndexOrThrow(COLUMN_LAST_COMPLETED))) null else it.getLong(it.getColumnIndexOrThrow(COLUMN_LAST_COMPLETED)),
+                createdAt = it.getLong(it.getColumnIndexOrThrow(COLUMN_CREATED_AT))
+            ) else null
         }
+    }
+
+    fun deleteHabit(id: Long): Boolean {
+        val db = writableDatabase
+        db.delete(TABLE_HABIT_COMPLETIONS, "$COLUMN_HABIT_ID_FK = ?", arrayOf(id.toString()))
+        return db.delete(TABLE_HABITS, "$COLUMN_ID = ?", arrayOf(id.toString())) > 0
     }
 
     fun getHabitStatistics(habitId: Long): HabitStatistics {
-        val completions = getHabitCompletions(habitId)
-        val habit = getHabitById(habitId) ?: return HabitStatistics(0, 0, 0, 0, 0, emptyList())
+        val completions = mutableListOf<Long>()
+        val db = readableDatabase
+        db.rawQuery("SELECT $COLUMN_COMPLETION_DATE FROM $TABLE_HABIT_COMPLETIONS WHERE $COLUMN_HABIT_ID_FK = $habitId", null).use {
+            while (it.moveToNext()) completions.add(it.getLong(0))
+        }
+        
+        val cursor = db.rawQuery("SELECT $COLUMN_STREAK_COUNT, $COLUMN_RECORD_STREAK, $COLUMN_CREATED_AT FROM $TABLE_HABITS WHERE $COLUMN_ID = $habitId", null)
+        var currentS = 0
+        var recordS = 0
+        var created: Long = 0
+        if (cursor.moveToFirst()) {
+            currentS = cursor.getInt(0)
+            recordS = cursor.getInt(1)
+            created = cursor.getLong(2)
+        }
+        cursor.close()
 
-        val totalDays = calculateTotalDays(habit.createdAt)
-        val completedDays = completions.size
-        val completionRate = if (totalDays > 0) (completedDays.toDouble() / totalDays * 100).toInt() else 0
-
-        val currentStreak = habit.streakCount
-        val recordStreak = calculateRecordStreak(completions)
-
-        return HabitStatistics(
-            totalDays = totalDays,
-            completedDays = completedDays,
-            completionRate = completionRate,
-            currentStreak = currentStreak,
-            recordStreak = recordStreak,
-            completions = completions
-        )
+        return HabitStatistics(calculateTotalDays(created), completions.size, 0, currentS, recordS, completions)
     }
 
     private fun calculateTotalDays(createdAt: Long): Int {
-        val createdDate = Calendar.getInstance().apply { timeInMillis = createdAt }
-        val currentDate = Calendar.getInstance()
-        val diffInMillis = currentDate.timeInMillis - createdDate.timeInMillis
-        return (diffInMillis / (24 * 60 * 60 * 1000)).toInt() + 1
+        val diff = System.currentTimeMillis() - createdAt
+        return (diff / (1000 * 60 * 60 * 24)).toInt() + 1
     }
 
-    private fun calculateRecordStreak(completions: List<Long>): Int {
-        if (completions.isEmpty()) return 0
-        var maxStreak = 1
-        var currentStreak = 1
-        for (i in 1 until completions.size) {
-            val prevDate = Calendar.getInstance().apply { timeInMillis = completions[i-1] }
-            val currDate = Calendar.getInstance().apply { timeInMillis = completions[i] }
-            if (isConsecutiveDay(prevDate, currDate)) {
-                currentStreak++
-                maxStreak = maxOf(maxStreak, currentStreak)
-            } else {
-                currentStreak = 1
-            }
+    private fun isSameDay(c1: Calendar, c2: Calendar) = c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR) && c1.get(Calendar.DAY_OF_YEAR) == c2.get(Calendar.DAY_OF_YEAR)
+    private fun isYesterday(last: Calendar, now: Calendar): Boolean {
+        val yest = now.clone() as Calendar
+        yest.add(Calendar.DAY_OF_YEAR, -1)
+        return isSameDay(last, yest)
+    }
+
+    fun hasUncompletedHabitsToday(): Boolean {
+        val habits = getAllHabits()
+        val now = Calendar.getInstance()
+        return habits.any { habit ->
+            if (habit.type == HabitType.GOOD) {
+                val last = habit.lastCompleted
+                last == null || !isSameDay(Calendar.getInstance().apply { timeInMillis = last }, now)
+            } else false
         }
-        return maxStreak
-    }
-
-    private fun isConsecutiveDay(day1: Calendar, day2: Calendar): Boolean {
-        val diff = day2.timeInMillis - day1.timeInMillis
-        return diff <= (24 * 60 * 60 * 1000L)
-    }
-
-    public fun isSameDay(cal1: Calendar, cal2: Calendar): Boolean {
-        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
-                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
-    }
-
-    fun isDataBaseEmpty(): Boolean {
-        val db = readableDatabase
-        val cursor = db.rawQuery("SELECT COUNT(*) FROM $TABLE_HABITS", null)
-        var count = 0
-        cursor.use {
-            if (it.moveToFirst()){
-                count = it.getInt(0)
-            }
-        }
-        db.close()
-        return count == 0
-    }
-
-    fun countHabits(): Int{
-        val db = readableDatabase
-        val cursor = db.rawQuery("SELECT COUNT(*) FROM $TABLE_HABITS", null)
-        var count = 0
-        cursor.use {
-            if (it.moveToFirst()){
-                count = it.getInt(0)
-            }
-        }
-        db.close()
-        return count
     }
 }

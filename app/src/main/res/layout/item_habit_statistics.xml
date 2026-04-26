@@ -3,42 +3,35 @@
     android:id="@+id/habitItemContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
+    android:layout_margin="6dp"
     android:background="@drawable/bg_habit"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
+    android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="12dp">
+    android:padding="16dp">
 
     <View
         android:id="@+id/typeIndicatorView"
-        android:layout_width="4dp"
-        android:layout_height="match_parent"
-        android:layout_marginEnd="16dp"
-        android:background="@color/good_habit_color" />
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone" />
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/habitNameTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="vertical">
+        android:fontFamily="@font/montserrat_semibold"
+        android:text="Название"
+        android:textColor="#000000"
+        android:textSize="20sp" />
 
-        <TextView
-            android:id="@+id/habitNameTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Название"
-            android:textColor="@color/white"
-            android:textSize="20sp" />
-
-        <TextView
-            android:id="@+id/typeOfHabit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="0 дней"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
-    </LinearLayout>
+    <TextView
+        android:id="@+id/typeOfHabit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
 
 </LinearLayout>

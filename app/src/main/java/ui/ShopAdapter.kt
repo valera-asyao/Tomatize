@@ -40,19 +40,22 @@ class ShopAdapter(
         val equipped = isEquipped(item)
 
         if (owned || equipped) {
-            // Apply grayscale and disable click
+            holder.price.visibility = View.GONE
+            
             val matrix = ColorMatrix()
             matrix.setSaturation(0f)
             holder.icon.colorFilter = ColorMatrixColorFilter(matrix)
             holder.container.alpha = 0.5f
             holder.container.isEnabled = false
-            holder.price.text = if (equipped) "Надето" else "Куплен"
+            
+
         } else {
-            // Reset to normal state
+            holder.price.visibility = View.VISIBLE
+            holder.price.text = item.price.toString()
+            
             holder.icon.colorFilter = null
             holder.container.alpha = 1.0f
             holder.container.isEnabled = true
-            holder.price.text = item.price.toString()
             holder.container.setOnClickListener {
                 onItemClick(item)
             }

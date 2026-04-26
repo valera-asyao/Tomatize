@@ -66,6 +66,7 @@ class HabitStatisticsFragment : Fragment() {
             requireActivity().supportFragmentManager.popBackStack()
         }
     }
+
     private fun showDeleteConfirmation() {
         activity?.let { context ->
             android.app.AlertDialog.Builder(context)
@@ -74,7 +75,7 @@ class HabitStatisticsFragment : Fragment() {
                 .setPositiveButton("Удалить") { _, _ ->
                     val success = databaseHelper.deleteHabit(habitId)
                     if (success) {
-                        android.widget.Toast.makeText(context, "Привычка удалена", android.widget.Toast.LENGTH_SHORT).show()
+                        (activity as? MainActivity)?.showTopNotification("Привычка удалена")
                         requireActivity().supportFragmentManager.popBackStack()
                     } else {
                         android.widget.Toast.makeText(context, "Ошибка при удалении", android.widget.Toast.LENGTH_SHORT).show()
@@ -84,12 +85,12 @@ class HabitStatisticsFragment : Fragment() {
                 .show()
         }
     }
+
     private fun setupDeleteButton() {
         view?.findViewById<ImageButton>(R.id.deleteButton)?.setOnClickListener {
             showDeleteConfirmation()
         }
     }
-
 
     private fun loadHabitStatistics() {
         if (habitId == -1L) return
@@ -99,69 +100,37 @@ class HabitStatisticsFragment : Fragment() {
 
         habit?.let {
             displayHabitData(it, statistics)
-            setupCurrentWeekCalendar(it)
-            setupMonthlyCalendar(statistics.completions)
+            setupCurrentWeekCalendar(it, statistics.completions)
+            setupMonthlyCalendar(it, statistics.completions)
         }
-    }
-
-    private fun showError(message: String) {
-        android.widget.Toast.makeText(requireContext(), message, android.widget.Toast.LENGTH_SHORT).show()
     }
 
     private fun displayHabitData(habit: Habit, statistics: HabitStatistics) {
-        // Заголовок
         view?.findViewById<TextView>(R.id.header)?.text = habit.name.uppercase()
-
-        // Общая статистика
-        view?.findViewById<TextView>(R.id.habitDescription)?.text =
-            "Выполнено: ${statistics.completedDays} из ${statistics.totalDays} дней"
-
         view?.findViewById<TextView>(R.id.habitDescription)?.text =
             if (habit.description.isNullOrBlank()) "Описания привычки нет" else habit.description
 
-        // Серии
-        val seriesText = when {
-            statistics.currentStreak % 10 == 1 && statistics.currentStreak % 100 != 11 ->
-                "СЕРИЯ ИЗ\n${statistics.currentStreak} ДНЯ"
-            statistics.currentStreak % 10 in 2..4 && statistics.currentStreak % 100 !in 12..14 ->
-                "СЕРИЯ ИЗ\n${statistics.currentStreak} ДНЕЙ"
-            else -> "СЕРИЯ ИЗ\n${statistics.currentStreak} ДНЕЙ"
-        }
-
-        val recordText = when {
-            statistics.recordStreak % 10 == 1 && statistics.recordStreak % 100 != 11 ->
-                "РЕКОРД:\n${statistics.recordStreak} ДЕНЬ"
-            statistics.recordStreak % 10 in 2..4 && statistics.recordStreak % 100 !in 12..14 ->
-                "РЕКОРД:\n${statistics.recordStreak} ДНЯ"
-            else -> "РЕКОРД:\n${statistics.recordStreak} ДНЕЙ"
-        }
+        val seriesText = "СЕРИЯ ИЗ\n${statistics.currentStreak} ${getDayWord(statistics.currentStreak)}"
+        val recordText = "РЕКОРД:\n${statistics.recordStreak} ${getDayWord(statistics.recordStreak)}"
 
         view?.findViewById<TextView>(R.id.series)?.text = seriesText
         view?.findViewById<TextView>(R.id.record)?.text = recordText
     }
 
-    private fun calculateHabitExperience(createdAt: Long): String {
-        val createdDate = Calendar.getInstance().apply { timeInMillis = createdAt }
-        val currentDate = Calendar.getInstance()
-
-        val diffInMillis = currentDate.timeInMillis - createdDate.timeInMillis
-        val days = (diffInMillis / (24 * 60 * 60 * 1000)).toInt()
-
+    private fun getDayWord(count: Int): String {
         return when {
-            days < 30 -> "$days дней"
-            days < 365 -> "${days / 30} месяцев"
-            else -> "${days / 365} лет"
+            count % 10 == 1 && count % 100 != 11 -> "ДЕНЬ"
+            count % 10 in 2..4 && count % 100 !in 12..14 -> "ДНЯ"
+            else -> "ДНЕЙ"
         }
     }
 
-    private fun setupCurrentWeekCalendar(habit: Habit) {
+    private fun setupCurrentWeekCalendar(habit: Habit, completions: List<Long>) {
         try {
             val calendar = Calendar.getInstance().apply {
                 firstDayOfWeek = Calendar.MONDAY
+                set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
             }
-
-            // Устанавливаем на понедельник текущей недели
-            calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
 
             val dayIds = listOf(
                 R.id.currentDay1, R.id.currentDay2, R.id.currentDay3, R.id.currentDay4,
@@ -169,33 +138,20 @@ class HabitStatisticsFragment : Fragment() {
             )
 
             val today = Calendar.getInstance()
+            val createdAtCal = Calendar.getInstance().apply { timeInMillis = habit.createdAt }
 
             for (i in 0 until 7) {
                 val dayView = view?.findViewById<TextView>(dayIds[i])
                 val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
+                
+                dayView?.text = dayOfMonth.toString()
 
-
-
-                // Проверяем, выполнен ли день
-                val isCompleted = isHabitCompletedOnDate(habit, calendar.timeInMillis)
+                val isMarkedInDb = isDateInCompletions(calendar.timeInMillis, completions)
                 val isToday = isSameDay(calendar, today)
+                val isBeforeToday = calendar.before(today) && !isToday
+                val existedAtThatDay = isSameDay(calendar, createdAtCal) || calendar.after(createdAtCal)
 
-                when {
-                    isCompleted -> {
-                        dayView?.setBackgroundResource(R.drawable.day_circle_completed)
-                        dayView?.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
-                    }
-                    isToday -> {
-                        dayView?.text = dayOfMonth.toString()
-                        dayView?.setBackgroundResource(R.drawable.day_circle_today)
-                        dayView?.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black))
-                    }
-                    else -> {
-                        dayView?.text = dayOfMonth.toString()
-                        dayView?.setBackgroundResource(R.drawable.day_circle)
-                        dayView?.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black))
-                    }
-                }
+                updateDayStyle(dayView, isMarkedInDb, isToday, isBeforeToday, habit.type, existedAtThatDay)
 
                 calendar.add(Calendar.DAY_OF_MONTH, 1)
             }
@@ -204,12 +160,11 @@ class HabitStatisticsFragment : Fragment() {
         }
     }
 
-    private fun setupMonthlyCalendar(completions: List<Long>) {
+    private fun setupMonthlyCalendar(habit: Habit, completions: List<Long>) {
         val calendar = Calendar.getInstance()
         val currentMonth = calendar.get(Calendar.MONTH)
         val currentYear = calendar.get(Calendar.YEAR)
 
-        // Устанавливаем на первое число текущего месяца
         calendar.set(currentYear, currentMonth, 1)
 
         val firstDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
@@ -217,7 +172,6 @@ class HabitStatisticsFragment : Fragment() {
 
         val dayIds = getMonthlyCalendarDayIds()
 
-        // Сбрасываем все дни
         dayIds.forEach { id ->
             view?.findViewById<TextView>(id)?.apply {
                 text = ""
@@ -226,9 +180,9 @@ class HabitStatisticsFragment : Fragment() {
             }
         }
 
-        // Заполняем календарь с учетом всей истории выполнений
         var dayCounter = 1
         val today = Calendar.getInstance()
+        val createdAtCal = Calendar.getInstance().apply { timeInMillis = habit.createdAt }
 
         val startPosition = when (firstDayOfWeek) {
             Calendar.MONDAY -> 0
@@ -245,32 +199,70 @@ class HabitStatisticsFragment : Fragment() {
             if (position >= startPosition && dayCounter <= daysInMonth) {
                 val dayView = view?.findViewById<TextView>(dayIds[position])
                 dayView?.apply {
-
                     visibility = View.VISIBLE
+                    text = dayCounter.toString()
 
-                    // Проверяем выполнение для этого дня
                     calendar.set(currentYear, currentMonth, dayCounter)
-                    val isCompleted = isDateInCompletions(calendar.timeInMillis, completions)
+                    val isMarkedInDb = isDateInCompletions(calendar.timeInMillis, completions)
                     val isToday = isSameDay(calendar, today)
+                    val isBeforeToday = calendar.before(today) && !isToday
+                    val existedAtThatDay = isSameDay(calendar, createdAtCal) || calendar.after(createdAtCal)
 
-                    when {
-                        isCompleted -> {
-                            setBackgroundResource(R.drawable.day_circle_completed)
-                            setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
-                        }
-                        isToday -> {
-                            text = dayCounter.toString()
-                            setBackgroundResource(R.drawable.day_circle_today)
-                            setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black))
-                        }
-                        else -> {
-                            text = dayCounter.toString()
-                            setBackgroundResource(R.drawable.day_circle)
-                            setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black))
-                        }
-                    }
+                    updateDayStyle(this, isMarkedInDb, isToday, isBeforeToday, habit.type, existedAtThatDay)
                 }
                 dayCounter++
+            }
+        }
+    }
+
+    private fun updateDayStyle(dayView: TextView?, isMarkedInDb: Boolean, isToday: Boolean, isBeforeToday: Boolean, habitType: HabitType, existedAtThatDay: Boolean) {
+        dayView?.apply {
+            if (!existedAtThatDay) {
+                setBackgroundResource(0)
+                setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black))
+                alpha = 0.3f // Делаем дни до создания полупрозрачными
+                return
+            }
+            alpha = 1.0f
+
+            if (habitType == HabitType.GOOD) {
+                when {
+                    isMarkedInDb -> {
+                        setBackgroundResource(R.drawable.day_circle_green)
+                        setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+                    }
+                    isToday -> {
+                        setBackgroundResource(R.drawable.day_circle_black)
+                        setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+                    }
+                    isBeforeToday -> {
+                        setBackgroundResource(R.drawable.day_circle_red)
+                        setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+                    }
+                    else -> {
+                        setBackgroundResource(0)
+                        setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black))
+                    }
+                }
+            } else { // BAD Habit
+                when {
+                    isMarkedInDb -> { // Срыв (записан в БД)
+                        setBackgroundResource(R.drawable.day_circle_red)
+                        setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+                    }
+                    isToday -> {
+                        setBackgroundResource(R.drawable.day_circle_black)
+                        setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+                    }
+                    isBeforeToday -> { // Соблюдение (не было срыва)
+                        setBackgroundResource(R.drawable.day_circle_green)
+                        setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+                    }
+                    else -> {
+                        setBackgroundResource(0)
+                        setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black))
+                    }
+                }
             }
         }
     }
@@ -283,20 +275,9 @@ class HabitStatisticsFragment : Fragment() {
         }
     }
 
-    private fun isHabitCompletedOnDate(habit: Habit, dateInMillis: Long): Boolean {
-        // Упрощенная проверка - сравниваем только с lastCompleted
-        if (habit.lastCompleted == null) return false
-
-        val habitDate = Calendar.getInstance().apply { timeInMillis = habit.lastCompleted!! }
-        val targetDate = Calendar.getInstance().apply { timeInMillis = dateInMillis }
-
-        return isSameDay(habitDate, targetDate)
-    }
-
     private fun isSameDay(cal1: Calendar, cal2: Calendar): Boolean {
         return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
-                cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH) &&
-                cal1.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH)
+                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
     }
 
     private fun getMonthlyCalendarDayIds(): List<Int> {

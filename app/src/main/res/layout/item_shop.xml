@@ -46,7 +46,7 @@
 
             <TextView
                 android:id="@+id/itemPrice"
-                android:layout_width="72dp"
+                android:layout_width="30dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"

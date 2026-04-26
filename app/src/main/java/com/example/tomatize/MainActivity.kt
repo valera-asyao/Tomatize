@@ -1,18 +1,25 @@
 package com.example.tomatize
 
+import android.Manifest
 import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.cardview.widget.CardView
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -20,10 +27,19 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.core.widget.ImageViewCompat
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.navOptions
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import ui.AddHabitDialog
 import ui.Habit
 import ui.HabitDatabaseHelper
+import ui.HabitReminderWorker
 import ui.HomeFragment
+import ui.StatisticsFragment
+import java.util.Calendar
+import java.util.concurrent.TimeUnit
+import kotlin.math.abs
 
 class MainActivity : AppCompatActivity() {
 
@@ -32,6 +48,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navButtons: List<FrameLayout>
     private lateinit var navIcons: List<ImageView>
     private var currentIndex = 0
+    private var currentNavIndex = 0
+
+    private lateinit var topNotificationCard: CardView
+    private lateinit var topNotificationText: TextView
+    private lateinit var topNotificationIcon: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -39,8 +60,12 @@ class MainActivity : AppCompatActivity() {
         
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        checkNotificationPermission()
 
-        // Handle Splash Screen
+        topNotificationCard = findViewById(R.id.topNotificationCard)
+        topNotificationText = findViewById(R.id.topNotificationText)
+        topNotificationIcon = findViewById(R.id.topNotificationIcon)
+
         val splashScreen = findViewById<View>(R.id.splash_screen)
         splashScreen.postDelayed({
             splashScreen.animate()
@@ -58,10 +83,14 @@ class MainActivity : AppCompatActivity() {
         }, 1000)
 
         databaseHelper = HabitDatabaseHelper(this)
+        scheduleDailyReminder()
 
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            currentNavIndex = getNavIndex(destination.id)
+        }
 
         val rootLayout = findViewById<View>(R.id.main_root)
         val customBottomNav = findViewById<View>(R.id.custom_bottom_nav)
@@ -99,68 +128,114 @@ class MainActivity : AppCompatActivity() {
 
         navButtons.forEachIndexed { index, frameLayout ->
             frameLayout.setOnClickListener {
-                val destinationId = destinationIds[index]
-                if (destinationId == R.id.addHabitFragment) {
+                val targetId = destinationIds[index]
+
+                if (targetId == R.id.addHabitFragment) {
                     showAddHabitDialog()
-                } else {
-                    if (navController.currentDestination?.id != destinationId) {
-                        navController.navigate(destinationId)
+                } else if (navController.currentDestination?.id != targetId) {
+
+                    val actualCurrentIdx = getNavIndex(navController.currentDestination?.id)
+
+                    val options = navOptions {
+                        anim {
+                            if (index > actualCurrentIdx) {
+                                enter = R.anim.slide_in_right
+                                exit = R.anim.slide_out_left
+                                popEnter = R.anim.slide_in_left
+                                popExit = R.anim.slide_out_right
+                            } else {
+                                enter = R.anim.slide_in_left
+                                exit = R.anim.slide_out_right
+                                popEnter = R.anim.slide_in_right
+                                popExit = R.anim.slide_out_left
+                            }
+                        }
+                        launchSingleTop = true
                     }
+                    navController.navigate(targetId, null, options)
                 }
             }
         }
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            val index = destinationIds.indexOf(destination.id)
-            if (index != -1 && index != currentIndex) {
+            val index = getNavIndex(destination.id)
+            if (index != -1) {
+                currentIndex = index
                 animateSelector(index)
             }
         }
 
-        selectorOval.post {
-            moveSelector(0, animate = false)
+        selectorOval.post { initSelector() }
+    }
+
+    fun showTopNotification(text: String, iconRes: Int = R.drawable.tomato) {
+        topNotificationText.text = text
+        topNotificationIcon.setImageResource(iconRes)
+
+        topNotificationCard.animate()
+            .translationY(0f)
+            .setDuration(500)
+            .setInterpolator(DecelerateInterpolator())
+            .withEndAction {
+                topNotificationCard.postDelayed({
+                    topNotificationCard.animate()
+                        .translationY(-400f)
+                        .setDuration(500)
+                        .setInterpolator(AccelerateInterpolator())
+                        .start()
+                }, 2000)
+            }
+            .start()
+    }
+
+    private fun getNavIndex(destinationId: Int?): Int {
+        return when (destinationId) {
+            R.id.homeFragment -> 0
+            R.id.statisticsFragment, R.id.habitStatisticsFragment -> 1
+            R.id.shopFragment -> 3
+            R.id.profileFragment -> 4
+            else -> currentNavIndex
         }
     }
 
     private fun animateSelector(newIndex: Int) {
         val container = findViewById<View>(R.id.nav_buttons_container)
         val tabWidth = container.width / 5f
-        val startX = currentIndex * tabWidth + (tabWidth - selectorOval.width) / 2f
-        val endX = newIndex * tabWidth + (tabWidth - selectorOval.width) / 2f
+        if (tabWidth <= 0) return
 
-        val moveAnimator = ObjectAnimator.ofFloat(selectorOval, "translationX", startX, endX)
-        
-        val stretchAnimator = ValueAnimator.ofFloat(1f, 1.25f, 1f)
-        stretchAnimator.addUpdateListener { animator ->
-            val scale = animator.animatedValue as Float
-            selectorOval.scaleX = scale
+        val targetX = newIndex * tabWidth + (tabWidth - selectorOval.width) / 2f
+
+        if (abs(selectorOval.translationX - targetX) < 1f) {
+            updateNavColors(newIndex)
+            return
         }
 
-        val animatorSet = AnimatorSet().apply {
+        val moveAnimator = ObjectAnimator.ofFloat(selectorOval, "translationX", selectorOval.translationX, targetX)
+
+        val stretchAnimator = ValueAnimator.ofFloat(1f, 1.25f, 1f)
+        stretchAnimator.addUpdateListener { animator ->
+            selectorOval.scaleX = animator.animatedValue as Float
+        }
+
+        AnimatorSet().apply {
             playTogether(moveAnimator, stretchAnimator)
             duration = 300
             interpolator = AccelerateDecelerateInterpolator()
+            start()
         }
-
         updateNavColors(newIndex)
-        animatorSet.start()
-        currentIndex = newIndex
     }
 
-    private fun moveSelector(index: Int, animate: Boolean) {
+    private fun initSelector() {
         val container = findViewById<View>(R.id.nav_buttons_container)
         if (container.width == 0) return
         
         val tabWidth = container.width / 5f
-        val targetX = index * tabWidth + (tabWidth - selectorOval.width) / 2f
+        val targetX = (tabWidth - selectorOval.width) / 2f
         
-        if (animate) {
-            animateSelector(index)
-        } else {
-            selectorOval.translationX = targetX
-            updateNavColors(index)
-            currentIndex = index
-        }
+        selectorOval.translationX = targetX
+        updateNavColors(0)
+        currentIndex = 0
     }
 
     private fun updateNavColors(activeIndex: Int) {
@@ -175,7 +250,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Missing methods added here
     fun setNavBarVisibility(visible: Boolean) {
         findViewById<View>(R.id.custom_bottom_nav).visibility = if (visible) View.VISIBLE else View.GONE
     }
@@ -196,13 +270,49 @@ class MainActivity : AppCompatActivity() {
             override fun onHabitAdded(habit: Habit) {
                 val id = databaseHelper.addHabit(habit)
                 if (id != -1L) {
-                    android.widget.Toast.makeText(this@MainActivity, "Привычка добавлена!", android.widget.Toast.LENGTH_SHORT).show()
+                    showTopNotification("Привычка добавлена!")
                     val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
                     val currentFragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
-                    if (currentFragment is HomeFragment) currentFragment.refreshHabits()
+                    when (currentFragment) {
+                        is HomeFragment -> currentFragment.refreshHabits()
+                        is StatisticsFragment -> currentFragment.refreshHabits()
+                    }
                 }
             }
         })
         dialog.show(supportFragmentManager, "AddHabitDialog")
+    }
+
+    private fun checkNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 101)
+            }
+        }
+    }
+
+    private fun scheduleDailyReminder() {
+        val currentDate = Calendar.getInstance()
+        val dueDate = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 20)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+        }
+
+        if (dueDate.before(currentDate)) {
+            dueDate.add(Calendar.HOUR_OF_DAY, 24)
+        }
+
+        val timeDiff = dueDate.timeInMillis - currentDate.timeInMillis
+
+        val dailyWorkRequest = PeriodicWorkRequestBuilder<HabitReminderWorker>(24, TimeUnit.HOURS)
+            .setInitialDelay(timeDiff, TimeUnit.MILLISECONDS)
+            .build()
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "HabitDailyReminder",
+            ExistingPeriodicWorkPolicy.UPDATE,
+            dailyWorkRequest
+        )
     }
 }

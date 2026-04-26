@@ -8,10 +8,10 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.tomatize.MainActivity
 import com.example.tomatize.R
 import com.example.tomatize.ShopItem
 import com.example.tomatize.UserData
@@ -50,6 +50,7 @@ class ShopFragment : Fragment() {
         btnCheat.setOnClickListener {
             ShopStorage.addBalance(requireContext(), 5000)
             updateBalanceUI()
+            (activity as? MainActivity)?.showTopNotification("Получено 5000 \uD83C\uDF45!")
         }
 
         setupFilters()
@@ -78,18 +79,10 @@ class ShopFragment : Fragment() {
 
         if (currentEquippedId == item.id) {
             ShopStorage.unequipType(requireContext(), item.type)
-            Toast.makeText(
-                requireContext(),
-                "\u0421\u043d\u044f\u0442\u043e: ${item.name}",
-                Toast.LENGTH_SHORT
-            ).show()
+            (activity as? MainActivity)?.showTopNotification("Снято: ${item.name}")
         } else {
             ShopStorage.equipItem(requireContext(), item)
-            Toast.makeText(
-                requireContext(),
-                "\u041d\u0430\u0434\u0435\u0442\u043e: ${item.name}",
-                Toast.LENGTH_SHORT
-            ).show()
+            (activity as? MainActivity)?.showTopNotification("Надето: ${item.name}")
         }
 
         adapter.notifyDataSetChanged()
@@ -150,11 +143,7 @@ class ShopFragment : Fragment() {
 
     private fun handlePurchase(item: ShopItem) {
         if (ShopStorage.isOwned(requireContext(), item.id)) {
-            Toast.makeText(
-                requireContext(),
-                "\u041f\u0440\u0435\u0434\u043c\u0435\u0442 \u0443\u0436\u0435 \u043a\u0443\u043f\u043b\u0435\u043d",
-                Toast.LENGTH_SHORT
-            ).show()
+            (activity as? MainActivity)?.showTopNotification("Предмет уже куплен")
             return
         }
 
@@ -163,17 +152,9 @@ class ShopFragment : Fragment() {
         if (success) {
             updateBalanceUI()
             adapter.notifyDataSetChanged()
-            Toast.makeText(
-                requireContext(),
-                "\u041a\u0443\u043f\u043b\u0435\u043d\u043e: ${item.name}",
-                Toast.LENGTH_SHORT
-            ).show()
+            (activity as? MainActivity)?.showTopNotification("Куплено: ${item.name}")
         } else {
-            Toast.makeText(
-                requireContext(),
-                "\u041d\u0435\u0434\u043e\u0441\u0442\u0430\u0442\u043e\u0447\u043d\u043e \u0441\u0440\u0435\u0434\u0441\u0442\u0432",
-                Toast.LENGTH_SHORT
-            ).show()
+            (activity as? MainActivity)?.showTopNotification("Недостаточно средств")
         }
     }
 

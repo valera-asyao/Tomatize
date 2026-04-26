@@ -24,11 +24,13 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:backgroundTint="#79B381"
+        android:textColor="@color/black"
         android:text="+5000🍅"
-        android:textSize="10sp"
+        android:textSize="12sp"
+        android:fontFamily="@font/gnf"
         app:layout_constraintBottom_toBottomOf="@+id/currencyContainer"
         app:layout_constraintEnd_toStartOf="@+id/currencyContainer"
-        app:layout_constraintTop_toTopOf="@+id/currencyContainer" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/currencyContainer"
@@ -48,9 +50,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0"
+            android:fontFamily="@font/gnf"
             android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textSize="16sp" />
 
         <TextView
             android:layout_width="wrap_content"
