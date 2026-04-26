@@ -42,6 +42,7 @@ class ShopAdapter(
         if (owned || equipped) {
             holder.price.visibility = View.GONE
             
+
             val matrix = ColorMatrix()
             matrix.setSaturation(0f)
             holder.icon.colorFilter = ColorMatrixColorFilter(matrix)
@@ -53,6 +54,7 @@ class ShopAdapter(
             holder.price.visibility = View.VISIBLE
             holder.price.text = item.price.toString()
             
+
             holder.icon.colorFilter = null
             holder.container.alpha = 1.0f
             holder.container.isEnabled = true

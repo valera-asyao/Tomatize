@@ -40,6 +40,20 @@ class HabitsAdapter(
         holder.nameTextView.text = habit.name
         holder.streakTextView.text = "${habit.streakCount} дн."
 
+        val (bgColor, btnColor, textColor) = if (habit.type == HabitType.GOOD) {
+            Triple(
+                ContextCompat.getColor(context, R.color.habit_good_bg),
+                ContextCompat.getColor(context, R.color.habit_good_btn),
+                ContextCompat.getColor(context, R.color.habit_good_text)
+            )
+        } else {
+            Triple(
+                ContextCompat.getColor(context, R.color.habit_bad_bg),
+                ContextCompat.getColor(context, R.color.habit_bad_btn),
+                ContextCompat.getColor(context, R.color.habit_bad_text)
+            )
+        }
+
         val goodBg = ContextCompat.getColor(context, R.color.habit_good_bg)
         val goodBtn = ContextCompat.getColor(context, R.color.habit_good_btn)
         val goodTxt = ContextCompat.getColor(context, R.color.habit_good_text)

@@ -134,6 +134,7 @@ object UserData {
     private fun hasClothesKeyword(resourceName: String): Boolean {
         val clothesKeywords = listOf(
             "apron",
+            "costume",
             "dress",
             "hoodie",
             "jacket",

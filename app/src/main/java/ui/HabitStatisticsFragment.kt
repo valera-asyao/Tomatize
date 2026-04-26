@@ -275,6 +275,17 @@ class HabitStatisticsFragment : Fragment() {
         }
     }
 
+
+    private fun isHabitCompletedOnDate(habit: Habit, dateInMillis: Long): Boolean {
+        if (habit.lastCompleted == null) return false
+
+        val habitDate = Calendar.getInstance().apply { timeInMillis = habit.lastCompleted!! }
+        val targetDate = Calendar.getInstance().apply { timeInMillis = dateInMillis }
+
+        return isSameDay(habitDate, targetDate)
+    }
+
+
     private fun isSameDay(cal1: Calendar, cal2: Calendar): Boolean {
         return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
                 cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)

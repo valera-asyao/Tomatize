@@ -18,10 +18,6 @@ import com.example.tomatize.UserData
 
 class ProfileFragment : Fragment() {
 
-    private companion object {
-        private const val PROFILE_CLOTHES_OFFSET_DP = 2f
-    }
-
     private lateinit var mascotOverlayContainer: FrameLayout
     private lateinit var ownedItemsRecycler: RecyclerView
     private lateinit var inventoryAdapter: InventoryAdapter
@@ -78,12 +74,7 @@ class ProfileFragment : Fragment() {
             .mapNotNull { type -> ShopStorage.getEquippedItemId(requireContext(), type) }
             .mapNotNull(UserData::findItemById)
 
-        MascotOverlayRenderer.render(
-            requireContext(),
-            mascotOverlayContainer,
-            equippedItems,
-            clothesOffsetDp = PROFILE_CLOTHES_OFFSET_DP
-        )
+        MascotOverlayRenderer.render(requireContext(), mascotOverlayContainer, equippedItems)
     }
 
     private inner class InventoryAdapter(
@@ -109,7 +100,7 @@ class ProfileFragment : Fragment() {
             val isEquipped = ShopStorage.isEquipped(requireContext(), item)
 
             holder.icon.setImageResource(item.iconRes)
-            holder.price.visibility = View.GONE // Hide price/status text since we use 'name' field
+            holder.price.visibility = View.GONE
 
             val params = holder.name.layoutParams as RelativeLayout.LayoutParams
             
@@ -118,17 +109,14 @@ class ProfileFragment : Fragment() {
                 holder.name.gravity = Gravity.CENTER
                 holder.name.setTextColor(android.graphics.Color.parseColor("#FFFFFF"))
                 
-                // Remove constraints to price to allow centering in the whole bar
                 params.removeRule(RelativeLayout.START_OF)
                 params.removeRule(RelativeLayout.LEFT_OF)
                 params.width = RelativeLayout.LayoutParams.MATCH_PARENT
             } else {
-                // Show original name
                 holder.name.text = item.name
                 holder.name.gravity = Gravity.CENTER
                 holder.name.setTextColor(android.graphics.Color.WHITE)
                 
-                // Restore original constraints if needed (though price is GONE)
                 params.width = RelativeLayout.LayoutParams.MATCH_PARENT
             }
             holder.name.layoutParams = params
