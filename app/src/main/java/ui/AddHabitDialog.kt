@@ -23,6 +23,7 @@ class AddHabitDialog : DialogFragment() {
     private lateinit var nameEditText: EditText
     private lateinit var descriptionEditText: EditText
     private var selectedType: HabitType? = null
+    private var selectedBadDifficulty = DEFAULT_BAD_DIFFICULTY
     
     private lateinit var btnTypeGood: Button
     private lateinit var btnTypeBad: Button
@@ -105,6 +106,7 @@ class AddHabitDialog : DialogFragment() {
                 type = type!!,
                 streakCount = 0,
                 lastCompleted = null,
+                badDifficulty = if (type == HabitType.BAD) selectedBadDifficulty else DEFAULT_BAD_DIFFICULTY,
                 createdAt = System.currentTimeMillis()
             )
 
@@ -139,6 +141,7 @@ class AddHabitDialog : DialogFragment() {
         nameEditText.text?.clear()
         descriptionEditText.text?.clear()
         selectedType = null
+        selectedBadDifficulty = DEFAULT_BAD_DIFFICULTY
         
         val grayColor = ContextCompat.getColor(requireContext(), R.color.nav_inactive)
         val whiteColor = ContextCompat.getColor(requireContext(), R.color.white)

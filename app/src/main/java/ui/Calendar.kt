@@ -3,7 +3,7 @@ package ui
 import java.util.Calendar
 import java.util.Locale
 
-class Calendar {
+class CalendarHelper {
 
     //Получение начала недели (понедельник) для указанной даты
     fun getStartOfWeek(calendar: Calendar = Calendar.getInstance()): Calendar {
