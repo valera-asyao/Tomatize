@@ -18,9 +18,14 @@ object ShopStorage {
         prefs(context).edit().putInt(UserData.KEY_CURRENCY, newValue).apply()
     }
 
+    fun setBalance(context: Context, value: Int) {
+        prefs(context).edit()
+            .putInt(UserData.KEY_CURRENCY, maxOf(0, value))
+            .apply()
+    }
+
     fun spendBalance(context: Context, amount: Int) {
-        val newValue = getBalance(context) - amount
-        prefs(context).edit().putInt(UserData.KEY_CURRENCY, newValue).apply()
+        setBalance(context, getBalance(context) - amount)
     }
 
     fun getOwnedItemIds(context: Context): Set<Int> {
@@ -77,5 +82,25 @@ object ShopStorage {
 
     fun isEquipped(context: Context, item: ShopItem): Boolean {
         return getEquippedItemId(context, item.type) == item.id
+    }
+
+    fun clearSkins(context: Context) {
+        val editor = prefs(context).edit()
+            .remove(UserData.KEY_OWNED_ITEMS)
+
+        UserData.shopTypes.forEach { type ->
+            editor.putInt(keyForType(type), -1)
+        }
+
+        editor.apply()
+    }
+
+    fun clearMoneyAndSkins(context: Context) {
+        prefs(context).edit()
+            .putInt(UserData.KEY_CURRENCY, 0)
+            .remove(UserData.KEY_OWNED_ITEMS)
+            .apply()
+
+        clearSkins(context)
     }
 }

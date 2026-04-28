@@ -33,6 +33,16 @@
             android:textColor="#666666"
             android:textSize="14sp" />
 
+        <TextView
+            android:id="@+id/detailsHabitDifficulty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/montserrat_semibold"
+            android:text="Сложность: нет"
+            android:textColor="#666666"
+            android:textSize="14sp" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"

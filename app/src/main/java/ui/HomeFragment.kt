@@ -25,6 +25,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     private lateinit var mascotOverlayContainer: FrameLayout
     private lateinit var tvCurrencyHome: TextView
     private lateinit var tvMaxStreak: TextView
+    private lateinit var tvTomatoHearts: TextView
 
 
     override fun onCreateView(
@@ -38,6 +39,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         emptyStateTextView = view.findViewById(R.id.emptyStateTextView)
         tvCurrencyHome = view.findViewById(R.id.tvCurrencyHome)
         tvMaxStreak = view.findViewById(R.id.tvMaxStreakTitle)
+        tvTomatoHearts = view.findViewById(R.id.tvTomatoHearts)
 
         return view
     }
@@ -55,12 +57,20 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         loadHabits()
         updateMascot()
         updateBalanceUI()
+        updateHealthUI()
     }
 
     private fun updateBalanceUI() {
         val prefs = requireActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
         val balance = prefs.getInt("USER_CURRENCY", 0)
         tvCurrencyHome.text = balance.toString()
+    }
+
+    private fun updateHealthUI() {
+        val state = TomatoHealthStorage.getState(requireContext())
+        val fullHearts = "♥".repeat(state.hearts)
+        val emptyHearts = "♡".repeat(TomatoHealthStorage.MAX_HEARTS - state.hearts)
+        tvTomatoHearts.text = fullHearts + emptyHearts
     }
 
     private fun checkAndAwardCurrency(habitId: Long) {
@@ -130,13 +140,32 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         bottomSheet.setOnConfirmListener {
             if (databaseHelper.recordFailure(habit.id)) {
                 applyFailurePenalty()
+                val change = TomatoHealthStorage.loseHearts(requireContext(), habit.heartDamage)
                 loadHabits()
                 updateBalanceUI()
-                showActionSnackbar("Срыв зафиксирован", false)
-                (activity as? MainActivity)?.showTopNotification("Вы потеряли 100 \uD83C\uDF45")
+                updateHealthUI()
+                if (change.died) {
+                    showTomatoDiedDialog()
+                } else {
+                    showActionSnackbar("Срыв зафиксирован", false)
+                    (activity as? MainActivity)?.showTopNotification("Вы потеряли 100 \uD83C\uDF45")
+                }
             }
         }
         bottomSheet.show(parentFragmentManager, "BadHabitFailureBottomSheet")
+    }
+
+    private fun showTomatoDiedDialog() {
+        android.app.AlertDialog.Builder(requireContext())
+            .setTitle("Помидор погиб")
+            .setMessage("Помидор потерял все сердца. Деньги и скины сброшены.")
+            .setPositiveButton("OK") { _, _ ->
+                updateBalanceUI()
+                loadHabits()
+                updateMascot()
+                updateHealthUI()
+            }
+            .show()
     }
 
     private fun applyFailurePenalty() {
@@ -166,6 +195,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
 
     fun refreshHabits() {
         loadHabits()
+        updateHealthUI()
     }
 
     override fun onHabitAdded(habit: Habit) {
@@ -180,6 +210,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
             showActionSnackbar("Привычка ${habit.name} соблюдена!", true)
             checkAndAwardCurrency(habit.id)
             updateBalanceUI()
+            updateHealthUI()
         }
     }
 
@@ -214,6 +245,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         if (success) {
             loadHabits()
             updateBalanceUI()
+            updateHealthUI()
             showActionSnackbar("Выполнение отменено", true)
         }
     }

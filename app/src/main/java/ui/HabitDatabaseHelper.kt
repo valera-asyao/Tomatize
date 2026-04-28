@@ -2,6 +2,7 @@ package ui
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import java.util.Calendar
@@ -19,12 +20,13 @@ class HabitDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
 
     companion object {
         private const val DATABASE_NAME = "habits.db"
-        private const val DATABASE_VERSION = 3
+        private const val DATABASE_VERSION = 4
         private const val TABLE_HABITS = "habits"
         private const val COLUMN_ID = "id"
         private const val COLUMN_NAME = "name"
         private const val COLUMN_DESCRIPTION = "description"
         private const val COLUMN_TYPE = "type"
+        private const val COLUMN_BAD_DIFFICULTY = "bad_difficulty"
         private const val COLUMN_STREAK_COUNT = "streak_count"
         private const val COLUMN_RECORD_STREAK = "record_streak"
         private const val COLUMN_LAST_COMPLETED = "last_completed"
@@ -43,6 +45,7 @@ class HabitDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
                 $COLUMN_NAME TEXT NOT NULL,
                 $COLUMN_DESCRIPTION TEXT,
                 $COLUMN_TYPE TEXT NOT NULL,
+                $COLUMN_BAD_DIFFICULTY INTEGER NOT NULL DEFAULT $DEFAULT_BAD_DIFFICULTY,
                 $COLUMN_STREAK_COUNT INTEGER DEFAULT 0,
                 $COLUMN_RECORD_STREAK INTEGER DEFAULT 0,
                 $COLUMN_LAST_COMPLETED INTEGER,
@@ -64,7 +67,26 @@ class HabitDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
             db.execSQL("CREATE TABLE $TABLE_HABIT_COMPLETIONS ($COLUMN_COMPLETION_ID INTEGER PRIMARY KEY AUTOINCREMENT, $COLUMN_HABIT_ID_FK INTEGER NOT NULL, $COLUMN_COMPLETION_DATE INTEGER NOT NULL, FOREIGN KEY ($COLUMN_HABIT_ID_FK) REFERENCES $TABLE_HABITS($COLUMN_ID))")
         }
         if (oldVersion < 3) {
-            db.execSQL("ALTER TABLE $TABLE_HABITS ADD COLUMN $COLUMN_RECORD_STREAK INTEGER DEFAULT 0")
+            addColumnIfNeeded(db, COLUMN_RECORD_STREAK, "ALTER TABLE $TABLE_HABITS ADD COLUMN $COLUMN_RECORD_STREAK INTEGER DEFAULT 0")
+        }
+        if (oldVersion < 4) {
+            addColumnIfNeeded(db, COLUMN_RECORD_STREAK, "ALTER TABLE $TABLE_HABITS ADD COLUMN $COLUMN_RECORD_STREAK INTEGER DEFAULT 0")
+            addColumnIfNeeded(db, COLUMN_BAD_DIFFICULTY, "ALTER TABLE $TABLE_HABITS ADD COLUMN $COLUMN_BAD_DIFFICULTY INTEGER NOT NULL DEFAULT $DEFAULT_BAD_DIFFICULTY")
+        }
+    }
+
+    private fun addColumnIfNeeded(db: SQLiteDatabase, columnName: String, sql: String) {
+        var exists = false
+        val cursor = db.rawQuery("PRAGMA table_info($TABLE_HABITS)", null)
+        cursor.use {
+            while (it.moveToNext()) {
+                if (it.getString(it.getColumnIndexOrThrow("name")) == columnName) {
+                    exists = true
+                }
+            }
+        }
+        if (!exists) {
+            db.execSQL(sql)
         }
     }
 
@@ -86,12 +108,21 @@ class HabitDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
             put(COLUMN_NAME, habit.name)
             put(COLUMN_DESCRIPTION, habit.description)
             put(COLUMN_TYPE, habit.type.name)
+            put(COLUMN_BAD_DIFFICULTY, normalizeBadDifficulty(habit.badDifficulty))
             put(COLUMN_STREAK_COUNT, 0)
             put(COLUMN_RECORD_STREAK, 0)
             put(COLUMN_LAST_COMPLETED, null as Long?)
             put(COLUMN_CREATED_AT, System.currentTimeMillis())
         }
         return db.insert(TABLE_HABITS, null, values)
+    }
+
+    private fun readBadDifficulty(cursor: Cursor): Int {
+        val index = cursor.getColumnIndex(COLUMN_BAD_DIFFICULTY)
+        if (index == -1 || cursor.isNull(index)) {
+            return DEFAULT_BAD_DIFFICULTY
+        }
+        return normalizeBadDifficulty(cursor.getInt(index))
     }
 
     fun getAllHabits(): List<Habit> {
@@ -108,6 +139,7 @@ class HabitDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
                     type = HabitType.valueOf(it.getString(it.getColumnIndexOrThrow(COLUMN_TYPE))),
                     streakCount = it.getInt(it.getColumnIndexOrThrow(COLUMN_STREAK_COUNT)),
                     lastCompleted = if (it.isNull(it.getColumnIndexOrThrow(COLUMN_LAST_COMPLETED))) null else it.getLong(it.getColumnIndexOrThrow(COLUMN_LAST_COMPLETED)),
+                    badDifficulty = readBadDifficulty(it),
                     createdAt = it.getLong(it.getColumnIndexOrThrow(COLUMN_CREATED_AT))
                 ))
             }
@@ -234,6 +266,7 @@ class HabitDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
                 type = HabitType.valueOf(it.getString(it.getColumnIndexOrThrow(COLUMN_TYPE))),
                 streakCount = it.getInt(it.getColumnIndexOrThrow(COLUMN_STREAK_COUNT)),
                 lastCompleted = if (it.isNull(it.getColumnIndexOrThrow(COLUMN_LAST_COMPLETED))) null else it.getLong(it.getColumnIndexOrThrow(COLUMN_LAST_COMPLETED)),
+                badDifficulty = readBadDifficulty(it),
                 createdAt = it.getLong(it.getColumnIndexOrThrow(COLUMN_CREATED_AT))
             ) else null
         }

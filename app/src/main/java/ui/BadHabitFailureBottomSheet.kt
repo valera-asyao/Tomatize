@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
 import com.example.tomatize.R
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
@@ -42,6 +43,12 @@ class BadHabitFailureBottomSheet : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val habit = HabitDatabaseHelper(requireContext()).getHabitById(habitId)
+        if (habit != null) {
+            view.findViewById<TextView>(R.id.dialogMessage).text =
+                "Стрик будет сброшен. Помидор потеряет ${habit.heartDamage} серд."
+        }
 
         view.findViewById<Button>(R.id.btnCancel).setOnClickListener {
             dismiss()

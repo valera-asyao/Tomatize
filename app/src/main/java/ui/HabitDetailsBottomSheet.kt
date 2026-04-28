@@ -53,6 +53,7 @@ class HabitDetailsBottomSheet : BottomSheetDialogFragment() {
             habit.description.ifBlank { "Описание отсутствует" }
 
         val typeView = view.findViewById<TextView>(R.id.detailsHabitType)
+        val difficultyView = view.findViewById<TextView>(R.id.detailsHabitDifficulty)
         val statusView = view.findViewById<TextView>(R.id.detailsHabitStatus)
 
         val isActionToday = habit.lastCompleted?.let {
@@ -64,6 +65,7 @@ class HabitDetailsBottomSheet : BottomSheetDialogFragment() {
 
         if (habit.type == HabitType.GOOD) {
             typeView.text = "Тип: Хорошая"
+            difficultyView.text = "Сложность: нет"
             if (isActionToday) {
                 statusView.text = "Выполнено"
                 statusView.setTextColor(requireContext().getColor(android.R.color.holo_green_dark))
@@ -73,6 +75,7 @@ class HabitDetailsBottomSheet : BottomSheetDialogFragment() {
             }
         } else {
             typeView.text = "Тип: Плохая"
+            difficultyView.text = "Сложность: ${normalizeBadDifficulty(habit.badDifficulty)}/3"
             if (isActionToday) {
                 statusView.text = "Срыв зафиксирован"
                 statusView.setTextColor(requireContext().getColor(android.R.color.holo_red_dark))
