@@ -1,12 +1,15 @@
 package ui
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,6 +25,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     private lateinit var mascotOverlayContainer: FrameLayout
     private lateinit var tvCurrencyHome: TextView
     private lateinit var tvMaxStreak: TextView
+    private lateinit var tvTomatoHearts: TextView
 
 
     override fun onCreateView(
@@ -35,6 +39,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         emptyStateTextView = view.findViewById(R.id.emptyStateTextView)
         tvCurrencyHome = view.findViewById(R.id.tvCurrencyHome)
         tvMaxStreak = view.findViewById(R.id.tvMaxStreakTitle)
+        tvTomatoHearts = view.findViewById(R.id.tvTomatoHearts)
 
         return view
     }
@@ -52,6 +57,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         loadHabits()
         updateMascot()
         updateBalanceUI()
+        updateHealthUI()
     }
 
     private fun updateBalanceUI() {
@@ -60,7 +66,13 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         tvCurrencyHome.text = balance.toString()
     }
 
-    // Функция для проверки лимитов и выдачи награды
+    private fun updateHealthUI() {
+        val state = TomatoHealthStorage.getState(requireContext())
+        val fullHearts = "♥".repeat(state.hearts)
+        val emptyHearts = "♡".repeat(TomatoHealthStorage.MAX_HEARTS - state.hearts)
+        tvTomatoHearts.text = fullHearts + emptyHearts
+    }
+
     private fun checkAndAwardCurrency(habitId: Long) {
         val prefs = requireActivity().getSharedPreferences("AppPrefs", android.content.Context.MODE_PRIVATE)
         val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
@@ -141,7 +153,11 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
                 completeHabit(habit)
             },
             onUndoClick = { habit ->
-                undoHabitCompletion(habit)
+                if (habit.type == HabitType.BAD) {
+                    failBadHabit(habit)
+                } else {
+                    undoHabitCompletion(habit)
+                }
             }
         )
 
@@ -169,6 +185,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
 
     fun refreshHabits() {
         loadHabits()
+        updateHealthUI()
     }
 
     fun showAddHabitDialog() {
@@ -196,7 +213,37 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
             showCompletionMessage(habit)
             checkAndAwardCurrency(habit.id)
             updateBalanceUI()
+            updateHealthUI()
         }
+    }
+
+    private fun failBadHabit(habit: Habit) {
+        val change = TomatoHealthStorage.loseHearts(requireContext(), habit.heartDamage)
+        loadHabits()
+        updateHealthUI()
+
+        if (change.died) {
+            showTomatoDiedDialog()
+        } else {
+            android.widget.Toast.makeText(
+                requireContext(),
+                "Помидор потерял ${habit.heartDamage} серд.",
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    private fun showTomatoDiedDialog() {
+        android.app.AlertDialog.Builder(requireContext())
+            .setTitle("Помидор погиб")
+            .setMessage("Помидор потерял все сердца. Деньги и скины сброшены.")
+            .setPositiveButton("OK") { _, _ ->
+                updateBalanceUI()
+                loadHabits()
+                updateMascot()
+                updateHealthUI()
+            }
+            .show()
     }
 
     private fun undoHabitCompletion(habit: Habit) {
@@ -205,6 +252,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
             checkAndDeductCurrency(habit.id)
             loadHabits()
             updateBalanceUI()
+            updateHealthUI()
             android.widget.Toast.makeText(requireContext(), "Выполнение отменено", android.widget.Toast.LENGTH_SHORT).show()
         }
         else {
@@ -244,28 +292,45 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     }
 
     private fun showHabitDetails(habit: Habit) {
-        val description = if (habit.description.isNullOrBlank()) "Описания привычки нет" else habit.description
-        val message = """
-            Название: ${habit.name}
-            Описание: $description
-            Тип: ${if (habit.type == HabitType.GOOD) "Хорошая" else "Плохая"}
-            Текущий стрик: ${habit.streakCount} дней
-            ${if (habit.lastCompleted != null) "Последнее выполнение: ${formatDate(habit.lastCompleted)}" else "Еще не выполнялась"}
-        """.trimIndent()
-
+        val view = layoutInflater.inflate(R.layout.dialog_habit_details, null)
         val dialog = android.app.AlertDialog.Builder(requireContext())
-            .setTitle("Информация о привычке")
-            .setMessage(message)
-            .setPositiveButton("OK", null)
-            .setNeutralButton("Удалить") { _, _ ->
-                deleteHabit(habit)
-            }
+            .setView(view)
             .create()
 
+        val description = if (habit.description.isBlank()) "Описание не добавлено" else habit.description
+        val typeText = if (habit.type == HabitType.GOOD) "Хорошая привычка" else "Плохая привычка"
+        val difficultyText = if (habit.type == HabitType.BAD) "${normalizeBadDifficulty(habit.badDifficulty)}/3" else "нет"
+        val lastCompletedText = if (habit.lastCompleted != null) {
+            "Последнее выполнение: ${formatDate(habit.lastCompleted)}"
+        } else {
+            "Еще не выполнялась"
+        }
+        val typeColor = if (habit.type == HabitType.GOOD) {
+            ContextCompat.getColor(requireContext(), R.color.good_habit_color)
+        } else {
+            ContextCompat.getColor(requireContext(), R.color.bad_habit_color)
+        }
+
+        val typeTextView = view.findViewById<TextView>(R.id.tvDetailsType)
+        view.findViewById<TextView>(R.id.tvDetailsName).text = habit.name
+        typeTextView.text = typeText
+        typeTextView.backgroundTintList = ColorStateList.valueOf(typeColor)
+        view.findViewById<TextView>(R.id.tvDetailsDescription).text = description
+        view.findViewById<TextView>(R.id.tvDetailsStreak).text = "${habit.streakCount} дн."
+        view.findViewById<TextView>(R.id.tvDetailsDifficulty).text = difficultyText
+        view.findViewById<TextView>(R.id.tvDetailsLastCompleted).text = lastCompletedText
+
+        view.findViewById<Button>(R.id.btnCloseDetails).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        view.findViewById<Button>(R.id.btnDeleteHabit).setOnClickListener {
+            dialog.dismiss()
+            deleteHabit(habit)
+        }
+
         dialog.setOnShowListener {
-            dialog.getButton(android.app.AlertDialog.BUTTON_NEUTRAL)?.setTextColor(
-                android.graphics.Color.RED
-            )
+            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         }
 
         dialog.show()

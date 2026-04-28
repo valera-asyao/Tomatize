@@ -9,7 +9,7 @@ import com.example.tomatize.UserData
 
 object MascotOverlayRenderer {
 
-    private const val CLOTHES_OFFSET_DP = 6f
+    private const val CLOTHES_OFFSET_DP = 4f
 
     fun render(
         context: Context,
@@ -31,7 +31,6 @@ object MascotOverlayRenderer {
                     setImageResource(item.overlayRes)
                     contentDescription = null
                     importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
-                    // Clothing PNGs have a slightly left-shifted canvas, so compensate here.
                     translationX = if (item.type == "clothes") clothesOffsetDp * density else 0f
                 }
 
