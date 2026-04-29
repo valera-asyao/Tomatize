@@ -118,9 +118,13 @@ class AddHabitDialog : DialogFragment() {
 
     private fun validateInput(name: String, description: String, type: HabitType?): Boolean {
         var isValid = true
+        val dbHelper = HabitDatabaseHelper(requireContext())
 
         if (name.isEmpty()) {
             nameEditText.error = "Введите название привычки"
+            isValid = false
+        } else if (dbHelper.existsByName(name)) {
+            nameEditText.error = "Привычка с таким названием уже существует"
             isValid = false
         } else {
             nameEditText.error = null

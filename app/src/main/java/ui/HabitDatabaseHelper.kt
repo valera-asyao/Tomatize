@@ -80,6 +80,14 @@ class HabitDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
         return isEmpty
     }
 
+    fun existsByName(name: String): Boolean {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT 1 FROM $TABLE_HABITS WHERE $COLUMN_NAME = ? LIMIT 1", arrayOf(name))
+        val exists = cursor.count > 0
+        cursor.close()
+        return exists
+    }
+
     fun addHabit(habit: Habit): Long {
         val db = writableDatabase
         val values = ContentValues().apply {
