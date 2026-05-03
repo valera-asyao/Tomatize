@@ -51,7 +51,7 @@ class BadHabitFailureBottomSheet : BottomSheetDialogFragment() {
                 "Стрик будет сброшен. Помидор потеряет ${habit.heartDamage} сердце"
             else
                 view.findViewById<TextView>(R.id.dialogMessage).text =
-                    "Стрик будет сброшен. Помидор потеряет ${habit.heartDamage} сердец"
+                    "Стрик будет сброшен. Помидор потеряет ${habit.heartDamage} сердца"
         }
 
         view.findViewById<Button>(R.id.btnCancel).setOnClickListener {
