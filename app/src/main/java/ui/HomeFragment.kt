@@ -93,14 +93,20 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         if (rewardedHabits.size < 3) {
             val currentBalance = prefs.getInt("USER_CURRENCY", 0)
             val rewardAmount = 50
+            val newBalance = minOf(currentBalance + rewardAmount, ShopStorage.MAX_BALANCE)
+
             rewardedHabits.add(habitId.toString())
             val newList = rewardedHabits.joinToString(",")
             prefs.edit()
-                .putInt("USER_CURRENCY", currentBalance + rewardAmount)
+                .putInt("USER_CURRENCY", newBalance)
                 .putString("REWARDED_HABITS_TODAY", newList)
                 .apply()
-            
-            (activity as? MainActivity)?.showTopNotification("Награда $rewardAmount \uD83C\uDF45! (${rewardedHabits.size}/3)")
+
+            if (newBalance == ShopStorage.MAX_BALANCE && currentBalance < ShopStorage.MAX_BALANCE) {
+                (activity as? MainActivity)?.showTopNotification("Ваш баланс достиг максимума, Вы богач!")
+            } else {
+                (activity as? MainActivity)?.showTopNotification("Награда $rewardAmount \uD83C\uDF45! (${rewardedHabits.size}/3)")
+            }
         }
     }
 
@@ -252,21 +258,17 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         val view = view ?: return
         val snackbar = Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
 
-        // Цвета: используйте чуть более темные или насыщенные оттенки, чем у карточек
         val backgroundColor = ContextCompat.getColor(requireContext(),
-            if (isSuccess) R.color.habit_good_notification else R.color.habit_bad_notification) // Создайте новые цвета в colors.xml
+            if (isSuccess) R.color.habit_good_notification else R.color.habit_bad_notification)
 
         snackbar.setBackgroundTint(backgroundColor)
 
-        // Получаем View снекбара для кастомизации
         val snackbarView = snackbar.view
 
-        // 1. Скругление углов через Drawable
         val background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_snackbar)
         background?.setTint(backgroundColor)
         snackbarView.background = background
 
-        // 2. Добавляем отступы, чтобы он "летал" над навигацией
         val params = snackbarView.layoutParams as ViewGroup.MarginLayoutParams
         params.setMargins(
             params.leftMargin + 40,
@@ -276,12 +278,10 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         )
         snackbarView.layoutParams = params
 
-        // 3. Настройка текста и иконки
         val textView = snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
         textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         textView.compoundDrawablePadding = 24
 
-        // Добавляем иконку слева от текста
         val iconRes = if (isSuccess) R.drawable.ic_check_circle else R.drawable.ic_warning
         val icon = ContextCompat.getDrawable(requireContext(), iconRes)
         icon?.setTint(ContextCompat.getColor(requireContext(), R.color.white))
