@@ -300,6 +300,9 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         bottomSheet.setOnGoToStatsListener { habitId ->
             openFullStatistics(habitId)
         }
+        bottomSheet.setOnHabitDeletedListener {
+            refreshHabits()
+        }
         bottomSheet.show(parentFragmentManager, "HabitDetailsBottomSheet")
     }
 

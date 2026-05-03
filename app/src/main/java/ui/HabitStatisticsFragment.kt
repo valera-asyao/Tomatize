@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.tomatize.MainActivity
@@ -68,22 +70,25 @@ class HabitStatisticsFragment : Fragment() {
     }
 
     private fun showDeleteConfirmation() {
-        activity?.let { context ->
-            android.app.AlertDialog.Builder(context)
-                .setTitle("Удалить привычку?")
-                .setMessage("Вы уверены, что хотите удалить эту привычку? Все данные будут безвозвратно удалены.")
-                .setPositiveButton("Удалить") { _, _ ->
-                    val success = databaseHelper.deleteHabit(habitId)
-                    if (success) {
-                        (activity as? MainActivity)?.showTopNotification("Привычка удалена")
-                        requireActivity().supportFragmentManager.popBackStack()
-                    } else {
-                        android.widget.Toast.makeText(context, "Ошибка при удалении", android.widget.Toast.LENGTH_SHORT).show()
-                    }
-                }
-                .setNegativeButton("Отмена", null)
-                .show()
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_delete_habit, null)
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+
+        dialogView.findViewById<Button>(R.id.btnCancelDelete).setOnClickListener {
+            dialog.dismiss()
         }
+
+        dialogView.findViewById<Button>(R.id.btnConfirmDelete).setOnClickListener {
+            if (databaseHelper.deleteHabit(habitId)) {
+                (activity as? MainActivity)?.showTopNotification("Привычка удалена")
+                dialog.dismiss()
+                requireActivity().supportFragmentManager.popBackStack()
+            }
+        }
+
+        dialog.show()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
     }
 
     private fun setupDeleteButton() {
