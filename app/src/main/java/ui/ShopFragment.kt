@@ -51,7 +51,10 @@ class ShopFragment : Fragment() {
             val previousBalance = ShopStorage.getBalance(requireContext())
             val newBalance = ShopStorage.addBalance(requireContext(), 5000)
             updateBalanceUI()
-            if (newBalance == ShopStorage.MAX_BALANCE && previousBalance < ShopStorage.MAX_BALANCE) {
+
+            if (previousBalance >= ShopStorage.MAX_BALANCE) {
+                (activity as? MainActivity)?.showTopNotification("Ваш баланс достиг максимума, Вы богач!")
+            } else if (newBalance == ShopStorage.MAX_BALANCE) {
                 (activity as? MainActivity)?.showTopNotification("Ваш баланс достиг максимума, Вы богач!")
             } else {
                 (activity as? MainActivity)?.showTopNotification("Получено 5000 \uD83C\uDF45!")
