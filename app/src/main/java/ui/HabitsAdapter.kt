@@ -4,7 +4,7 @@ import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -24,8 +24,8 @@ class HabitsAdapter(
         val rootLayout: View = itemView.findViewById(R.id.habitItemLayout)
         val nameTextView: TextView = itemView.findViewById(R.id.habitNameTextView)
         val streakTextView: TextView = itemView.findViewById(R.id.streakCountTextView)
-        val completeButton: Button = itemView.findViewById(R.id.completeButton)
-        val cancelButton: Button = itemView.findViewById(R.id.cancel_button)
+        val completeButton: ImageButton = itemView.findViewById(R.id.completeButton)
+        val cancelButton: ImageButton = itemView.findViewById(R.id.cancel_button)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HabitViewHolder {
@@ -57,7 +57,7 @@ class HabitsAdapter(
             holder.cancelButton.backgroundTintList = ColorStateList.valueOf(goodBtn)
             holder.nameTextView.setTextColor(goodTxt)
             holder.streakTextView.setTextColor(goodTxt)
-            holder.completeButton.text = "✔"
+            holder.completeButton.setImageResource(R.drawable.ic_habit_tick)
             
             if (isDoneToday) {
                 holder.completeButton.visibility = View.GONE
@@ -72,7 +72,7 @@ class HabitsAdapter(
             holder.cancelButton.backgroundTintList = ColorStateList.valueOf(badBtn)
             holder.nameTextView.setTextColor(badTxt)
             holder.streakTextView.setTextColor(badTxt)
-            holder.completeButton.text = "✘"
+            holder.completeButton.setImageResource(R.drawable.ic_habit_cross)
             holder.cancelButton.visibility = View.GONE
             
             if (isDoneToday) {

@@ -41,24 +41,24 @@
 
     </LinearLayout>
 
-    <androidx.appcompat.widget.AppCompatButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/completeButton"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginStart="16dp"
         android:background="@drawable/bg_circle_button"
-        android:text="✔"
-        android:textColor="#FFFFFF"
-        android:textSize="18sp" />
+        android:padding="12dp"
+        android:scaleType="fitCenter"
+        app:srcCompat="@drawable/ic_habit_tick" />
 
-    <androidx.appcompat.widget.AppCompatButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/cancel_button"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginStart="16dp"
         android:background="@drawable/bg_circle_button"
-        android:text="✘"
-        android:textColor="#FFFFFF"
-        android:textSize="18sp" />
+        android:padding="12dp"
+        android:scaleType="fitCenter"
+        app:srcCompat="@drawable/ic_habit_cross" />
 
 </LinearLayout>

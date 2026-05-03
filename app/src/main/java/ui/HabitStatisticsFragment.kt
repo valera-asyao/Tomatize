@@ -116,7 +116,7 @@ class HabitStatisticsFragment : Fragment() {
             if (habit.description.isNullOrBlank()) "Описания привычки нет" else habit.description
 
         val seriesText = "СЕРИЯ ИЗ\n${statistics.currentStreak} ${getDayWord(statistics.currentStreak)}"
-        val recordText = "РЕКОРД:\n${statistics.recordStreak} ${getDayWord(statistics.recordStreak)}"
+        val recordText = "РЕКОРД:\n${statistics.recordStreak} ${getStreak(statistics.recordStreak)}"
 
         view?.findViewById<TextView>(R.id.series)?.text = seriesText
         view?.findViewById<TextView>(R.id.record)?.text = recordText
@@ -125,6 +125,14 @@ class HabitStatisticsFragment : Fragment() {
     private fun getDayWord(count: Int): String {
         return when {
             count % 10 == 1 && count % 100 != 11 -> "ДНЯ"
+            else -> "ДНЕЙ"
+        }
+    }
+
+    private fun getStreak(count: Int): String{
+        return when {
+            count % 10 == 1 -> "ДЕНЬ"
+            count in 2..4 -> "ДНЯ"
             else -> "ДНЕЙ"
         }
     }
