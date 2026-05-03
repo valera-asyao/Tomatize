@@ -29,6 +29,7 @@
                 android:adjustViewBounds="true"
                 android:maxHeight="270dp"
                 android:scaleType="centerCrop"
+                android:background="@color/white_color"
                 android:src="@drawable/sad_tomato" />
         </androidx.cardview.widget.CardView>
 
