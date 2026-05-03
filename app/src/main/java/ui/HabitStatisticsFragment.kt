@@ -124,8 +124,7 @@ class HabitStatisticsFragment : Fragment() {
 
     private fun getDayWord(count: Int): String {
         return when {
-            count % 10 == 1 && count % 100 != 11 -> "ДЕНЬ"
-            count % 10 in 2..4 && count % 100 !in 12..14 -> "ДНЯ"
+            count % 10 == 1 && count % 100 != 11 -> "ДНЯ"
             else -> "ДНЕЙ"
         }
     }
