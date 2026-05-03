@@ -96,21 +96,125 @@
                 <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:fontFamily="@font/montserrat_regular" android:gravity="center" android:text="Вс" android:textColor="#666666" android:textSize="12sp" />
             </LinearLayout>
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:gravity="center"
-                android:orientation="horizontal">
+                android:layout_marginBottom="16dp">
 
-                <TextView android:id="@+id/currentDay1" android:layout_width="0dp" android:layout_height="42dp" android:layout_margin="3dp" android:layout_weight="1" android:background="@drawable/day_circle" android:fontFamily="@font/montserrat_bold" android:gravity="center" android:textColor="#000000" android:textSize="14sp" />
-                <TextView android:id="@+id/currentDay2" android:layout_width="0dp" android:layout_height="42dp" android:layout_margin="3dp" android:layout_weight="1" android:background="@drawable/day_circle" android:fontFamily="@font/montserrat_bold" android:gravity="center" android:textColor="#000000" android:textSize="14sp" />
-                <TextView android:id="@+id/currentDay3" android:layout_width="0dp" android:layout_height="42dp" android:layout_margin="3dp" android:layout_weight="1" android:background="@drawable/day_circle" android:fontFamily="@font/montserrat_bold" android:gravity="center" android:textColor="#000000" android:textSize="14sp" />
-                <TextView android:id="@+id/currentDay4" android:layout_width="0dp" android:layout_height="42dp" android:layout_margin="3dp" android:layout_weight="1" android:background="@drawable/day_circle" android:fontFamily="@font/montserrat_bold" android:gravity="center" android:textColor="#000000" android:textSize="14sp" />
-                <TextView android:id="@+id/currentDay5" android:layout_width="0dp" android:layout_height="42dp" android:layout_margin="3dp" android:layout_weight="1" android:background="@drawable/day_circle" android:fontFamily="@font/montserrat_bold" android:gravity="center" android:textColor="#000000" android:textSize="14sp" />
-                <TextView android:id="@+id/currentDay6" android:layout_width="0dp" android:layout_height="42dp" android:layout_margin="3dp" android:layout_weight="1" android:background="@drawable/day_circle" android:fontFamily="@font/montserrat_bold" android:gravity="center" android:textColor="#000000" android:textSize="14sp" />
-                <TextView android:id="@+id/currentDay7" android:layout_width="0dp" android:layout_height="42dp" android:layout_margin="3dp" android:layout_weight="1" android:background="@drawable/day_circle" android:fontFamily="@font/montserrat_bold" android:gravity="center" android:textColor="#000000" android:textSize="14sp" />
-            </LinearLayout>
+                <TextView
+                    android:id="@+id/currentDay1"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_margin="3dp"
+                    android:background="@drawable/day_circle"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:gravity="center"
+                    android:textColor="#000000"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintDimensionRatio="1:1"
+                    app:layout_constraintEnd_toStartOf="@+id/currentDay2"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/currentDay2"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_margin="3dp"
+                    android:background="@drawable/day_circle"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:gravity="center"
+                    android:textColor="#000000"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintDimensionRatio="1:1"
+                    app:layout_constraintEnd_toStartOf="@+id/currentDay3"
+                    app:layout_constraintStart_toEndOf="@+id/currentDay1"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/currentDay3"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_margin="3dp"
+                    android:background="@drawable/day_circle"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:gravity="center"
+                    android:textColor="#000000"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintDimensionRatio="1:1"
+                    app:layout_constraintEnd_toStartOf="@+id/currentDay4"
+                    app:layout_constraintStart_toEndOf="@+id/currentDay2"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/currentDay4"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_margin="3dp"
+                    android:background="@drawable/day_circle"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:gravity="center"
+                    android:textColor="#000000"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintDimensionRatio="1:1"
+                    app:layout_constraintEnd_toStartOf="@+id/currentDay5"
+                    app:layout_constraintStart_toEndOf="@+id/currentDay3"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/currentDay5"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_margin="3dp"
+                    android:background="@drawable/day_circle"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:gravity="center"
+                    android:textColor="#000000"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintDimensionRatio="1:1"
+                    app:layout_constraintEnd_toStartOf="@+id/currentDay6"
+                    app:layout_constraintStart_toEndOf="@+id/currentDay4"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/currentDay6"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_margin="3dp"
+                    android:background="@drawable/day_circle"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:gravity="center"
+                    android:textColor="#000000"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintDimensionRatio="1:1"
+                    app:layout_constraintEnd_toStartOf="@+id/currentDay7"
+                    app:layout_constraintStart_toEndOf="@+id/currentDay5"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/currentDay7"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_margin="3dp"
+                    android:background="@drawable/day_circle"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:gravity="center"
+                    android:textColor="#000000"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintDimensionRatio="1:1"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/currentDay6"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <View
                 android:layout_width="match_parent"

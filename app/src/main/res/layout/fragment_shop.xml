@@ -27,7 +27,7 @@
         android:textColor="@color/black"
         android:text="+5000🍅"
         android:textSize="12sp"
-        android:fontFamily="@font/gnf"
+        android:fontFamily="@font/montserrat_medium"
         app:layout_constraintBottom_toBottomOf="@+id/currencyContainer"
         app:layout_constraintEnd_toStartOf="@+id/currencyContainer"
         app:layout_constraintTop_toTopOf="parent" />
@@ -50,7 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0"
-            android:fontFamily="@font/gnf"
+            android:fontFamily="@font/montserrat_medium"
             android:textColor="#FFFFFF"
             android:textSize="16sp" />
 

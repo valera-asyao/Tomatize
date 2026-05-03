@@ -4,13 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="10dp"
-    app:cardCornerRadius="30dp"
+    app:cardCornerRadius="25dp"
     app:cardElevation="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FFFFFF"
+        android:background="@color/white_color"
         android:gravity="center"
         android:orientation="vertical"
         android:padding="15dp">
@@ -27,7 +27,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
-                android:maxHeight="230dp"
+                android:maxHeight="270dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/sad_tomato" />
         </androidx.cardview.widget.CardView>
@@ -39,7 +39,7 @@
             android:layout_marginTop="20dp"
             android:fontFamily="@font/montserrat_bold"
             android:text="Вы сорвались?"
-            android:textColor="#000000"
+            android:textColor="@color/black"
             android:textSize="20sp" />
 
         <TextView
