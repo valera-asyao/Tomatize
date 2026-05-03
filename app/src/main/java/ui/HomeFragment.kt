@@ -6,7 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.TextView
+import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,7 +27,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     private lateinit var mascotOverlayContainer: FrameLayout
     private lateinit var tvCurrencyHome: TextView
     private lateinit var tvMaxStreak: TextView
-    private lateinit var tvTomatoHearts: TextView
+    private lateinit var heartContainer: LinearLayout
 
 
     override fun onCreateView(
@@ -39,7 +41,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         emptyStateTextView = view.findViewById(R.id.emptyStateTextView)
         tvCurrencyHome = view.findViewById(R.id.tvCurrencyHome)
         tvMaxStreak = view.findViewById(R.id.tvMaxStreakTitle)
-        tvTomatoHearts = view.findViewById(R.id.tvTomatoHearts)
+        heartContainer = view.findViewById(R.id.heartContainerHome)
 
         return view
     }
@@ -68,9 +70,13 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
 
     private fun updateHealthUI() {
         val state = TomatoHealthStorage.getState(requireContext())
-        val fullHearts = "♥".repeat(state.hearts)
-        val emptyHearts = "♡".repeat(TomatoHealthStorage.MAX_HEARTS - state.hearts)
-        tvTomatoHearts.text = fullHearts + emptyHearts
+        for (index in 0 until TomatoHealthStorage.MAX_HEARTS) {
+            val heartImage = heartContainer.getChildAt(index) as? ImageView
+            heartImage?.setImageResource(
+                if (index < state.hearts) R.drawable.ic_heart_filled_white
+                else R.drawable.ic_heart_outline_white
+            )
+        }
     }
 
     private fun checkAndAwardCurrency(habitId: Long) {
