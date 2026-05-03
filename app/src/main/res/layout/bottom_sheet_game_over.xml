@@ -4,13 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="10dp"
-    app:cardCornerRadius="30dp"
+    app:cardCornerRadius="25dp"
     app:cardElevation="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FFFFFF"
+        android:background="@color/white"
         android:gravity="center"
         android:orientation="vertical"
         android:padding="20dp">
@@ -27,9 +27,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
-                android:maxHeight="230dp"
+                android:maxHeight="270dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/sad_tomato" />
+                android:src="@drawable/dead_tomato" />
         </androidx.cardview.widget.CardView>
 
         <TextView

@@ -18,7 +18,8 @@ object UserData {
         "room",
         "hat",
         "sad_tomato",
-        "tomato"
+        "tomato",
+        "dead_tomato"
     )
 
     private val excludedDrawablePrefixes = listOf(
