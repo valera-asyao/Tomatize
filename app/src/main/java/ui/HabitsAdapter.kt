@@ -58,9 +58,14 @@ class HabitsAdapter(
             holder.nameTextView.setTextColor(goodTxt)
             holder.streakTextView.setTextColor(goodTxt)
             holder.completeButton.text = "✔"
-            holder.cancelButton.visibility = View.VISIBLE
             
-            holder.completeButton.visibility = if (isDoneToday) View.GONE else View.VISIBLE
+            if (isDoneToday) {
+                holder.completeButton.visibility = View.GONE
+                holder.cancelButton.visibility = View.VISIBLE
+            } else {
+                holder.completeButton.visibility = View.VISIBLE
+                holder.cancelButton.visibility = View.GONE
+            }
         } else {
             holder.rootLayout.backgroundTintList = ColorStateList.valueOf(badBg)
             holder.completeButton.backgroundTintList = ColorStateList.valueOf(badBtn)
@@ -69,7 +74,12 @@ class HabitsAdapter(
             holder.streakTextView.setTextColor(badTxt)
             holder.completeButton.text = "✘"
             holder.cancelButton.visibility = View.GONE
-            holder.completeButton.visibility = View.VISIBLE
+            
+            if (isDoneToday) {
+                holder.completeButton.visibility = View.GONE
+            } else {
+                holder.completeButton.visibility = View.VISIBLE
+            }
         }
 
         holder.completeButton.setOnClickListener {

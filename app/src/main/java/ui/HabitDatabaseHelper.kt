@@ -230,6 +230,10 @@ class HabitDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
     }
 
     fun recordFailure(habitId: Long): Boolean {
+        val habit = getHabitById(habitId) ?: return false
+        val last = habit.lastCompleted
+        if (last != null && isSameDay(Calendar.getInstance().apply { timeInMillis = last }, Calendar.getInstance())) return false
+
         val db = writableDatabase
         val now = System.currentTimeMillis()
         val values = ContentValues().apply {
