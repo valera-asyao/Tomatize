@@ -156,16 +156,14 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     }
 
     private fun showTomatoDiedDialog() {
-        android.app.AlertDialog.Builder(requireContext())
-            .setTitle("Помидор погиб")
-            .setMessage("Помидор потерял все сердца. Деньги и скины сброшены.")
-            .setPositiveButton("OK") { _, _ ->
-                updateBalanceUI()
-                loadHabits()
-                updateMascot()
-                updateHealthUI()
-            }
-            .show()
+        val bottomSheet = GameOverBottomSheet()
+        bottomSheet.setOnConfirmListener {
+            updateBalanceUI()
+            loadHabits()
+            updateMascot()
+            updateHealthUI()
+        }
+        bottomSheet.show(parentFragmentManager, "GameOverBottomSheet")
     }
 
     private fun applyFailurePenalty() {
