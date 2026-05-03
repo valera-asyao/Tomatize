@@ -79,28 +79,44 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         val currentDate = sdf.format(java.util.Date())
 
         val lastRewardDate = prefs.getString("LAST_REWARD_DATE", "")
-        var rewardedHabits = prefs.getString("REWARDED_HABITS_TODAY", "")
-            ?.split(",")
-            ?.filter { it.isNotBlank() }
-            ?.toMutableList() ?: mutableListOf()
-        if (currentDate != lastRewardDate) {
-            rewardedHabits = mutableListOf()
-            prefs.edit().putString("LAST_REWARD_DATE", currentDate).apply()
+        var rewardsToday = try {
+            prefs.getInt("REWARDED_HABITS_TODAY", 0)
+        } catch (e: ClassCastException) {
+            prefs.getString("REWARDED_HABITS_TODAY", "")
+                ?.split(",")
+                ?.filter { it.isNotBlank() }
+                ?.size ?: 0
         }
-        if (rewardedHabits.contains(habitId.toString())) {
+
+        if (currentDate != lastRewardDate) {
+            rewardsToday = 0
+            prefs.edit()
+                .putString("LAST_REWARD_DATE", currentDate)
+                .putInt("REWARDED_HABITS_TODAY", 0)
+                .apply()
+        }
+
+        if (rewardsToday >= 3) return
+
+        val currentBalance = prefs.getInt("USER_CURRENCY", 0)
+        val rewardAmount = 50
+        val newBalance = minOf(currentBalance + rewardAmount, ShopStorage.MAX_BALANCE)
+        val newRewardsToday = rewardsToday + 1
+
+        prefs.edit()
+            .putInt("USER_CURRENCY", newBalance)
+            .putInt("REWARDED_HABITS_TODAY", newRewardsToday)
+            .apply()
+
+        if (currentBalance >= ShopStorage.MAX_BALANCE) {
+            (activity as? MainActivity)?.showTopNotification("Ваш баланс достиг максимума, Вы богач!")
             return
         }
-        if (rewardedHabits.size < 3) {
-            val currentBalance = prefs.getInt("USER_CURRENCY", 0)
-            val rewardAmount = 50
-            rewardedHabits.add(habitId.toString())
-            val newList = rewardedHabits.joinToString(",")
-            prefs.edit()
-                .putInt("USER_CURRENCY", currentBalance + rewardAmount)
-                .putString("REWARDED_HABITS_TODAY", newList)
-                .apply()
-            
-            (activity as? MainActivity)?.showTopNotification("Награда $rewardAmount \uD83C\uDF45! (${rewardedHabits.size}/3)")
+
+        if (newBalance == ShopStorage.MAX_BALANCE && currentBalance < ShopStorage.MAX_BALANCE) {
+            (activity as? MainActivity)?.showTopNotification("Ваш баланс достиг максимума, Вы богач!")
+        } else {
+            (activity as? MainActivity)?.showTopNotification("Награда $rewardAmount \uD83C\uDF45! ($newRewardsToday/3)")
         }
     }
 
@@ -219,23 +235,28 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
             val currentDate = sdf.format(java.util.Date())
 
             val lastRewardDate = prefs.getString("LAST_REWARD_DATE", "")
-            val rewardedHabits = prefs.getString("REWARDED_HABITS_TODAY", "")
-                ?.split(",")
-                ?.filter { it.isNotBlank() }
-                ?.toMutableList() ?: mutableListOf()
+            if (currentDate == lastRewardDate) {
+                var rewardsToday = try {
+                    prefs.getInt("REWARDED_HABITS_TODAY", 0)
+                } catch (e: ClassCastException) {
+                    prefs.getString("REWARDED_HABITS_TODAY", "")
+                        ?.split(",")
+                        ?.filter { it.isNotBlank() }
+                        ?.size ?: 0
+                }
 
-            if (currentDate == lastRewardDate && rewardedHabits.contains(habit.id.toString())) {
-                val currentBalance = prefs.getInt("USER_CURRENCY", 0)
-                val penaltyAmount = 50
-                rewardedHabits.remove(habit.id.toString())
-                val newList = rewardedHabits.joinToString(",")
+                if (rewardsToday > 0) {
+                    val currentBalance = prefs.getInt("USER_CURRENCY", 0)
+                    val penaltyAmount = 50
+                    rewardsToday -= 1
 
-                prefs.edit()
-                    .putInt("USER_CURRENCY", maxOf(0, currentBalance - penaltyAmount))
-                    .putString("REWARDED_HABITS_TODAY", newList)
-                    .apply()
+                    prefs.edit()
+                        .putInt("USER_CURRENCY", maxOf(0, currentBalance - penaltyAmount))
+                        .putInt("REWARDED_HABITS_TODAY", rewardsToday)
+                        .apply()
 
-                (activity as? MainActivity)?.showTopNotification("Списано $penaltyAmount \uD83C\uDF45")
+                    (activity as? MainActivity)?.showTopNotification("Списано $penaltyAmount \uD83C\uDF45")
+                }
             }
         }
 
@@ -252,21 +273,17 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         val view = view ?: return
         val snackbar = Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
 
-        // Цвета: используйте чуть более темные или насыщенные оттенки, чем у карточек
         val backgroundColor = ContextCompat.getColor(requireContext(),
-            if (isSuccess) R.color.habit_good_notification else R.color.habit_bad_notification) // Создайте новые цвета в colors.xml
+            if (isSuccess) R.color.habit_good_notification else R.color.habit_bad_notification)
 
         snackbar.setBackgroundTint(backgroundColor)
 
-        // Получаем View снекбара для кастомизации
         val snackbarView = snackbar.view
 
-        // 1. Скругление углов через Drawable
         val background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_snackbar)
         background?.setTint(backgroundColor)
         snackbarView.background = background
 
-        // 2. Добавляем отступы, чтобы он "летал" над навигацией
         val params = snackbarView.layoutParams as ViewGroup.MarginLayoutParams
         params.setMargins(
             params.leftMargin + 40,
@@ -276,12 +293,10 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         )
         snackbarView.layoutParams = params
 
-        // 3. Настройка текста и иконки
         val textView = snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
         textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         textView.compoundDrawablePadding = 24
 
-        // Добавляем иконку слева от текста
         val iconRes = if (isSuccess) R.drawable.ic_check_circle else R.drawable.ic_warning
         val icon = ContextCompat.getDrawable(requireContext(), iconRes)
         icon?.setTint(ContextCompat.getColor(requireContext(), R.color.white))
