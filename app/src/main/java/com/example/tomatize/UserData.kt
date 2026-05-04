@@ -79,7 +79,7 @@ object UserData {
 
     fun typeLabel(type: String?): String = when (type) {
         null -> "Все"
-        "hat" -> "Шапки"
+        "hat" -> "Шляпы"
         "glasses" -> "Очки"
         "mustache" -> "Усы"
         "clothes" -> "Одежда"
@@ -87,12 +87,11 @@ object UserData {
     }
 
     fun overlaySortOrder(type: String): Int = when (type) {
-        "clothes" -> 0
-        "other" -> 1
-        "mustache" -> 2
-        "glasses" -> 3
-        "hat" -> 4
-        else -> 5
+        "hat" -> 0
+        "clothes" -> 1
+        "glasses" -> 2
+        "mustache" -> 3
+        else -> 4
     }
 
     private fun buildShopItem(resourceName: String, resourceId: Int): ShopItem? {
