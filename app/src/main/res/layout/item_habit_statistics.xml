@@ -3,35 +3,73 @@
     android:id="@+id/habitItemContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="6dp"
-    android:background="@drawable/bg_habit"
+    android:layout_margin="4dp"
+    android:background="@drawable/bg_habit_statistics"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:minHeight="84dp">
 
-    <View
-        android:id="@+id/typeIndicatorView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone" />
+    <LinearLayout
+        android:id="@+id/indicatorContainer"
+        android:layout_width="16dp"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="16dp"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/habitNameTextView"
+        <View
+            android:id="@+id/indicatorSection1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/good_habit_color"
+            android:visibility="gone" />
+
+        <View
+            android:id="@+id/indicatorSection2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="4dp"
+            android:background="@color/good_habit_color"
+            android:visibility="gone" />
+
+        <View
+            android:id="@+id/indicatorSection3"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="4dp"
+            android:background="@color/good_habit_color"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:fontFamily="@font/montserrat_semibold"
-        android:text="Название"
-        android:textColor="#000000"
-        android:textSize="20sp" />
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/typeOfHabit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone" />
+        <TextView
+            android:id="@+id/habitNameTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_semibold"
+            android:text="Название"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/streakTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Стрик 0 дн."
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+    </LinearLayout>
 
 </LinearLayout>
