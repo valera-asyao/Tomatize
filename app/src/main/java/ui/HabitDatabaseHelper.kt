@@ -267,6 +267,204 @@ class HabitDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
         return db.update(TABLE_HABITS, values, "$COLUMN_ID = ?", arrayOf(habitId.toString())) > 0
     }
 
+    fun toggleHabitCompletionOnDate(habitId: Long, dateMillis: Long): Boolean {
+        val habit = getHabitById(habitId) ?: return false
+        val dayStart = getStartOfDay(dateMillis)
+        val createdStart = getStartOfDay(habit.createdAt)
+        val todayStart = getStartOfDay(System.currentTimeMillis())
+
+        if (dayStart < createdStart || dayStart > todayStart) {
+            return false
+        }
+
+        val dayEnd = getEndOfDay(dateMillis)
+        val completed = isHabitCompletedOnDate(habitId, dateMillis)
+        val db = writableDatabase
+
+        val changed = if (completed) {
+            db.delete(
+                TABLE_HABIT_COMPLETIONS,
+                "$COLUMN_HABIT_ID_FK = ? AND $COLUMN_COMPLETION_DATE BETWEEN ? AND ?",
+                arrayOf(habitId.toString(), dayStart.toString(), dayEnd.toString())
+            ) > 0
+        } else {
+            val values = ContentValues().apply {
+                put(COLUMN_HABIT_ID_FK, habitId)
+                put(COLUMN_COMPLETION_DATE, dayStart)
+            }
+            db.insert(TABLE_HABIT_COMPLETIONS, null, values) != -1L
+        }
+
+        if (!changed) {
+            return false
+        }
+
+        return updateHabitProgressFromCompletions(habitId)
+    }
+
+    fun isHabitCompletedOnDate(habitId: Long, dateMillis: Long): Boolean {
+        val db = readableDatabase
+        val cursor = db.query(
+            TABLE_HABIT_COMPLETIONS,
+            arrayOf(COLUMN_COMPLETION_ID),
+            "$COLUMN_HABIT_ID_FK = ? AND $COLUMN_COMPLETION_DATE BETWEEN ? AND ?",
+            arrayOf(habitId.toString(), getStartOfDay(dateMillis).toString(), getEndOfDay(dateMillis).toString()),
+            null, null, null,
+            "1"
+        )
+
+        val completed = cursor.moveToFirst()
+        cursor.close()
+        return completed
+    }
+
+    private fun updateHabitProgressFromCompletions(habitId: Long): Boolean {
+        val habit = getHabitById(habitId) ?: return false
+        val completions = getHabitCompletionList(habitId)
+        val days = completions.map { getStartOfDay(it) }.distinct().sorted()
+
+        val currentStreak = if (habit.type == HabitType.GOOD) {
+            calculateGoodCurrentStreak(days)
+        } else {
+            calculateBadCurrentStreak(habit.createdAt, days)
+        }
+
+        val recordStreak = if (habit.type == HabitType.GOOD) {
+            calculateGoodRecordStreak(days)
+        } else {
+            calculateBadRecordStreak(habit.createdAt, days)
+        }
+
+        val values = ContentValues().apply {
+            put(COLUMN_STREAK_COUNT, currentStreak)
+            put(COLUMN_RECORD_STREAK, recordStreak)
+            val lastCompleted = completions.maxOrNull()
+            if (lastCompleted == null) {
+                putNull(COLUMN_LAST_COMPLETED)
+            } else {
+                put(COLUMN_LAST_COMPLETED, lastCompleted)
+            }
+        }
+
+        val db = writableDatabase
+        return db.update(TABLE_HABITS, values, "$COLUMN_ID = ?", arrayOf(habitId.toString())) > 0
+    }
+
+    private fun getHabitCompletionList(habitId: Long): List<Long> {
+        val completions = mutableListOf<Long>()
+        val db = readableDatabase
+        db.rawQuery(
+            "SELECT $COLUMN_COMPLETION_DATE FROM $TABLE_HABIT_COMPLETIONS WHERE $COLUMN_HABIT_ID_FK = ? ORDER BY $COLUMN_COMPLETION_DATE ASC",
+            arrayOf(habitId.toString())
+        ).use {
+            while (it.moveToNext()) {
+                completions.add(it.getLong(0))
+            }
+        }
+        return completions
+    }
+
+    private fun calculateGoodCurrentStreak(days: List<Long>): Int {
+        if (days.isEmpty()) return 0
+
+        val daySet = days.toSet()
+        val today = getStartOfDay(System.currentTimeMillis())
+        val yesterday = addDays(today, -1)
+
+        var day = when {
+            daySet.contains(today) -> today
+            daySet.contains(yesterday) -> yesterday
+            else -> return 0
+        }
+
+        var streak = 0
+        while (daySet.contains(day)) {
+            streak++
+            day = addDays(day, -1)
+        }
+        return streak
+    }
+
+    private fun calculateGoodRecordStreak(days: List<Long>): Int {
+        if (days.isEmpty()) return 0
+
+        var best = 1
+        var current = 1
+        for (i in 1 until days.size) {
+            if (days[i] == addDays(days[i - 1], 1)) {
+                current++
+            } else {
+                current = 1
+            }
+            best = maxOf(best, current)
+        }
+        return best
+    }
+
+    private fun calculateBadCurrentStreak(createdAt: Long, failureDays: List<Long>): Int {
+        val createdStart = getStartOfDay(createdAt)
+        val failureSet = failureDays.toSet()
+        var day = getStartOfDay(System.currentTimeMillis())
+        var streak = 0
+
+        while (day >= createdStart && !failureSet.contains(day)) {
+            streak++
+            day = addDays(day, -1)
+        }
+
+        return streak
+    }
+
+    private fun calculateBadRecordStreak(createdAt: Long, failureDays: List<Long>): Int {
+        val today = getStartOfDay(System.currentTimeMillis())
+        val failureSet = failureDays.toSet()
+        var day = getStartOfDay(createdAt)
+        var best = 0
+        var current = 0
+
+        while (day <= today) {
+            if (failureSet.contains(day)) {
+                current = 0
+            } else {
+                current++
+                best = maxOf(best, current)
+            }
+            day = addDays(day, 1)
+        }
+
+        return best
+    }
+
+    private fun getStartOfDay(dateMillis: Long): Long {
+        val calendar = Calendar.getInstance().apply {
+            timeInMillis = dateMillis
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        return calendar.timeInMillis
+    }
+
+    private fun getEndOfDay(dateMillis: Long): Long {
+        val calendar = Calendar.getInstance().apply {
+            timeInMillis = dateMillis
+            set(Calendar.HOUR_OF_DAY, 23)
+            set(Calendar.MINUTE, 59)
+            set(Calendar.SECOND, 59)
+            set(Calendar.MILLISECOND, 999)
+        }
+        return calendar.timeInMillis
+    }
+
+    private fun addDays(dateMillis: Long, count: Int): Long {
+        val calendar = Calendar.getInstance().apply {
+            timeInMillis = dateMillis
+            add(Calendar.DAY_OF_YEAR, count)
+        }
+        return calendar.timeInMillis
+    }
+
     fun getHabitById(id: Long): Habit? {
         val db = readableDatabase
         val cursor = db.query(TABLE_HABITS, null, "$COLUMN_ID = ?", arrayOf(id.toString()), null, null, null)

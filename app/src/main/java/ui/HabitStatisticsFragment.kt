@@ -188,6 +188,8 @@ class HabitStatisticsFragment : Fragment() {
             view?.findViewById<TextView>(id)?.apply {
                 text = ""
                 setBackgroundResource(0)
+                setOnClickListener(null)
+                isClickable = false
                 visibility = View.INVISIBLE
             }
         }
@@ -215,16 +217,54 @@ class HabitStatisticsFragment : Fragment() {
                     text = dayCounter.toString()
 
                     calendar.set(currentYear, currentMonth, dayCounter)
-                    val isMarkedInDb = isDateInCompletions(calendar.timeInMillis, completions)
+                    val dayMillis = calendar.timeInMillis
+                    val isMarkedInDb = isDateInCompletions(dayMillis, completions)
                     val isToday = isSameDay(calendar, today)
                     val isBeforeToday = calendar.before(today) && !isToday
                     val existedAtThatDay = isSameDay(calendar, createdAtCal) || calendar.after(createdAtCal)
+                    val canChange = canChangeCalendarDate(habit, dayMillis)
+
+                    isClickable = canChange
+                    if (canChange) {
+                        setOnClickListener {
+                            onCalendarDayClick(dayMillis)
+                        }
+                    } else {
+                        setOnClickListener(null)
+                    }
 
                     updateDayStyle(this, isMarkedInDb, isToday, isBeforeToday, habit.type, existedAtThatDay)
                 }
                 dayCounter++
             }
         }
+    }
+
+    private fun onCalendarDayClick(dayMillis: Long) {
+        val changed = databaseHelper.toggleHabitCompletionOnDate(habitId, dayMillis)
+        if (changed) {
+            loadHabitStatistics()
+        } else {
+            (activity as? MainActivity)?.showTopNotification("Нельзя изменить эту дату")
+        }
+    }
+
+    private fun canChangeCalendarDate(habit: Habit, dateInMillis: Long): Boolean {
+        val dayStart = getStartOfDay(dateInMillis)
+        val createdStart = getStartOfDay(habit.createdAt)
+        val todayStart = getStartOfDay(System.currentTimeMillis())
+        return dayStart >= createdStart && dayStart <= todayStart
+    }
+
+    private fun getStartOfDay(dateInMillis: Long): Long {
+        val calendar = Calendar.getInstance().apply {
+            timeInMillis = dateInMillis
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        return calendar.timeInMillis
     }
 
     private fun updateDayStyle(dayView: TextView?, isMarkedInDb: Boolean, isToday: Boolean, isBeforeToday: Boolean, habitType: HabitType, existedAtThatDay: Boolean) {
@@ -245,7 +285,7 @@ class HabitStatisticsFragment : Fragment() {
                     }
                     isToday -> {
                         setBackgroundResource(R.drawable.day_circle_black)
-                        setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+                        setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black))
                     }
                     isBeforeToday -> {
                         setBackgroundResource(R.drawable.day_circle_red)
@@ -264,7 +304,7 @@ class HabitStatisticsFragment : Fragment() {
                     }
                     isToday -> {
                         setBackgroundResource(R.drawable.day_circle_black)
-                        setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+                        setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black))
                     }
                     isBeforeToday -> { // Соблюдение (не было срыва)
                         setBackgroundResource(R.drawable.day_circle_green)
@@ -286,17 +326,6 @@ class HabitStatisticsFragment : Fragment() {
             isSameDay(targetDate, completionDate)
         }
     }
-
-
-    private fun isHabitCompletedOnDate(habit: Habit, dateInMillis: Long): Boolean {
-        if (habit.lastCompleted == null) return false
-
-        val habitDate = Calendar.getInstance().apply { timeInMillis = habit.lastCompleted!! }
-        val targetDate = Calendar.getInstance().apply { timeInMillis = dateInMillis }
-
-        return isSameDay(habitDate, targetDate)
-    }
-
 
     private fun isSameDay(cal1: Calendar, cal2: Calendar): Boolean {
         return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
