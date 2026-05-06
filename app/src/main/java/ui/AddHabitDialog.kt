@@ -6,15 +6,17 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
+import com.example.tomatize.MainActivity
 import com.example.tomatize.R
-
 
 class AddHabitDialog : DialogFragment() {
 
@@ -25,9 +27,10 @@ class AddHabitDialog : DialogFragment() {
     private var listener: OnHabitAddedListener? = null
     private lateinit var nameEditText: EditText
     private lateinit var descriptionEditText: EditText
+    private lateinit var typeErrorTextView: TextView
     private var selectedType: HabitType? = null
     private var selectedBadDifficulty = DEFAULT_BAD_DIFFICULTY
-    
+
     private lateinit var btnTypeGood: Button
     private lateinit var btnTypeBad: Button
     private lateinit var badDifficultyLayout: LinearLayout
@@ -54,8 +57,9 @@ class AddHabitDialog : DialogFragment() {
     private fun initViews(view: View) {
         nameEditText = view.findViewById(R.id.nameEditText)
         descriptionEditText = view.findViewById(R.id.descriptionEditText)
+        typeErrorTextView = view.findViewById(R.id.typeErrorTextView)
         val contentLayout: View = view.findViewById(R.id.addHabitContentLayout)
-        
+
         btnTypeGood = view.findViewById(R.id.btnTypeGood)
         btnTypeBad = view.findViewById(R.id.btnTypeBad)
         badDifficultyLayout = view.findViewById(R.id.badDifficultyLayout)
@@ -110,7 +114,8 @@ class AddHabitDialog : DialogFragment() {
 
     private fun selectType(type: HabitType) {
         selectedType = type
-        
+        typeErrorTextView.visibility = View.GONE
+
         val goodColor = ContextCompat.getColor(requireContext(), R.color.good_habit_color)
         val badColor = ContextCompat.getColor(requireContext(), R.color.bad_habit_color)
         val grayColor = ContextCompat.getColor(requireContext(), R.color.nav_inactive)
@@ -122,7 +127,7 @@ class AddHabitDialog : DialogFragment() {
 
             btnTypeGood.backgroundTintList = ColorStateList.valueOf(goodColor)
             btnTypeGood.setTextColor(whiteColor)
-            
+
             btnTypeBad.backgroundTintList = ColorStateList.valueOf(grayColor)
             btnTypeBad.setTextColor(whiteColor)
         } else {
@@ -131,7 +136,7 @@ class AddHabitDialog : DialogFragment() {
 
             btnTypeGood.backgroundTintList = ColorStateList.valueOf(grayColor)
             btnTypeGood.setTextColor(whiteColor)
-            
+
             btnTypeBad.backgroundTintList = ColorStateList.valueOf(badColor)
             btnTypeBad.setTextColor(whiteColor)
         }
@@ -184,16 +189,20 @@ class AddHabitDialog : DialogFragment() {
 
     private fun validateInput(name: String, description: String, type: HabitType?): Boolean {
         var isValid = true
+        val dbHelper = HabitDatabaseHelper(requireContext())
 
         if (name.isEmpty()) {
             nameEditText.error = "Введите название привычки"
+            isValid = false
+        } else if (dbHelper.existsByName(name)) {
+            nameEditText.error = "Привычка с таким названием уже существует"
             isValid = false
         } else {
             nameEditText.error = null
         }
 
         if (type == null) {
-            Toast.makeText(requireContext(), "Выберите тип привычки", Toast.LENGTH_SHORT).show()
+            typeErrorTextView.visibility = View.VISIBLE
             isValid = false
         }
 
@@ -204,23 +213,25 @@ class AddHabitDialog : DialogFragment() {
         super.onStart()
         nameEditText.text?.clear()
         descriptionEditText.text?.clear()
+        typeErrorTextView.visibility = View.GONE
         selectedType = null
         selectedBadDifficulty = DEFAULT_BAD_DIFFICULTY
         badDifficultyLayout.visibility = View.GONE
-        
+
         val grayColor = ContextCompat.getColor(requireContext(), R.color.nav_inactive)
         val whiteColor = ContextCompat.getColor(requireContext(), R.color.white)
-        
+
         btnTypeGood.backgroundTintList = ColorStateList.valueOf(grayColor)
         btnTypeGood.setTextColor(whiteColor)
-        
+
         btnTypeBad.backgroundTintList = ColorStateList.valueOf(grayColor)
         btnTypeBad.setTextColor(whiteColor)
         updateBadDifficultyButtons()
-        
+
         dialog?.window?.setSoftInputMode(
             WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE or WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN
         )
         dialog?.window?.setBackgroundDrawableResource(android.R.color.transparent)
-        }
+        dialog?.window?.setGravity(Gravity.CENTER)
     }
+}

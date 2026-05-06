@@ -6,6 +6,8 @@ import com.example.tomatize.UserData
 
 object ShopStorage {
 
+    const val MAX_BALANCE = 100000
+
     private fun prefs(context: Context) =
         context.getSharedPreferences(UserData.PREFS_NAME, Context.MODE_PRIVATE)
 
@@ -13,14 +15,16 @@ object ShopStorage {
         return prefs(context).getInt(UserData.KEY_CURRENCY, 0)
     }
 
-    fun addBalance(context: Context, amount: Int) {
-        val newValue = getBalance(context) + amount
+    fun addBalance(context: Context, amount: Int): Int {
+        val currentBalance = getBalance(context)
+        val newValue = minOf(currentBalance + amount, MAX_BALANCE)
         prefs(context).edit().putInt(UserData.KEY_CURRENCY, newValue).apply()
+        return newValue
     }
 
     fun setBalance(context: Context, value: Int) {
         prefs(context).edit()
-            .putInt(UserData.KEY_CURRENCY, maxOf(0, value))
+            .putInt(UserData.KEY_CURRENCY, minOf(maxOf(0, value), MAX_BALANCE))
             .apply()
     }
 

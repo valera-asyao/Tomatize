@@ -1,6 +1,6 @@
 package ui
 
-import android.content.res.ColorStateList
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -74,7 +74,7 @@ class StatisticsFragment : Fragment() {
     }
 
     private fun showHabitsList() {
-        val habits = databaseHelper.getAllHabits()
+        val habits = databaseHelper.getAllHabits().sortedBy { if (it.type == HabitType.BAD) 0 else 1 }
         val habitsContainer = LinearLayout(requireContext()).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -84,43 +84,86 @@ class StatisticsFragment : Fragment() {
         }
 
         habits.forEach { habit ->
-            addHabitButton(habitsContainer, habit)
+            addHabitBlock(habitsContainer, habit)
         }
         mainContainer.addView(habitsContainer)
     }
 
-    private fun addHabitButton(container: LinearLayout, habit: Habit) {
+    private fun addHabitBlock(container: LinearLayout, habit: Habit) {
         val habitView = LayoutInflater.from(requireContext())
             .inflate(R.layout.item_habit_statistics, container, false)
 
         val nameTextView = habitView.findViewById<TextView>(R.id.habitNameTextView)
+        val streakTextView = habitView.findViewById<TextView>(R.id.streakTextView)
         val mainItemContainer = habitView.findViewById<View>(R.id.habitItemContainer)
+        val indicatorSection1 = habitView.findViewById<View>(R.id.indicatorSection1)
+        val indicatorSection2 = habitView.findViewById<View>(R.id.indicatorSection2)
+        val indicatorSection3 = habitView.findViewById<View>(R.id.indicatorSection3)
 
         nameTextView.text = habit.name
+        streakTextView.text = "Стрик ${habit.streakCount} дн."
 
         val context = requireContext()
-        
-        // Правильное определение цветов через R.color
-        val (bgColor, txtColor) = if (habit.type == HabitType.GOOD) {
-            Pair(
-                ContextCompat.getColor(context, R.color.habit_good_bg),
-                ContextCompat.getColor(context, R.color.habit_good_text)
-            )
+        val indicatorColor = if (habit.type == HabitType.GOOD) {
+            ContextCompat.getColor(context, R.color.good_habit_color)
         } else {
-            Pair(
-                ContextCompat.getColor(context, R.color.red_color),
-                ContextCompat.getColor(context, R.color.habit_bad_text)
-            )
+            ContextCompat.getColor(context, R.color.bad_habit_color)
         }
 
-        mainItemContainer.backgroundTintList = ColorStateList.valueOf(bgColor)
-        nameTextView.setTextColor(txtColor)
+        val visibleCount = if (habit.type == HabitType.BAD) {
+            normalizeBadDifficulty(habit.badDifficulty)
+        } else {
+            1
+        }
+
+        val sections = listOf(indicatorSection1, indicatorSection2, indicatorSection3)
+        sections.forEachIndexed { index, section ->
+            section.visibility = if (index < visibleCount) View.VISIBLE else View.GONE
+            if (index < visibleCount) {
+                val topRounded = when (visibleCount) {
+                    1 -> true
+                    2 -> index == 0
+                    3 -> index == 0
+                    else -> false
+                }
+                val bottomRounded = when (visibleCount) {
+                    1 -> true
+                    2 -> index == 1
+                    3 -> index == 2
+                    else -> false
+                }
+                section.background = createIndicatorDrawable(indicatorColor, topRounded, bottomRounded)
+            }
+        }
 
         mainItemContainer.setOnClickListener {
             openHabitStatistics(habit)
         }
 
         container.addView(habitView)
+    }
+
+    private fun createIndicatorDrawable(color: Int, topRounded: Boolean, bottomRounded: Boolean): GradientDrawable {
+        val radius = dpToPx(8).toFloat()
+        val radii = floatArrayOf(
+            if (topRounded) radius else 0f,
+            if (topRounded) radius else 0f,
+            if (topRounded) radius else 0f,
+            if (topRounded) radius else 0f,
+            if (bottomRounded) radius else 0f,
+            if (bottomRounded) radius else 0f,
+            if (bottomRounded) radius else 0f,
+            if (bottomRounded) radius else 0f
+        )
+        return GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            setColor(color)
+            cornerRadii = radii
+        }
+    }
+
+    private fun dpToPx(dp: Int): Int {
+        return (dp * resources.displayMetrics.density).toInt()
     }
 
     private fun openHabitStatistics(habit: Habit) {

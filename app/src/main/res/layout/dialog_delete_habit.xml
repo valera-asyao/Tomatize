@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="10dp"
-    app:cardCornerRadius="25dp"
+    app:cardCornerRadius="30dp"
     app:cardElevation="0dp">
 
     <LinearLayout
@@ -13,56 +13,35 @@
         android:background="@color/white_color"
         android:gravity="center"
         android:orientation="vertical"
-        android:padding="15dp">
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp"
-            app:cardCornerRadius="15dp"
-            app:cardElevation="0dp">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:adjustViewBounds="true"
-                android:maxHeight="270dp"
-                android:scaleType="centerCrop"
-                android:background="@color/white_color"
-                android:src="@drawable/sad_tomato" />
-        </androidx.cardview.widget.CardView>
+        android:padding="20dp">
 
         <TextView
-            android:id="@+id/dialogTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:fontFamily="@font/montserrat_bold"
-            android:text="Вы сорвались?"
+            android:text="Удалить привычку?"
             android:textColor="@color/black"
             android:textSize="20sp" />
 
         <TextView
-            android:id="@+id/dialogMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:fontFamily="@font/montserrat_medium"
             android:gravity="center"
-            android:text="Стрик будет сброшен. Постарайтесь держаться!"
+            android:text="Вы уверены, что хотите удалить эту привычку? Весь прогресс будет потерян навсегда."
             android:textColor="#666666"
             android:textSize="15sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="24dp"
             android:gravity="center"
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/btnCancel"
+                android:id="@+id/btnCancelDelete"
                 style="?android:attr/borderlessButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="54dp"
@@ -74,7 +53,7 @@
                 android:textSize="14sp" />
 
             <Button
-                android:id="@+id/btnConfirm"
+                android:id="@+id/btnConfirmDelete"
                 android:layout_width="0dp"
                 android:layout_height="54dp"
                 android:layout_marginStart="12dp"
@@ -82,7 +61,7 @@
                 android:backgroundTint="#D84E4E"
                 app:cornerRadius="16dp"
                 android:fontFamily="@font/montserrat_bold"
-                android:text="СОРВАЛСЯ"
+                android:text="УДАЛИТЬ"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
                 android:textSize="14sp" />

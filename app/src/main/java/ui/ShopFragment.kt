@@ -48,9 +48,17 @@ class ShopFragment : Fragment() {
         recyclerView.adapter = adapter
 
         btnCheat.setOnClickListener {
-            ShopStorage.addBalance(requireContext(), 5000)
+            val previousBalance = ShopStorage.getBalance(requireContext())
+            val newBalance = ShopStorage.addBalance(requireContext(), 5000)
             updateBalanceUI()
-            (activity as? MainActivity)?.showTopNotification("Получено 5000 \uD83C\uDF45!")
+
+            if (previousBalance >= ShopStorage.MAX_BALANCE) {
+                (activity as? MainActivity)?.showTopNotification("Ваш баланс достиг максимума, Вы богач!")
+            } else if (newBalance == ShopStorage.MAX_BALANCE) {
+                (activity as? MainActivity)?.showTopNotification("Ваш баланс достиг максимума, Вы богач!")
+            } else {
+                (activity as? MainActivity)?.showTopNotification("Получено 5000 \uD83C\uDF45!")
+            }
         }
 
         setupFilters()

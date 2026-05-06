@@ -4,11 +4,12 @@ import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tomatize.R
+import java.util.Calendar
 
 class HabitsAdapter(
     private var habits: List<Habit> = emptyList(),
@@ -23,8 +24,8 @@ class HabitsAdapter(
         val rootLayout: View = itemView.findViewById(R.id.habitItemLayout)
         val nameTextView: TextView = itemView.findViewById(R.id.habitNameTextView)
         val streakTextView: TextView = itemView.findViewById(R.id.streakCountTextView)
-        val completeButton: Button = itemView.findViewById(R.id.completeButton)
-        val cancelButton: Button = itemView.findViewById(R.id.cancel_button)
+        val completeButton: ImageButton = itemView.findViewById(R.id.completeButton)
+        val cancelButton: ImageButton = itemView.findViewById(R.id.cancel_button)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HabitViewHolder {
@@ -40,20 +41,6 @@ class HabitsAdapter(
         holder.nameTextView.text = habit.name
         holder.streakTextView.text = "${habit.streakCount} дн."
 
-        val (bgColor, btnColor, textColor) = if (habit.type == HabitType.GOOD) {
-            Triple(
-                ContextCompat.getColor(context, R.color.habit_good_bg),
-                ContextCompat.getColor(context, R.color.habit_good_btn),
-                ContextCompat.getColor(context, R.color.habit_good_text)
-            )
-        } else {
-            Triple(
-                ContextCompat.getColor(context, R.color.habit_bad_bg),
-                ContextCompat.getColor(context, R.color.habit_bad_btn),
-                ContextCompat.getColor(context, R.color.habit_bad_text)
-            )
-        }
-
         val goodBg = ContextCompat.getColor(context, R.color.habit_good_bg)
         val goodBtn = ContextCompat.getColor(context, R.color.habit_good_btn)
         val goodTxt = ContextCompat.getColor(context, R.color.habit_good_text)
@@ -62,22 +49,37 @@ class HabitsAdapter(
         val badBtn = ContextCompat.getColor(context, R.color.habit_bad_btn)
         val badTxt = ContextCompat.getColor(context, R.color.habit_bad_text)
 
+        val isDoneToday = isCompletedToday(habit)
+
         if (habit.type == HabitType.GOOD) {
             holder.rootLayout.backgroundTintList = ColorStateList.valueOf(goodBg)
             holder.completeButton.backgroundTintList = ColorStateList.valueOf(goodBtn)
             holder.cancelButton.backgroundTintList = ColorStateList.valueOf(goodBtn)
             holder.nameTextView.setTextColor(goodTxt)
             holder.streakTextView.setTextColor(goodTxt)
-            holder.completeButton.text = "✔"
-            holder.cancelButton.visibility = View.VISIBLE
+            holder.completeButton.setImageResource(R.drawable.ic_habit_tick)
+            
+            if (isDoneToday) {
+                holder.completeButton.visibility = View.GONE
+                holder.cancelButton.visibility = View.VISIBLE
+            } else {
+                holder.completeButton.visibility = View.VISIBLE
+                holder.cancelButton.visibility = View.GONE
+            }
         } else {
             holder.rootLayout.backgroundTintList = ColorStateList.valueOf(badBg)
             holder.completeButton.backgroundTintList = ColorStateList.valueOf(badBtn)
             holder.cancelButton.backgroundTintList = ColorStateList.valueOf(badBtn)
             holder.nameTextView.setTextColor(badTxt)
             holder.streakTextView.setTextColor(badTxt)
-            holder.completeButton.text = "✘"
+            holder.completeButton.setImageResource(R.drawable.ic_habit_cross)
             holder.cancelButton.visibility = View.GONE
+            
+            if (isDoneToday) {
+                holder.completeButton.visibility = View.GONE
+            } else {
+                holder.completeButton.visibility = View.VISIBLE
+            }
         }
 
         holder.completeButton.setOnClickListener {
@@ -101,7 +103,18 @@ class HabitsAdapter(
     override fun getItemCount() = habits.size
 
     fun updateHabits(newHabits: List<Habit>) {
-        habits = newHabits
+        habits = newHabits.sortedWith(
+            compareBy<Habit> { it.type }
+                .thenBy { it.type == HabitType.GOOD && isCompletedToday(it) }
+        )
         notifyDataSetChanged()
+    }
+
+    private fun isCompletedToday(habit: Habit): Boolean {
+        val lastCompleted = habit.lastCompleted ?: return false
+        val habitCalendar = Calendar.getInstance().apply { timeInMillis = lastCompleted }
+        val todayCalendar = Calendar.getInstance()
+        return habitCalendar.get(Calendar.YEAR) == todayCalendar.get(Calendar.YEAR) &&
+                habitCalendar.get(Calendar.DAY_OF_YEAR) == todayCalendar.get(Calendar.DAY_OF_YEAR)
     }
 }

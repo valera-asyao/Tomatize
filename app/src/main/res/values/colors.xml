@@ -13,6 +13,7 @@
     <color name="light_blue_A200">#FF40C4FF</color>
     <color name="light_blue_A400">#FF00B0FF</color>
     <color name="black_overlay">#66000000</color>
+    <color name="statistics_bg">#2B1010</color>
 
     <color name="nav_active">#FF4B4B</color>
     <color name="nav_inactive">#8E8E93</color>
@@ -24,8 +25,8 @@
     <color name="habit_good_btn">#264031</color>
     <color name="habit_good_text">#000000</color>
 
-    <color name="habit_good_notification">#E6496B4E</color>"
-    <color name="habit_bad_notification">#E69B3737</color>"
+    <color name="habit_good_notification">#E6496B4E</color>
+    <color name="habit_bad_notification">#E69B3737</color>
 
     <color name="red_color">#D84E4E</color>
     <color name="habit_bad_btn">#672726</color>

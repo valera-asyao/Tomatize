@@ -14,14 +14,33 @@
         android:orientation="vertical"
         android:padding="24dp">
 
-        <TextView
-            android:id="@+id/detailsHabitName"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/montserrat_bold"
-            android:text="Название привычки"
-            android:textColor="@color/black"
-            android:textSize="22sp" />
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/detailsHabitName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@+id/deleteButton"
+                android:fontFamily="@font/montserrat_bold"
+                android:text="Название привычки"
+                android:textColor="@color/black"
+                android:textSize="22sp" />
+
+            <ImageButton
+                android:id="@+id/deleteButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Удалить привычку"
+                app:srcCompat="@android:drawable/ic_menu_delete"
+                app:tint="@color/bad_habit_color" />
+
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/detailsHabitType"

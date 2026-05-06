@@ -46,8 +46,12 @@ class BadHabitFailureBottomSheet : BottomSheetDialogFragment() {
 
         val habit = HabitDatabaseHelper(requireContext()).getHabitById(habitId)
         if (habit != null) {
+            if (habit.heartDamage == 1)
             view.findViewById<TextView>(R.id.dialogMessage).text =
-                "Стрик будет сброшен. Помидор потеряет ${habit.heartDamage} серд."
+                "Стрик будет сброшен. Помидор потеряет ${habit.heartDamage} сердце"
+            else
+                view.findViewById<TextView>(R.id.dialogMessage).text =
+                    "Стрик будет сброшен. Помидор потеряет ${habit.heartDamage} сердца"
         }
 
         view.findViewById<Button>(R.id.btnCancel).setOnClickListener {
