@@ -23,11 +23,23 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_toStartOf="@+id/deleteButton"
+                android:layout_toStartOf="@+id/editButton"
                 android:fontFamily="@font/montserrat_bold"
                 android:text="Название привычки"
                 android:textColor="@color/black"
                 android:textSize="22sp" />
+
+            <ImageButton
+                android:id="@+id/editButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="4dp"
+                android:layout_toStartOf="@+id/deleteButton"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Редактировать привычку"
+                app:srcCompat="@android:drawable/ic_menu_edit"
+                app:tint="@color/good_habit_color" />
 
             <ImageButton
                 android:id="@+id/deleteButton"

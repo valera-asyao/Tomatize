@@ -53,6 +53,7 @@ class HabitStatisticsFragment : Fragment() {
         (activity as? MainActivity)?.setNavBarVisibility(false)
         (activity as? MainActivity)?.disableNavBarSelection()
         setupDeleteButton()
+        setupEditButton()
         setupBackButton()
         loadHabitStatistics()
     }
@@ -95,6 +96,21 @@ class HabitStatisticsFragment : Fragment() {
         view?.findViewById<ImageButton>(R.id.deleteButton)?.setOnClickListener {
             showDeleteConfirmation()
         }
+    }
+
+    private fun setupEditButton() {
+        view?.findViewById<ImageButton>(R.id.editButton)?.setOnClickListener {
+            showEditDialog()
+        }
+    }
+
+    private fun showEditDialog() {
+        val editDialog = EditHabitDialog.newInstance(habitId)
+        editDialog.setOnHabitEditedListener {
+            loadHabitStatistics()
+            (activity as? MainActivity)?.showTopNotification("Привычка обновлена")
+        }
+        editDialog.show(parentFragmentManager, "EditHabitDialog")
     }
 
     private fun loadHabitStatistics() {

@@ -18,6 +18,7 @@ class HabitDetailsBottomSheet : BottomSheetDialogFragment() {
     private var habitId: Long = -1
     private var onGoToStatsListener: ((Long) -> Unit)? = null
     private var onHabitDeletedListener: (() -> Unit)? = null
+    private var onHabitEditedListener: (() -> Unit)? = null
 
     companion object {
         fun newInstance(habitId: Long): HabitDetailsBottomSheet {
@@ -35,6 +36,10 @@ class HabitDetailsBottomSheet : BottomSheetDialogFragment() {
 
     fun setOnHabitDeletedListener(listener: () -> Unit) {
         onHabitDeletedListener = listener
+    }
+
+    fun setOnHabitEditedListener(listener: () -> Unit) {
+        onHabitEditedListener = listener
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,9 +61,13 @@ class HabitDetailsBottomSheet : BottomSheetDialogFragment() {
         val databaseHelper = HabitDatabaseHelper(requireContext())
         val habit = databaseHelper.getHabitById(habitId) ?: return
 
-        view.findViewById<TextView>(R.id.detailsHabitName).text = habit.name
-        view.findViewById<TextView>(R.id.detailsHabitDescription).text =
-            habit.description.ifBlank { "Описание отсутствует" }
+        fun updateEditableHabitFields(updatedHabit: Habit) {
+            view.findViewById<TextView>(R.id.detailsHabitName).text = updatedHabit.name
+            view.findViewById<TextView>(R.id.detailsHabitDescription).text =
+                updatedHabit.description.ifBlank { "Описание отсутствует" }
+        }
+
+        updateEditableHabitFields(habit)
 
         val typeView = view.findViewById<TextView>(R.id.detailsHabitType)
         val difficultyView = view.findViewById<TextView>(R.id.detailsHabitDifficulty)
@@ -95,6 +104,18 @@ class HabitDetailsBottomSheet : BottomSheetDialogFragment() {
 
         view.findViewById<ImageButton>(R.id.deleteButton).setOnClickListener {
             showDeleteConfirmation()
+        }
+
+        view.findViewById<ImageButton>(R.id.editButton).setOnClickListener {
+            val editDialog = EditHabitDialog.newInstance(habitId)
+            editDialog.setOnHabitEditedListener {
+                databaseHelper.getHabitById(habitId)?.let { updatedHabit ->
+                    updateEditableHabitFields(updatedHabit)
+                }
+                onHabitEditedListener?.invoke()
+                (activity as? MainActivity)?.showTopNotification("Привычка обновлена")
+            }
+            editDialog.show(parentFragmentManager, "EditHabitDialog")
         }
 
         view.findViewById<Button>(R.id.btnDetailsClose).setOnClickListener {

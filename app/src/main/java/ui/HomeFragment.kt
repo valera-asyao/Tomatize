@@ -324,6 +324,9 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
         bottomSheet.setOnHabitDeletedListener {
             refreshHabits()
         }
+        bottomSheet.setOnHabitEditedListener {
+            refreshHabits()
+        }
         bottomSheet.show(parentFragmentManager, "HabitDetailsBottomSheet")
     }
 

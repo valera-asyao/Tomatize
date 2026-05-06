@@ -42,10 +42,20 @@
                 android:textSize="20sp" />
 
             <ImageButton
-                android:id="@+id/deleteButton"
+                android:id="@+id/editButton"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Редактировать привычку"
+                app:srcCompat="@android:drawable/ic_menu_edit"
+                app:tint="@color/good_habit_color" />
+
+            <ImageButton
+                android:id="@+id/deleteButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="4dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Удалить привычку"
                 app:srcCompat="@android:drawable/ic_menu_delete"
