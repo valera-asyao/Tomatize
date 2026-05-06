@@ -1,5 +1,7 @@
 package ui
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +14,8 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.tomatize.MainActivity
 import com.example.tomatize.R
+import com.example.tomatize.UserData
+import com.google.android.material.snackbar.Snackbar
 import java.util.Calendar
 
 class HabitStatisticsFragment : Fragment() {
@@ -171,13 +175,24 @@ class HabitStatisticsFragment : Fragment() {
             for (i in 0 until 7) {
                 val dayView = view?.findViewById<TextView>(dayIds[i])
                 val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
-                
+                val dayMillis = calendar.timeInMillis
+
                 dayView?.text = dayOfMonth.toString()
 
-                val isMarkedInDb = isDateInCompletions(calendar.timeInMillis, completions)
+                val isMarkedInDb = isDateInCompletions(dayMillis, completions)
                 val isToday = isSameDay(calendar, today)
                 val isBeforeToday = calendar.before(today) && !isToday
                 val existedAtThatDay = isSameDay(calendar, createdAtCal) || calendar.after(createdAtCal)
+                val canChange = canChangeCalendarDate(habit, dayMillis)
+
+                dayView?.isClickable = canChange
+                if (canChange) {
+                    dayView?.setOnClickListener {
+                        onCalendarDayClick(dayMillis)
+                    }
+                } else {
+                    dayView?.setOnClickListener(null)
+                }
 
                 updateDayStyle(dayView, isMarkedInDb, isToday, isBeforeToday, habit.type, existedAtThatDay)
 
@@ -257,12 +272,209 @@ class HabitStatisticsFragment : Fragment() {
     }
 
     private fun onCalendarDayClick(dayMillis: Long) {
+        val habit = databaseHelper.getHabitById(habitId) ?: return
+        val wasMarked = databaseHelper.isHabitCompletedOnDate(habitId, dayMillis)
+        val isToday = isToday(dayMillis)
+
+        if (habit.type == HabitType.BAD) {
+            if (wasMarked && isToday) {
+                (activity as? MainActivity)?.showTopNotification("Сегодняшний срыв нельзя отменить")
+                return
+            }
+
+            if (!wasMarked) {
+                showBadHabitFailureBottomSheet(habit, dayMillis)
+                return
+            }
+        }
+
         val changed = databaseHelper.toggleHabitCompletionOnDate(habitId, dayMillis)
         if (changed) {
+            if (habit.type == HabitType.GOOD && isToday) {
+                if (wasMarked) {
+                    takeBackTodayReward()
+                    showActionSnackbar("Выполнение отменено", true)
+                } else {
+                    awardCurrencyForToday()
+                    showActionSnackbar("Привычка ${habit.name} соблюдена!", true)
+                }
+            } else if (habit.type == HabitType.BAD && wasMarked) {
+                showActionSnackbar("Срыв отменен", true)
+            }
             loadHabitStatistics()
         } else {
             (activity as? MainActivity)?.showTopNotification("Нельзя изменить эту дату")
         }
+    }
+
+    private fun showBadHabitFailureBottomSheet(habit: Habit, dayMillis: Long) {
+        val bottomSheet = BadHabitFailureBottomSheet.newInstance(habit.id)
+        bottomSheet.setOnConfirmListener {
+            recordBadHabitFailure(habit, dayMillis)
+        }
+        bottomSheet.show(parentFragmentManager, "BadHabitFailureBottomSheet")
+    }
+
+    private fun recordBadHabitFailure(habit: Habit, dayMillis: Long) {
+        val changed = if (isToday(dayMillis)) {
+            databaseHelper.recordFailure(habit.id)
+        } else {
+            databaseHelper.toggleHabitCompletionOnDate(habit.id, dayMillis)
+        }
+
+        if (!changed) {
+            (activity as? MainActivity)?.showTopNotification("Нельзя изменить эту дату")
+            return
+        }
+
+        applyFailurePenalty()
+        val change = TomatoHealthStorage.loseHearts(requireContext(), habit.heartDamage)
+        loadHabitStatistics()
+
+        if (change.died) {
+            showTomatoDiedDialog()
+        } else {
+            showActionSnackbar("Срыв зафиксирован", false)
+            (activity as? MainActivity)?.showTopNotification("Вы потеряли 100 \uD83C\uDF45")
+        }
+    }
+
+    private fun showTomatoDiedDialog() {
+        val bottomSheet = GameOverBottomSheet()
+        bottomSheet.setOnConfirmListener {
+            loadHabitStatistics()
+        }
+        bottomSheet.show(parentFragmentManager, "GameOverBottomSheet")
+    }
+
+    private fun awardCurrencyForToday() {
+        val prefs = requireActivity().getSharedPreferences(UserData.PREFS_NAME, Context.MODE_PRIVATE)
+        val currentDate = getTodayDateText()
+        val lastRewardDate = prefs.getString("LAST_REWARD_DATE", "")
+        var rewardsToday = readRewardsToday(prefs)
+
+        if (currentDate != lastRewardDate) {
+            rewardsToday = 0
+            prefs.edit()
+                .putString("LAST_REWARD_DATE", currentDate)
+                .putInt("REWARDED_HABITS_TODAY", 0)
+                .apply()
+        }
+
+        if (rewardsToday >= 3) return
+
+        val currentBalance = prefs.getInt(UserData.KEY_CURRENCY, 0)
+        val rewardAmount = 50
+        val newBalance = minOf(currentBalance + rewardAmount, ShopStorage.MAX_BALANCE)
+        val newRewardsToday = rewardsToday + 1
+
+        prefs.edit()
+            .putInt(UserData.KEY_CURRENCY, newBalance)
+            .putInt("REWARDED_HABITS_TODAY", newRewardsToday)
+            .apply()
+
+        if (currentBalance >= ShopStorage.MAX_BALANCE) {
+            (activity as? MainActivity)?.showTopNotification("Ваш баланс достиг максимума, Вы богач!")
+            return
+        }
+
+        if (newBalance == ShopStorage.MAX_BALANCE && currentBalance < ShopStorage.MAX_BALANCE) {
+            (activity as? MainActivity)?.showTopNotification("Ваш баланс достиг максимума, Вы богач!")
+        } else {
+            (activity as? MainActivity)?.showTopNotification("Награда $rewardAmount \uD83C\uDF45! ($newRewardsToday/3)")
+        }
+    }
+
+    private fun takeBackTodayReward() {
+        val prefs = requireActivity().getSharedPreferences(UserData.PREFS_NAME, Context.MODE_PRIVATE)
+        val currentDate = getTodayDateText()
+        val lastRewardDate = prefs.getString("LAST_REWARD_DATE", "")
+        if (currentDate != lastRewardDate) return
+
+        val rewardsToday = readRewardsToday(prefs)
+        if (rewardsToday <= 0) return
+
+        val currentBalance = prefs.getInt(UserData.KEY_CURRENCY, 0)
+        val penaltyAmount = 50
+
+        prefs.edit()
+            .putInt(UserData.KEY_CURRENCY, maxOf(0, currentBalance - penaltyAmount))
+            .putInt("REWARDED_HABITS_TODAY", rewardsToday - 1)
+            .apply()
+
+        (activity as? MainActivity)?.showTopNotification("Списано $penaltyAmount \uD83C\uDF45")
+    }
+
+    private fun readRewardsToday(prefs: SharedPreferences): Int {
+        return try {
+            prefs.getInt("REWARDED_HABITS_TODAY", 0)
+        } catch (e: ClassCastException) {
+            prefs.getString("REWARDED_HABITS_TODAY", "")
+                ?.split(",")
+                ?.filter { it.isNotBlank() }
+                ?.size ?: 0
+        }
+    }
+
+    private fun applyFailurePenalty() {
+        val prefs = requireActivity().getSharedPreferences(UserData.PREFS_NAME, Context.MODE_PRIVATE)
+        val currentBalance = prefs.getInt(UserData.KEY_CURRENCY, 0)
+        val penalty = 100
+        prefs.edit()
+            .putInt(UserData.KEY_CURRENCY, maxOf(0, currentBalance - penalty))
+            .apply()
+    }
+
+    private fun showActionSnackbar(message: String, isSuccess: Boolean) {
+        val rootView = view ?: return
+        val snackbar = Snackbar.make(rootView, message, Snackbar.LENGTH_SHORT)
+
+        val backgroundColor = ContextCompat.getColor(
+            requireContext(),
+            if (isSuccess) R.color.habit_good_notification else R.color.habit_bad_notification
+        )
+
+        snackbar.setBackgroundTint(backgroundColor)
+
+        val snackbarView = snackbar.view
+        val background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_snackbar)
+        background?.setTint(backgroundColor)
+        snackbarView.background = background
+
+        val params = snackbarView.layoutParams as ViewGroup.MarginLayoutParams
+        params.setMargins(
+            params.leftMargin + 40,
+            params.topMargin,
+            params.rightMargin + 40,
+            params.bottomMargin + 40
+        )
+        snackbarView.layoutParams = params
+
+        val textView = snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+        textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        textView.compoundDrawablePadding = 24
+
+        val iconRes = if (isSuccess) R.drawable.ic_check_circle else R.drawable.ic_warning
+        val icon = ContextCompat.getDrawable(requireContext(), iconRes)
+        icon?.setTint(ContextCompat.getColor(requireContext(), R.color.white))
+        textView.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null)
+
+        val bottomNav = activity?.findViewById<View>(R.id.custom_bottom_nav)
+        if (bottomNav != null && bottomNav.visibility == View.VISIBLE) {
+            snackbar.anchorView = bottomNav
+        }
+
+        snackbar.show()
+    }
+
+    private fun getTodayDateText(): String {
+        val formatter = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+        return formatter.format(java.util.Date())
+    }
+
+    private fun isToday(dateInMillis: Long): Boolean {
+        val date = Calendar.getInstance().apply { timeInMillis = dateInMillis }
+        return isSameDay(date, Calendar.getInstance())
     }
 
     private fun canChangeCalendarDate(habit: Habit, dateInMillis: Long): Boolean {
