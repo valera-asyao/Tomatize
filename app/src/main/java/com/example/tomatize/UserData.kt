@@ -89,10 +89,10 @@ object UserData {
 
     fun overlaySortOrder(type: String): Int = when (type) {
         "clothes" -> 0
-        "other" -> 1
-        "mustache" -> 2
-        "glasses" -> 3
-        "hat" -> 4
+        "mustache" -> 1
+        "glasses" -> 2
+        "hat" -> 3
+        "other" -> 4
         else -> 5
     }
 
@@ -124,6 +124,7 @@ object UserData {
 
     private fun inferType(resourceName: String): String {
         return when {
+            resourceName == "maidcostume" -> "other"
             "glass" in resourceName -> "glasses"
             "moustache" in resourceName || "mustache" in resourceName -> "mustache"
             "hat" in resourceName -> "hat"

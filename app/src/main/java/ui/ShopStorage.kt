@@ -73,9 +73,20 @@ object ShopStorage {
     }
 
     fun equipItem(context: Context, item: ShopItem) {
-        prefs(context).edit()
-            .putInt(keyForType(item.type), item.id)
-            .apply()
+        val editor = prefs(context).edit()
+
+        if (item.type == "other") {
+            UserData.shopTypes.forEach { type ->
+                if (type != "mustache" && type != "other") {
+                    editor.putInt(UserData.keyForType(type), -1)
+                }
+            }
+        } else if (item.type != "mustache") {
+            editor.putInt(UserData.keyForType("other"), -1)
+        }
+
+        editor.putInt(UserData.keyForType(item.type), item.id)
+        editor.apply()
     }
 
     fun unequipType(context: Context, type: String) {
