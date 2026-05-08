@@ -110,6 +110,17 @@ class HabitDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
         return exists
     }
 
+    fun existsByNameExceptId(name: String, excludedHabitId: Long): Boolean {
+        val db = readableDatabase
+        val cursor = db.rawQuery(
+            "SELECT 1 FROM $TABLE_HABITS WHERE $COLUMN_NAME = ? AND $COLUMN_ID != ? LIMIT 1",
+            arrayOf(name, excludedHabitId.toString())
+        )
+        val exists = cursor.count > 0
+        cursor.close()
+        return exists
+    }
+
     fun addHabit(habit: Habit): Long {
         val db = writableDatabase
         val values = ContentValues().apply {
@@ -480,6 +491,15 @@ class HabitDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
                 createdAt = it.getLong(it.getColumnIndexOrThrow(COLUMN_CREATED_AT))
             ) else null
         }
+    }
+
+    fun updateHabit(id: Long, name: String, description: String): Boolean {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_NAME, name)
+            put(COLUMN_DESCRIPTION, description)
+        }
+        return db.update(TABLE_HABITS, values, "$COLUMN_ID = ?", arrayOf(id.toString())) > 0
     }
 
     fun deleteHabit(id: Long): Boolean {

@@ -88,11 +88,12 @@ object UserData {
     }
 
     fun overlaySortOrder(type: String): Int = when (type) {
-        "hat" -> 0
-        "clothes" -> 1
+        "clothes" -> 0
+        "mustache" -> 1
         "glasses" -> 2
-        "mustache" -> 3
-        else -> 4
+        "hat" -> 3
+        "other" -> 4
+        else -> 5
     }
 
     private fun buildShopItem(resourceName: String, resourceId: Int): ShopItem? {
@@ -123,6 +124,7 @@ object UserData {
 
     private fun inferType(resourceName: String): String {
         return when {
+            resourceName == "maidcostume" -> "other"
             "glass" in resourceName -> "glasses"
             "moustache" in resourceName || "mustache" in resourceName -> "mustache"
             "hat" in resourceName -> "hat"

@@ -129,7 +129,7 @@ object TomatoHealthStorage {
 
         prefs(context).edit()
             .putInt(KEY_DEATH_COUNT, newDeathCount)
-            .putInt(KEY_HEARTS, MAX_HEARTS)
+            .putInt(KEY_HEARTS, 0)
             .remove(KEY_HEART_CLOCK)
             .apply()
     }

@@ -127,10 +127,17 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     }
 
     private fun updateMascot() {
-        val equippedItems = UserData.shopTypes
+        val allEquipped = UserData.shopTypes
             .mapNotNull { type -> ShopStorage.getEquippedItemId(requireContext(), type) }
             .mapNotNull(UserData::findItemById)
 
+        val hasOtherItem = allEquipped.any { it.type == "other" }
+
+        val equippedItems = if (hasOtherItem) {
+            allEquipped.filter { it.type == "other" || it.type == "mustache" }
+        } else {
+            allEquipped
+        }
         MascotOverlayRenderer.render(requireContext(), mascotOverlayContainer, equippedItems)
     }
 
@@ -180,6 +187,7 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
     private fun showTomatoDiedDialog() {
         val bottomSheet = GameOverBottomSheet()
         bottomSheet.setOnConfirmListener {
+            TomatoHealthStorage.resetHearts(requireContext())
             updateBalanceUI()
             loadHabits()
             updateMascot()
@@ -322,6 +330,9 @@ class HomeFragment : Fragment(), AddHabitDialog.OnHabitAddedListener {
             openFullStatistics(habitId)
         }
         bottomSheet.setOnHabitDeletedListener {
+            refreshHabits()
+        }
+        bottomSheet.setOnHabitEditedListener {
             refreshHabits()
         }
         bottomSheet.show(parentFragmentManager, "HabitDetailsBottomSheet")
